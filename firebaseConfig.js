@@ -1,15 +1,17 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { REACT_APP_APIKEY, REACT_APP_AUTHDOMAIN, REACT_APP_PROJECT_ID, REACT_APP_STORAGEBUCKET, REACT_APP_MESSAGINGSENDER_ID, REACT_APP_APP_ID, REACT_APP_MEASUREMENT_ID } from '@env';
+
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAhRpIdHKZk_H9Jkp-In9Pc0YgB01pnnQE",
-    authDomain: "uw-marketplace-ebe58.firebaseapp.com",
-    projectId: "uw-marketplace-ebe58",
-    storageBucket: "uw-marketplace-ebe58.firebasestorage.app",
-    messagingSenderId: "869271955900",
-    appId: "1:869271955900:web:5e86631328a20eaf1f23b9",
-    measurementId: "G-D0QTKLFW34"
-  };
+  apiKey: REACT_APP_APIKEY,
+  authDomain: REACT_APP_AUTHDOMAIN,
+  projectId: REACT_APP_PROJECT_ID,
+  storageBucket: REACT_APP_STORAGEBUCKET,
+  messagingSenderId: REACT_APP_MESSAGINGSENDER_ID,
+  appId: REACT_APP_APP_ID,
+  measurementId: REACT_APP_MEASUREMENT_ID
+};
 
-  const app = initializeApp(firebaseConfig);
-  export const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
