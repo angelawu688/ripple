@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import { userContext } from '../../context/UserContext'
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const InfoOnboarding = ({ navigation, route }) => {
     const { email } = route.params
@@ -13,7 +14,6 @@ const InfoOnboarding = ({ navigation, route }) => {
         if (!email || !input) { // checking logic
             setErrorMessage('input an email!')
         }
-
         setUser(email) // this will change us to logged in navigator
 
     }

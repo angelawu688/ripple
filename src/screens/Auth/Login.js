@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');

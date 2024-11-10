@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const SignUp = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -12,12 +13,19 @@ const SignUp = ({ navigation }) => {
   const handleSignUp = async () => {
     try {
       const auth = getAuth();
+      const db = getFirestore();
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      setUser(userCredential.user);
+      const user = userCredential.user;
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        createdAt: new Date(),
+      });
+      setUser(user);
     } catch (error) {
       setError(error.message);
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
