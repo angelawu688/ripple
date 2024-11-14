@@ -15,7 +15,10 @@ const MainNavigator = () => {
   }
 
   return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+    <RootStack.Navigator screenOptions={{
+      contentStyle: { backgroundColor: 'white' }, // Set background for all screens
+      headerShown: false,
+    }}>
       {!user ? (
         <RootStack.Screen name="Auth" component={AuthStackNavigator} />
       ) : (

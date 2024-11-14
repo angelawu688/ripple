@@ -21,7 +21,7 @@ const SignUp = ({ navigation }) => {
         email: user.email,
         createdAt: new Date(),
       });
-      setUser(user);
+      setUser(user); // this will navigate to the home page
     } catch (error) {
       setError(error.message);
     }

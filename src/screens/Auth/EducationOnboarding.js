@@ -1,18 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { userContext } from '../../context/UserContext'
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
-import { Syne_700Bold } from '@expo-google-fonts/syne';
-import { Inter_400Regular } from '@expo-google-fonts/inter';
 
 
-
-
-const EmailOnboarding = ({ navigation }) => {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('');
+const EducationOnboarding = ({ navigation, route }) => {
+    const { email, password } = route.params
+    const [major, setMajor] = useState('')
+    const [concentration, setConcentration] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
-
 
     // focus the top text field on component mount
     const inputRef = useRef(null);
@@ -24,59 +21,51 @@ const EmailOnboarding = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-
-
             <Text style={styles.headerText}>
-                What's your email?
+                Education
             </Text>
 
             <View style={{ height: 30, }}>
                 {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
             </View>
 
-
             <View style={styles.lowerContainer}>
                 <View style={{ width: '100%', }}>
                     <Text style={styles.inputHeader}>
-                        Enter UW NetID
+                        Major
                     </Text>
                     <TextInput
-                        ref={inputRef} // this is the reference to the input field
-                        placeholder='Email'
-                        value={email}
-                        onChangeText={setEmail}
+                        ref={inputRef}
                         style={styles.input}
-                        keyboardType='email-address'
-                        autoCapitalize='none'
-                        autoCorrect='none'
+                        placeholder=''
+                        value={major}
+                        onChangeText={setMajor}
                     />
                 </View>
 
                 <View style={{ width: '100%' }}>
                     <Text style={styles.inputHeader}>
-                        Password
+                        Concentration
                     </Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Password"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
+                        placeholder=""
+                        value={concentration}
+                        onChangeText={setConcentration}
                     />
                 </View>
             </View>
-
 
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
                 style={styles.button}
                 onPress={() => {
-                    if (!email) {
-                        setErrorMessage('Input an email!')
-                    } else if (!password) {
-                        setErrorMessage('Input a password!')
+                    if (!major) {
+                        setErrorMessage('Input a major!')
+                    } else if (!concentration) {
+                        setErrorMessage('Input a concentration!')
                     } else {
-                        navigation.navigate('EmailConfirmation', { email: email, password: password })
+                        navigation.navigate('EducationOnboarding', { email: email, password: password, major: major, concentration: concentration })
                     }
                 }}
             >
@@ -87,7 +76,8 @@ const EmailOnboarding = ({ navigation }) => {
     )
 }
 
-export default EmailOnboarding;
+
+export default EducationOnboarding;
 
 const styles = StyleSheet.create({
     container: {

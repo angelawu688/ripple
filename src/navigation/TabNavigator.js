@@ -39,6 +39,7 @@ const TabNavigator = () => {
                             : 'person-outline';
                     }
                     return <Ionicons name={iconName} size={size} color={color} />
+
                 },
 
 
@@ -48,7 +49,8 @@ const TabNavigator = () => {
                 tabBarShowLabel: false,
                 tabBarStyle: {
                     backgroundColor: colors.lightgray
-                }
+                },
+
             })}
         >
             <Tab.Screen name="MessagesStack"
