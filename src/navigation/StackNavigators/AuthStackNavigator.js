@@ -19,55 +19,64 @@ const AuthStackNavigator = ({ navigation }) => {
     <AuthStack.Navigator
       screenOptions={{
         contentStyle: { backgroundColor: 'white' },
-        headerShadowVisible: false, // applied here
+        headerShadowVisible: false,
       }}
     >
       <AuthStack.Screen
         name="Login"
         component={Login}
-        options={{
+        options={({ navigation }) => ({
           headerTitle: () => <Logo />,
-        }}
+        })}
       />
       <AuthStack.Screen
         name="EmailOnboarding"
         component={EmailOnboarding}
-        options={{
+        options={({ navigation }) => ({
           headerTitle: () => <Logo />,
-          headerLeft: () => (<TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={24} color="#000" />
-          </TouchableOpacity>)
-        }}
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity>
+          )
+        })}
       />
       <AuthStack.Screen
         name="EmailConfirmation"
         component={EmailConfirmation}
-        options={{
+        options={({ navigation }) => ({
           headerTitle: () => <Logo />,
-          headerLeft: () => (<TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={24} color="#000" />
-          </TouchableOpacity>)
-        }}
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity>
+          )
+        })}
+      />
+
+      <AuthStack.Screen
+        name="EducationOnboarding"
+        component={EducationOnboarding}
+        options={({ navigation }) => ({
+          headerTitle: () => <Logo />,
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity>
+          )
+        })}
       />
       <AuthStack.Screen
         name="InfoOnboarding"
         component={InfoOnboarding}
-        options={{
+        options={({ navigation }) => ({
           headerTitle: () => <Logo />,
-          headerLeft: () => (<TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={24} color="#000" />
-          </TouchableOpacity>)
-        }}
-      />
-      <AuthStack.Screen
-        name="EducationOnboarding"
-        component={EducationOnboarding}
-        options={{
-          headerTitle: () => <Logo />,
-          headerLeft: () => (<TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={24} color="#000" />
-          </TouchableOpacity>)
-        }}
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity>
+          )
+        })}
       />
     </AuthStack.Navigator >
   );

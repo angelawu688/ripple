@@ -48,7 +48,7 @@ const EmailOnboarding = ({ navigation }) => {
                         style={styles.input}
                         keyboardType='email-address'
                         autoCapitalize='none'
-                        autoCorrect='none'
+                        autoCorrect={false}
                     />
                 </View>
 

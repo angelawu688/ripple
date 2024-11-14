@@ -19,6 +19,10 @@ const MarketplaceStackNavigator = ({ navigation }) => {
         <MarketplaceStack.Navigator
             initialRouteName="Marketplace"
             options={{ headerShown: false }}
+            screenOptions={{
+                contentStyle: { backgroundColor: 'white' },
+                headerShadowVisible: false, // applied here
+            }}
 
         >
             <MarketplaceStack.Screen
@@ -32,7 +36,7 @@ const MarketplaceStackNavigator = ({ navigation }) => {
                         <TouchableOpacity
                             onPress={() => navigation.navigate('Search')}
                         >
-                            <Ionicons name="search" size={24} color="#000" />
+                            <Ionicons name="search" size={30} color="#000" />
                         </TouchableOpacity>
                     )
                 }}

@@ -42,6 +42,10 @@ const TabNavigator = () => {
 
                 },
 
+                contentStyle: { backgroundColor: 'white' },
+                headerShadowVisible: false, // applied here
+
+
 
                 // styling for all of the tabs, generally: 
                 tabBarActiveTintColor: colors.black,
@@ -53,8 +57,8 @@ const TabNavigator = () => {
 
             })}
         >
-            <Tab.Screen name="MessagesStack"
-                component={MessagesStackNavigator}
+            <Tab.Screen name="ProfileStack"
+                component={ProfileStackNavigator}
                 options={{
                     headerShown: false
                 }}
@@ -65,8 +69,9 @@ const TabNavigator = () => {
                     headerShown: false
                 }}
             />
-            <Tab.Screen name="ProfileStack"
-                component={ProfileStackNavigator}
+
+            <Tab.Screen name="MessagesStack"
+                component={MessagesStackNavigator}
                 options={{
                     headerShown: false
                 }}

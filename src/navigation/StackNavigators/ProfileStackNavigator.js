@@ -7,6 +7,8 @@ import BackArrow from "../../components/BackArrow";
 import SoldItems from "../../screens/Profile/SoldItems";
 import YourListings from "../../screens/Profile/YourListings";
 import SavedItems from "../../screens/Profile/SavedItems";
+import Analytics from "../../screens/Profile/Analytics";
+import { Text } from "react-native";
 
 
 const ProfileStack = createNativeStackNavigator();
@@ -16,6 +18,10 @@ const ProfileStackNavigator = () => {
         <ProfileStack.Navigator
             initialRouteName="Profile"
             options={{ headerShown: false }}
+            screenOptions={{
+                contentStyle: { backgroundColor: 'white' },
+                headerShadowVisible: false,
+            }}
 
         >
             <ProfileStack.Screen
@@ -32,7 +38,8 @@ const ProfileStackNavigator = () => {
                 component={PersonalInformation}
                 options={{
                     headerTitle: () => (
-                        <Logo />
+                        <Text style={{ fontFamily: 'inter', fontWeght: '600', fontSize: 18 }}>Account Center</Text>
+                        // <Logo />
                     ),
                     headerLeft: () => <BackArrow />
                 }}
@@ -62,6 +69,17 @@ const ProfileStackNavigator = () => {
             <ProfileStack.Screen
                 name="SoldItems"
                 component={SoldItems}
+                options={{
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+                    headerLeft: () => <BackArrow />
+                }}
+            />
+
+            <ProfileStack.Screen
+                name="Analytics"
+                component={Analytics}
                 options={{
                     headerTitle: () => (
                         <Logo />

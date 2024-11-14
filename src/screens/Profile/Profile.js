@@ -4,10 +4,14 @@ import { userContext } from "../../context/UserContext";
 import { Ionicons } from '@expo/vector-icons';
 
 
-
 const Profile = ({ navigation }) => {
     const { user, setUser } = useContext(userContext);
     const handleLogout = () => {
+        setUser(null)
+    }
+
+    const handleDeleteAccount = () => {
+        console.log('deleted user (not actually)')
         setUser(null)
     }
     return (
@@ -63,11 +67,31 @@ const Profile = ({ navigation }) => {
 
                 <TouchableOpacity
                     style={styles.profileCard}
+                    onPress={(() => navigation.navigate('Analytics'))}
+                >
+                    <Ionicons name={'analytics-outline'} size={24} color={'black'} style={styles.icon} />
+                    <Text style={styles.cardText}>
+                        Analytics
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.profileCard}
                     onPress={(() => handleLogout())}
                 >
                     <Ionicons name={'exit-outline'} size={24} color={'black'} style={styles.icon} />
                     <Text style={styles.cardText}>
-                        Log out
+                        Log Out
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.profileCard}
+                    onPress={(() => handleDeleteAccount())}
+                >
+                    <Ionicons name={'trash-outline'} size={24} color={'black'} style={styles.icon} />
+                    <Text style={styles.cardText}>
+                        Delete Account
                     </Text>
                 </TouchableOpacity>
 

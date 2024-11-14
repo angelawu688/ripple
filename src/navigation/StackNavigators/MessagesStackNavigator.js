@@ -14,6 +14,10 @@ const MessagesStackNavigator = () => {
         <MessagesStack.Navigator
             initialRouteName="Profile"
             options={{ headerShown: false }}
+            screenOptions={{
+                contentStyle: { backgroundColor: 'white' },
+                headerShadowVisible: false,
+            }}
 
         >
             <MessagesStack.Screen

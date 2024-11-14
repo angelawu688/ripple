@@ -10,6 +10,9 @@ const Marketplace = ({ navigation }) => {
     const [listings, setListings] = useState(testPosts)
     const [isLoading, setIsLoading] = useState(true)
 
+    // possible options are foryou, friends, sell, search
+    const [selectedOption, setSelectedOption] = useState('foryou')
+
     useEffect(() => {
         // grab the posts on component mount?
         // use context?
@@ -24,14 +27,19 @@ const Marketplace = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.upperContainer}>
-                <TouchableOpacity style={{ marginRight: 45, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, padding: 6, paddingHorizontal: 14, }}>
+                <TouchableOpacity
+                    onClick={() => setSelectedOption('foryou')}
+
+                    style={{ marginRight: 45, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, padding: 6, paddingHorizontal: 14, }}>
                     <Text style={styles.tabTextStyle}>
                         For you
                     </Text>
                 </TouchableOpacity>
 
+                <TouchableOpacity
+                    onClick={() => setSelectedOption('sell')}
 
-                <TouchableOpacity onPress={() => navigation.navigate('SellScreen')}
+                    // onPress={() => navigation.navigate('SellScreen')}
 
                     style={{ marginRight: 45, }}>
                     <Text style={styles.tabTextStyle}>
@@ -39,7 +47,21 @@ const Marketplace = ({ navigation }) => {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={{ marginRight: 45, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity
+                    onClick={() => setSelectedOption('friends')}
+
+                    // onPress={() => navigation.navigate('SellScreen')}
+
+                    style={{ marginRight: 45, }}>
+                    <Text style={styles.tabTextStyle}>
+                        Sell
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    onClick={() => setSelectedOption('')}
+
+                    style={{ marginRight: 45, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 
                     <Text style={styles.tabTextStyle}>
                         Categories
