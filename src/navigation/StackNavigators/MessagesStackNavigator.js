@@ -1,9 +1,11 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MessagesOverview from "../../screens/Messages/MessagesOverview";
 import Conversation from "../../screens/Messages/Conversation";
+import { Ionicons } from '@expo/vector-icons';
 
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
+import { TouchableOpacity } from "react-native";
 
 
 
@@ -12,7 +14,7 @@ const MessagesStack = createNativeStackNavigator();
 const MessagesStackNavigator = () => {
     return (
         <MessagesStack.Navigator
-            initialRouteName="Profile"
+            initialRouteName="MessagesOverview"
             options={{ headerShown: false }}
             screenOptions={{
                 contentStyle: { backgroundColor: 'white' },
@@ -34,12 +36,16 @@ const MessagesStackNavigator = () => {
             <MessagesStack.Screen
                 name="Conversation"
                 component={Conversation}
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: () => (
                         <Logo />
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
         </MessagesStack.Navigator>
     )

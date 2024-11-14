@@ -19,7 +19,7 @@ const ListingCard = ({ price, title, img, sold }) => {
             {img ? (
                 <Image src={img} />
             ) : (
-                <View style={{ borderRadius: 12, backgroundColor: 'gray', width: '100%', height: width, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={{ borderRadius: 12, backgroundColor: '#F2F0F0', width: '100%', height: width, justifyContent: 'center', alignItems: 'center' }}>
                     {sold && (
                         <Text style={{ color: 'black', fontSize: 70, opacity: 0.4, fontWeight: '900' }}>SOLD</Text>
                     )}

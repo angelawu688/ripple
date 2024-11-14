@@ -1,14 +1,16 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import PersonalInformation from '../../screens/Profile/PersonalInformation'
 import Profile from '../../screens/Profile/Profile'
+import { Ionicons } from '@expo/vector-icons';
+
 
 import Logo from '../../components/Logo'
-import BackArrow from "../../components/BackArrow";
 import SoldItems from "../../screens/Profile/SoldItems";
 import YourListings from "../../screens/Profile/YourListings";
 import SavedItems from "../../screens/Profile/SavedItems";
 import Analytics from "../../screens/Profile/Analytics";
-import { Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import ListingScreen from "../../screens/Marketplace/ListingScreen";
 
 
 const ProfileStack = createNativeStackNavigator();
@@ -16,7 +18,7 @@ const ProfileStack = createNativeStackNavigator();
 const ProfileStackNavigator = () => {
     return (
         <ProfileStack.Navigator
-            initialRouteName="Profile"
+            // initialRouteName="Profile"
             options={{ headerShown: false }}
             screenOptions={{
                 contentStyle: { backgroundColor: 'white' },
@@ -33,62 +35,108 @@ const ProfileStackNavigator = () => {
                     )
                 }}
             />
+
             <ProfileStack.Screen
                 name="PersonalInformation"
                 component={PersonalInformation}
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: () => (
                         <Text style={{ fontFamily: 'inter', fontWeght: '600', fontSize: 18 }}>Account Center</Text>
                         // <Logo />
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
 
 
             <ProfileStack.Screen
                 name="SavedItems"
                 component={SavedItems}
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: () => (
-                        <Logo />
+                        <Text style={styles.title}>Saved Listings</Text>
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
             <ProfileStack.Screen
                 name="YourListings"
                 component={YourListings}
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: () => (
-                        <Logo />
+                        <Text style={styles.title}>Your listings</Text>
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
             <ProfileStack.Screen
                 name="SoldItems"
                 component={SoldItems}
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: () => (
-                        <Logo />
+                        <Text style={styles.title}>Sold listings</Text>
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
 
             <ProfileStack.Screen
                 name="Analytics"
                 component={Analytics}
-                options={{
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Text style={styles.title}>Analytics</Text>
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
+
+            <ProfileStack.Screen
+                name="ListingScreen"
+                component={ListingScreen}
+                options={({ navigation }) => ({
                     headerTitle: () => (
                         <Logo />
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
+
+
         </ProfileStack.Navigator>
     )
 }
 
 export default ProfileStackNavigator
+
+const styles = StyleSheet.create({
+    title: {
+        fontSize: 18,
+        fontFamily: 'inter',
+        fontWeight: '500'
+    }
+})
