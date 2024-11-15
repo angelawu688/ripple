@@ -8,13 +8,14 @@ import SellScreen from '../../screens/Marketplace/SellScreen'
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
+import CreateListing from "../../screens/Marketplace/MarketplaceLists/CreateListing";
 
 
 
 const MarketplaceStack = createNativeStackNavigator();
 
-const MarketplaceStackNavigator = ({ navigation }) => {
+const MarketplaceStackNavigator = () => {
     return (
         <MarketplaceStack.Navigator
             initialRouteName="Marketplace"
@@ -32,47 +33,68 @@ const MarketplaceStackNavigator = ({ navigation }) => {
                     headerTitle: () => (
                         <Logo />
                     ),
-                    headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Search')}
-                        >
-                            <Ionicons name="search" size={30} color="#000" />
-                        </TouchableOpacity>
-                    )
+
                 }}
             />
             <MarketplaceStack.Screen
                 name="Search"
                 component={Search}
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: () => (
                         <Logo />
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
 
             {/* ensure that userID is passed in as a prop */}
             <MarketplaceStack.Screen
                 name="ListingScreen"
                 component={ListingScreen}
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: () => (
                         <Logo />
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
 
             <MarketplaceStack.Screen
                 name="SellScreen"
                 component={SellScreen}
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: () => (
                         <Logo />
                     ),
-                    headerLeft: () => <BackArrow />
-                }}
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
+
+            <MarketplaceStack.Screen
+                name="CreateListing"
+                component={CreateListing}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Text style={{ fontFamily: 'inter', fontSize: 18, fontWeight: '500' }}> Listing </Text>
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
         </MarketplaceStack.Navigator>
     )

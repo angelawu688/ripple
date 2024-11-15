@@ -8,7 +8,7 @@ const PostCard = ({ img, price, title, id }) => {
             {img ? (
                 <Image />
             ) : (
-                <View style={{ backgroundColor: '#F2F0F0', width: 50, height: 50 }} />
+                <View style={{ backgroundColor: 'gray', width: 50, height: 50 }} />
             )}
         </View>
     )

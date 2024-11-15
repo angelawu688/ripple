@@ -39,7 +39,7 @@ const Profile = ({ navigation }) => {
 
 
                     <Text style={styles.cardText}>
-                        Saved Items
+                        Saved Listings
                     </Text>
                 </TouchableOpacity>
 

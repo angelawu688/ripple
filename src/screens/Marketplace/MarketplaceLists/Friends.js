@@ -1,35 +1,18 @@
-import { useContext, useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
-import { userContext } from '../../context/UserContext'
-import FullLoadingScreen from '../shared/FullLoadingScreen'
-import { FlatList } from 'react-native'
-import ListingCard from '../../components/ListingCard'
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
+import ListingCard from "../../../components/ListingCard"
 
-const YourListings = ({ navigation }) => {
-    const testListings = [
-        { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
-    ]
-    const { user } = useContext(userContext)
-    const [yourListings, setYourListings] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
-        setIsLoading(true)
-        try {
-            // grab the users saved listings on component mount
-            // for now is test listings
-            setYourListings(testListings)
-        } catch (e) {
-            setErrorMessage(e.message)
-        } finally {
-            setIsLoading(false)
-        }
-    }, [])
-
-    if (isLoading) {
-        return <FullLoadingScreen />
+const Friends = ({ listings, navigation }) => {
+    if (!listings) {
+        return (
+            <View style={{ display: 'flex', height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                <Text>
+                    Posts from your friends will show up here!
+                </Text>
+            </View>
+        )
     }
+
     return (
         <FlatList
             style={{ width: '99%', alignSelf: 'center' }}
@@ -39,7 +22,7 @@ const YourListings = ({ navigation }) => {
             }}
             ListHeaderComponent={null} // blank for now, this is where a header would go.
             numColumns={2} // this is how we put them side by side
-            data={yourListings}
+            data={listings}
             renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
                 const listingID = listing.listingID
                 return (
@@ -65,6 +48,7 @@ const YourListings = ({ navigation }) => {
 
         />
     )
+
 }
 
-export default YourListings;
+export default Friends

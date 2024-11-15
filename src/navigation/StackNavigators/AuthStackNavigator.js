@@ -14,7 +14,7 @@ import EmailConfirmation from "../../screens/Auth/EmailConfirmation";
 
 const AuthStack = createNativeStackNavigator();
 
-const AuthStackNavigator = ({ navigation }) => {
+const AuthStackNavigator = () => {
   return (
     <AuthStack.Navigator
       screenOptions={{
