@@ -50,8 +50,8 @@ const Marketplace = ({ navigation }) => {
     const [selectedOption, setSelectedOption] = useState('foryou')
 
     useEffect(() => {
-        // grab the posts on component mount?
-        // use context?
+        // grab the posts on component mount
+        // we can memoize to prevent more renders
         if (listings) {
             setIsLoading(false)
         } else {
@@ -62,6 +62,7 @@ const Marketplace = ({ navigation }) => {
     const renderSelectedOption = () => {
         // NOTE:
         // just pass in undefined to test the empty case
+        // this will throw an error for now
         switch (selectedOption) {
             case 'foryou':
                 return <ForYou listings={listings} navigation={navigation} />
@@ -81,6 +82,7 @@ const Marketplace = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.upperContainer}>
 
+                {/* top menu bar */}
                 <TouchableOpacity
                     onPress={() => setSelectedOption('foryou')}
                     style={[selectedOption === 'foryou' && styles.shadow, styles.topTitle]}>
@@ -107,8 +109,6 @@ const Marketplace = ({ navigation }) => {
                     </Text>
                 </TouchableOpacity>
 
-
-
                 <TouchableOpacity
                     onPress={() => setSelectedOption('search')}
                     style={[selectedOption === 'search' && styles.shadow, styles.topTitle]}>
@@ -119,7 +119,9 @@ const Marketplace = ({ navigation }) => {
 
             </View>
 
-            {selectedOption !== 'sell' && <View style={styles.collegeHeaderContainer}>
+
+            {/* college header */}
+            {selectedOption !== 'sell' && selectedOption !== 'search' && <View style={styles.collegeHeaderContainer}>
 
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ marginRight: 8, }}><Ionicons name={'location'} size={24} color={'black'} /></View>
@@ -131,14 +133,8 @@ const Marketplace = ({ navigation }) => {
             }
 
 
-            {/* this is the flatlist for the posts */}
 
             {isLoading ? <ActivityIndicator size="large" /> : renderSelectedOption()}
-
-            {isLoading && <ActivityIndicator size={'large'} />}
-
-            {selectedOption === 'foryou' && ForYou}
-
         </View>
     )
 }

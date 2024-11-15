@@ -26,6 +26,7 @@ const ForYou = ({ listings, navigation }) => {
             ListHeaderComponent={null} // blank for now, this is where a header would go.
             numColumns={2} // this is how we put them side by side
             data={listings}
+            showsVerticalScrollIndicator={false}
             renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
                 const listingID = listing.listingID
                 return (
