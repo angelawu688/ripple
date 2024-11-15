@@ -2,7 +2,6 @@ import React, { useState, useContext } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Touchable, TouchableOpacity } from 'react-native';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
-import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const Login = ({ navigation }) => {
   // TODO IMPLEMENT FORGOT PASSWORD
@@ -94,11 +93,6 @@ const Login = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
   input: {
     backgroundColor: 'white',
     borderRadius: 12,
