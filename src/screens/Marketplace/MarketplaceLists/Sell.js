@@ -49,7 +49,7 @@ const Sell = ({ activeListings, navigation }) => {
                 onEndReachedThreshold={null}
                 onEndReached={null}
             />) : (
-                <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center', height: '70%', width: '70%', alignSelf: 'center' }}>
+                <View style={{  justifyContent: 'center', alignItems: 'center', height: '70%', width: '70%', alignSelf: 'center' }}>
                     <Text style={{ fontSize: 16, fontFamily: 'inter', fontWeight: '600', marginBottom: 12 }}>
                         Ready to sell?
                     </Text>
