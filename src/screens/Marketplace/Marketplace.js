@@ -1,4 +1,5 @@
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../colors'

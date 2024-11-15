@@ -37,6 +37,10 @@ const InfoOnboarding = ({ navigation, route }) => {
                 uid: user.uid,
                 email: user.email,
                 createdAt: new Date(),
+                major: major,
+                concentration: concentration,
+                gradYear: gradYear
+                // profile photo requires firebase storage
             });
             setUser(user); // this will navigate to the home page
 
