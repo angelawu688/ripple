@@ -4,14 +4,45 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Syne_700Bold } from '@expo-google-fonts/syne';
 import { Inter_400Regular } from '@expo-google-fonts/inter';
-
-
-
+import {doc, getFirestore, setDoc} from "firebase/firestore";
+import {createUserWithEmailAndPassword, getAuth, sendEmailVerification} from "firebase/auth";
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('')
+
+    // TODO ADD LOGIC IF THEY LEAVE IN THE MIDDLE OF ONBOARDING
+    const handleEmailConfirm = (user, navigation) => {
+        const intervalId = setInterval(async () => {
+            console.log("reloading status");
+            await user.reload(); // Reload user data
+            if (user.emailVerified) {
+                console.log('user verified');
+                clearInterval(intervalId); // Stop checking
+                navigation.navigate('EducationOnboarding', { email: email });
+            } else {
+                console.log('user not verified');
+                setErrorMessage('Verify your email...');
+            }
+        }, 5000);
+    }
+
+    const handleSendEmail = async () => {
+        try {
+            const auth = getAuth();
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            // console.log('user created');
+            const user = userCredential.user;
+            // navigation.navigate('Login');
+            await sendEmailVerification(user);
+            setErrorMessage('Verify your email');
+            // console.log("verification email sent");
+            handleEmailConfirm(user, navigation);
+        } catch (error) {
+            setErrorMessage(error.message);
+        }
+    };
 
 
     // focus the top text field on component mount
@@ -76,7 +107,7 @@ const EmailOnboarding = ({ navigation }) => {
                     } else if (!password) {
                         setErrorMessage('Input a password!')
                     } else {
-                        navigation.navigate('EmailConfirmation', { email: email, password: password })
+                        handleSendEmail();
                     }
                 }}
             >
