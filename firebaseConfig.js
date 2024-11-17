@@ -16,10 +16,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-// export const auth = getAuth(app);
 
 // this allows us to have persistence over sessions
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 })
+// export const auth = getAuth(app);
 export const db = getFirestore(app);

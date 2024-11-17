@@ -2,8 +2,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import PersonalInformation from '../../screens/Profile/PersonalInformation'
 import Profile from '../../screens/Profile/Profile'
 import { Ionicons } from '@expo/vector-icons';
-
-
 import Logo from '../../components/Logo'
 import SoldItems from "../../screens/Profile/SoldItems";
 import YourListings from "../../screens/Profile/YourListings";
