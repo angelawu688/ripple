@@ -1,3 +1,5 @@
+// screen not needed, use InfoOnboarding for sign up
+
 import React, { useState, useContext } from 'react';
 import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';

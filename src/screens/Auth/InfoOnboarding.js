@@ -1,16 +1,20 @@
 import { useEffect, useContext } from 'react'
 import { useRef, useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    signInWithEmailAndPassword
+} from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 
 
-
 const InfoOnboarding = ({ navigation, route }) => {
-    const { email, major, concentration, password } = route.params
+    const { email, major, concentration } = route.params
     const [gradYear, setGradYear] = useState('')
     const [profPhoto, setProfPhoto] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
@@ -31,20 +35,21 @@ const InfoOnboarding = ({ navigation, route }) => {
         try {
             const auth = getAuth();
             const db = getFirestore();
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
                 email: user.email,
                 createdAt: new Date(),
-                major: major,
-                concentration: concentration,
-                gradYear: gradYear
+                // major: major,
+                // concentration: concentration,
+                // gradYear: gradYear
                 // profile photo requires firebase storage
             });
             setUser(user); // this will navigate to the home page
 
         } catch (error) {
+            console.log(error.message);
             setErrorMessage(error.message);
         } finally {
             setIsLoading(false)

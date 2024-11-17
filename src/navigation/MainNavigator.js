@@ -19,7 +19,7 @@ const MainNavigator = () => {
       contentStyle: { backgroundColor: 'white' }, // Set background for all screens
       headerShown: false,
     }}>
-      {!user ? (
+      {!user || (user && !user.emailVerified) ? (
         <RootStack.Screen name="Auth" component={AuthStackNavigator} />
       ) : (
         <RootStack.Screen name="Main" component={TabNavigator} />
