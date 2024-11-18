@@ -4,11 +4,12 @@ import SignUp from "../../screens/Auth/SignUp";
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
 import EmailOnboarding from "../../screens/Auth/EmailOnboarding";
-import EducationOnboarding from "../../screens/Auth/EducationOnboarding";
 import InfoOnboarding from "../../screens/Auth/InfoOnboarding";
+import EducationOnboarding from "../../screens/Auth/EducationOnboarding";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import EmailConfirmation from "../../screens/Auth/EmailConfirmation";
+import LandingPage from "../../screens/Auth/LandingPage";
 
 
 
@@ -23,9 +24,22 @@ const AuthStackNavigator = () => {
       }}
     >
       <AuthStack.Screen
+        name="LandingPage"
+        component={LandingPage}
+        options={({ navigation }) => ({
+          headerTitle: () => <Logo />,
+        })}
+      />
+
+      <AuthStack.Screen
         name="Login"
         component={Login}
         options={({ navigation }) => ({
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity>
+          ),
           headerTitle: () => <Logo />,
         })}
       />

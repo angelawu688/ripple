@@ -14,36 +14,29 @@ const Profile = ({ navigation }) => {
         console.log('deleted user (not actually)')
         setUser(null)
     }
+
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.profileCardContainer}
                 onPress={() => navigation.navigate('PersonalInformation')}
-
             >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', height: 50 }}>
                     {/* profile icon placeholder */}
-                    <View style={{ borderRadius: 50, width: 45, height: 45, backgroundColor: 'gray', marginRight: 10 }} />
-                    <Text style={{ fontSize: 18 }}>
+                    <View style={{ borderRadius: 50, width: 36, height: 36, backgroundColor: 'gray', marginRight: 10 }} />
+                    <Text style={{ fontSize: 18, marginLeft: 6 }}>
                         Account Center
                     </Text>
                 </View>
-
                 <Ionicons name={'chevron-forward'} size={24} color={'black'} />
-
-
             </TouchableOpacity>
 
 
             <View style={styles.cardsContainer}>
-
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={() => navigation.navigate('SavedItems')}
                 >
-
                     <Ionicons name={'bookmark-outline'} size={24} color={'black'} style={styles.icon} />
-
-
                     <Text style={styles.cardText}>
                         Saved Listings
                     </Text>
@@ -126,14 +119,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '90%',
-        marginBottom: 35,
+        marginBottom: 40,
         marginTop: 40,
         borderWidth: 1,
         borderRadius: 12,
         padding: 8,
         borderColor: '#F2F0F0',
-
-
+        height: 60
     },
     cardText: {
         fontSize: 18,

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Touchable, TouchableOpacity } from 'react-native';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const Login = ({ navigation }) => {
   // TODO IMPLEMENT FORGOT PASSWORD
@@ -9,6 +10,7 @@ const Login = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const { setUser } = useContext(userContext);
+  const [secureTextEntry, setSecureTextEntry] = useState(true)
 
   const handleLogin = async () => {
     try {
@@ -20,10 +22,14 @@ const Login = ({ navigation }) => {
     }
   };
 
+  const toggle = () => {
+    setSecureTextEntry(!secureTextEntry)
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.upperText}>
-        Welcome!
+        Welcome back!
       </Text>
 
       <View style={{ height: 30, }}>
@@ -56,8 +62,16 @@ const Login = ({ navigation }) => {
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={secureTextEntry}
           />
+          <TouchableOpacity onPress={toggle}
+            style={{
+              width: 40, height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: 2,
+              // top: errorMessage ? (88) : (71) 
+              top: 28
+            }}>
+            {secureTextEntry ? (<Ionicons name='eye-off' size={24} color={'black'} />) : (<Ionicons name='eye' size={24} color={'black'} />)}
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -71,7 +85,7 @@ const Login = ({ navigation }) => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => navigation.navigate('EmailOnboarding')}
         hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
         style={styles.button}
@@ -79,7 +93,7 @@ const Login = ({ navigation }) => {
         <Text style={styles.buttonText}>
           Sign up
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity
         onPress={() => { console.log('FORGOT PASSWORD') }}>

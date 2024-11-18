@@ -1,13 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, AppState } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
-import { Syne_700Bold } from '@expo-google-fonts/syne';
-import { Inter_400Regular } from '@expo-google-fonts/inter';
-import { doc, getFirestore, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
-import { RotationGestureHandler } from 'react-native-gesture-handler';
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')
@@ -18,6 +13,7 @@ const EmailOnboarding = ({ navigation }) => {
     const [verifiedStatus, setVerifiedStatus] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false)
+    const [secureTextEntry, setSecureTextEntry] = useState(true)
 
     // this allows us to track if the app is in the background or foreground
     const isMounted = useRef(true);
@@ -32,6 +28,9 @@ const EmailOnboarding = ({ navigation }) => {
         }
     }, [])
 
+    const toggle = () => {
+        setSecureTextEntry(!secureTextEntry)
+    }
 
     // listener for auth changes
     useEffect(() => {
@@ -135,7 +134,7 @@ const EmailOnboarding = ({ navigation }) => {
                 const refreshedUser = auth.currentUser;
                 if (refreshedUser?.emailVerified) {
                     setIsModalVisible(false);
-                    navigation.navigate('EducationOnboarding', { email, password });
+                    navigation.navigate('EducationOnboarding', { email: email, password: password });
                 } else {
                     setErrorMessage('Email not verified yet. Please check your inbox.');
                 }
@@ -205,6 +204,7 @@ const EmailOnboarding = ({ navigation }) => {
                         keyboardType='email-address'
                         autoCapitalize='none'
                         autoCorrect={false}
+
                     />
                 </View>
 
@@ -220,14 +220,22 @@ const EmailOnboarding = ({ navigation }) => {
                             setPassword(text)
                             setErrorMessage('')
                         }}
-                        secureTextEntry
+                        secureTextEntry={secureTextEntry}
                     />
+                    <TouchableOpacity onPress={toggle}
+                        style={{
+                            width: 40, height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: 2,
+                            // top: errorMessage ? (88) : (71) 
+                            top: 28
+                        }}>
+                        {secureTextEntry ? (<Ionicons name='eye-off' size={24} color={'black'} />) : (<Ionicons name='eye' size={24} color={'black'} />)}
+                    </TouchableOpacity>
                 </View>
             </View>
 
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={[styles.button, { backgroundColor: !isLoading && email && password ? 'black' : '#D9D9D9' }]}
+                style={[styles.button, { backgroundColor: !isLoading && email && password.length >= 6 ? 'black' : '#D9D9D9' }]}
 
                 disabled={isLoading || !email || !password} // disabled when loading
                 onPress={() => {
@@ -370,7 +378,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // make back darker
     },
     modalContent: {
         backgroundColor: 'white',
@@ -392,6 +400,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         padding: 10,
         borderRadius: 5,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     modalCloseButtonText: {
         color: 'white',
@@ -399,14 +410,26 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textAlign: 'center',
     },
-    innerModalContainer: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '80%', alignSelf: 'center' },
-    modalButtonContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '75%', marginTop: 20 },
+    innerModalContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '80%',
+        alignSelf: 'center'
+    },
+    modalButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '85%',
+        marginTop: 20,
+        alignItems: 'center'
+    },
     manualCheckButton: {
         backgroundColor: '#f0f0f0',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
-        marginBottom: 10,
     },
 
 

@@ -1,7 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Marketplace from '../../screens/Marketplace/Marketplace'
-import Search from '../../screens/Marketplace/Search'
 import ListingScreen from '../../screens/Marketplace/ListingScreen'
 import SellScreen from '../../screens/Marketplace/SellScreen'
 
@@ -10,6 +9,7 @@ import BackArrow from "../../components/BackArrow";
 import { Ionicons } from '@expo/vector-icons';
 import { Text, TouchableOpacity } from "react-native";
 import CreateListing from "../../screens/Marketplace/MarketplaceLists/CreateListing";
+import UserProfile from "../../screens/Marketplace/UserProfile";
 
 const MarketplaceStack = createNativeStackNavigator();
 
@@ -22,7 +22,6 @@ const MarketplaceStackNavigator = () => {
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false, // applied here
             }}
-
         >
             <MarketplaceStack.Screen
                 name="Marketplace"
@@ -34,20 +33,6 @@ const MarketplaceStackNavigator = () => {
                     ),
 
                 }}
-            />
-            <MarketplaceStack.Screen
-                name="Search"
-                component={Search}
-                options={({ navigation }) => ({
-                    headerTitle: () => (
-                        <Logo />
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    )
-                })}
             />
 
             {/* ensure that userID is passed in as a prop */}
@@ -88,6 +73,18 @@ const MarketplaceStackNavigator = () => {
                     headerTitle: () => (
                         <Text style={{ fontFamily: 'inter', fontSize: 18, fontWeight: '500' }}> Listing </Text>
                     ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
+            <MarketplaceStack.Screen
+                name="UserProfile"
+                component={UserProfile}
+                options={({ navigation }) => ({
+                    headerTitle: () => '',
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Ionicons name="chevron-back" size={24} color="#000" />
