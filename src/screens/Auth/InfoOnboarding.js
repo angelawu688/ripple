@@ -14,7 +14,7 @@ import FullLoadingScreen from '../shared/FullLoadingScreen'
 
 
 const InfoOnboarding = ({ navigation, route }) => {
-    const { email, major, concentration } = route.params
+    const { email, password, major, concentration } = route.params
     const [gradYear, setGradYear] = useState('')
     const [profPhoto, setProfPhoto] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
@@ -41,9 +41,9 @@ const InfoOnboarding = ({ navigation, route }) => {
                 uid: user.uid,
                 email: user.email,
                 createdAt: new Date(),
-                // major: major,
-                // concentration: concentration,
-                // gradYear: gradYear
+                major: major,
+                concentration: concentration,
+                gradYear: gradYear
                 // profile photo requires firebase storage
             });
             setUser(user); // this will navigate to the home page

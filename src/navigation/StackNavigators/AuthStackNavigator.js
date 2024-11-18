@@ -4,8 +4,8 @@ import SignUp from "../../screens/Auth/SignUp";
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
 import EmailOnboarding from "../../screens/Auth/EmailOnboarding";
-import InfoOnboarding from "../../screens/Auth/EducationOnboarding";
-import EducationOnboarding from "../../screens/Auth/InfoOnboarding";
+import EducationOnboarding from "../../screens/Auth/EducationOnboarding";
+import InfoOnboarding from "../../screens/Auth/InfoOnboarding";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import EmailConfirmation from "../../screens/Auth/EmailConfirmation";

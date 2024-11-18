@@ -40,7 +40,7 @@ const EmailOnboarding = ({ navigation }) => {
                 await user.reload();
                 const refreshedUser = auth.currentUser;
                 if (refreshedUser?.emailVerified && email && password) {
-                    navigation.navigate('EducationOnboarding', { email: email })
+                    navigation.navigate('EducationOnboarding', { email: email, password: password })
                 }
             }
         });
@@ -76,7 +76,7 @@ const EmailOnboarding = ({ navigation }) => {
                 if (refreshedUser?.emailVerified && email && password) {
                     // close modal and navigate
                     setIsModalVisible(false);
-                    navigation.navigate('EducationOnboarding', { email });
+                    navigation.navigate('EducationOnboarding', { email: email, password: password });
                 } else {
                     // not verified!
                 }
@@ -135,7 +135,7 @@ const EmailOnboarding = ({ navigation }) => {
                 const refreshedUser = auth.currentUser;
                 if (refreshedUser?.emailVerified) {
                     setIsModalVisible(false);
-                    navigation.navigate('EducationOnboarding', { email });
+                    navigation.navigate('EducationOnboarding', { email, password });
                 } else {
                     setErrorMessage('Email not verified yet. Please check your inbox.');
                 }

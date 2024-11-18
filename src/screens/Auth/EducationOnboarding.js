@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 const EducationOnboarding = ({ navigation, route }) => {
-    const { email } = route.params
+    const { email, password } = route.params
     const [major, setMajor] = useState('')
     const [concentration, setConcentration] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
@@ -65,7 +65,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                     } else if (!concentration) {
                         setErrorMessage('Input a concentration!')
                     } else {
-                        navigation.navigate('InfoOnboarding', { email: email, major: major, concentration: concentration })
+                        navigation.navigate('InfoOnboarding', { email: email, password: password, major: major, concentration: concentration })
                     }
                 }}
             >
