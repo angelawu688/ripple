@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to upload photos.",
+        "NSCameraUsageDescription": "This app requires access to your camera to take photos."
+      }
     },
     "android": {
       "adaptiveIcon": {

@@ -52,9 +52,8 @@ const Search = ({ navigation }) => {
 
     const handleRemoveItemFromRecentSearches = (item) => {
         // backend logic here:
-        const newSearches = (prev) => prev.filter((search) => search !== item)
         // BACKEND LOGIC TO REMOVE IT ON BACKEND AS WELL
-        setRecentSearches(newSearches); // frontend change
+        setRecentSearches((prev) => prev.filter((search) => search !== item));
     }
 
     const handleSearchSelect = (item) => {
@@ -95,7 +94,6 @@ const Search = ({ navigation }) => {
     );
 
     const SearchResults = ({ query, results }) => (
-
         <View>
             {/* this is temp for debugging */}
             <Text style={styles.resultsHeader}>Results for "{query}"</Text>
@@ -134,7 +132,7 @@ const Search = ({ navigation }) => {
                     style={styles.clearButton}
                     onPress={() => {
                         setQuery('');
-                        setDisplayResults(false); // Reset to show recent searches
+                        setDisplayResults(false); // reset to show recent searches
                     }}
                 >
                     <Ionicons name="close-outline" size={24} color="#000" />

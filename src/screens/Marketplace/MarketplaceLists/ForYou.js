@@ -5,12 +5,13 @@ import ListingCard from "../../../components/ListingCard"
 
 
 const ForYou = ({ listings, navigation }) => {
+
     if (!listings) {
         return (
             <View style={{ display: 'flex', height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                <Text>
+                {/* <Text>
                     Posts from your friends will show up here!
-                </Text>
+                </Text> */}
             </View>
         )
     }

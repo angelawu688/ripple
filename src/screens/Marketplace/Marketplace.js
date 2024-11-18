@@ -72,7 +72,7 @@ const Marketplace = ({ navigation }) => {
             case 'sell':
                 return <Sell activeListings={testActiveListings} navigation={navigation} />
             case 'search':
-                return <Search />
+                return <Search navigation={navigation} />
             default:
                 return <Text>Oops! Option not found.</Text>
         }

@@ -20,11 +20,17 @@ const Profile = ({ navigation }) => {
                 onPress={() => navigation.navigate('PersonalInformation')}
 
             >
-                {/* profile icon placeholder */}
-                <View style={{ borderRadius: 50, width: 45, height: 45, backgroundColor: 'gray', marginRight: 10 }} />
-                <Text style={{ fontSize: 18 }}>
-                    FIRSTNAME LASTNAME
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {/* profile icon placeholder */}
+                    <View style={{ borderRadius: 50, width: 45, height: 45, backgroundColor: 'gray', marginRight: 10 }} />
+                    <Text style={{ fontSize: 18 }}>
+                        Account Center
+                    </Text>
+                </View>
+
+                <Ionicons name={'chevron-forward'} size={24} color={'black'} />
+
+
             </TouchableOpacity>
 
 
@@ -118,10 +124,16 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         width: '90%',
         marginBottom: 35,
-        marginTop: 40
+        marginTop: 40,
+        borderWidth: 1,
+        borderRadius: 12,
+        padding: 8,
+        borderColor: '#F2F0F0',
+
+
     },
     cardText: {
         fontSize: 18,
