@@ -50,7 +50,6 @@ const ForYou = ({ listings, navigation }) => {
             // this is where we will put the handling to load more
             onEndReachedThreshold={null}
             onEndReached={null}
-
         />
     )
 }

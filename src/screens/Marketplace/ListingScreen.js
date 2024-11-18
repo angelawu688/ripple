@@ -3,8 +3,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 
 
-const ListingScreen = ({ route }) => {
+const ListingScreen = ({ navigation, route }) => {
     const [width, setWidth] = useState(0);
+    const [isSaved, setIsSaved] = useState(false) // TODO, grab this from the post object
+
     const handleLayout = (event) => {
         const { width } = event.nativeEvent.layout;
         setWidth(width);
@@ -17,8 +19,8 @@ const ListingScreen = ({ route }) => {
 
 
     const handleSavePost = () => {
-        console.log('SAVE POST!')
-        // no navigation
+        setIsSaved(!isSaved) // toggle
+        // BACKEND LOGIC HERE
     }
 
     const handleSendHi = () => {
@@ -57,15 +59,13 @@ const ListingScreen = ({ route }) => {
                 </Text>
 
 
-                <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center', height: 45, paddingHorizontal: 12, marginBottom: 12 }}>
+                <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { userID: '4' })}
+                    style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center', height: 45, paddingHorizontal: 12, marginBottom: 12 }}>
 
                     {pfp ? <Image src={pfp} /> : <View style={{ borderRadius: 50, width: 45, height: 45, backgroundColor: 'gray' }} />}
                     <Text style={{ fontFamily: 'inter', fontSize: 16, marginLeft: 12 }}>
                         FIRST LAST
                     </Text>
-
-
-
                 </TouchableOpacity>
 
                 <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', paddingHorizontal: 12, borderRadius: 13 }}>
@@ -81,7 +81,6 @@ const ListingScreen = ({ route }) => {
                     >
                         <Text style={{ fontSize: 14, fontFamily: 'inter' }}>Send</Text>
                     </View>
-
                 </TouchableOpacity>
 
 
@@ -94,8 +93,11 @@ const ListingScreen = ({ route }) => {
                         </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={{ width: '48%', display: 'flex', justifyContent: 'center', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', borderRadius: 13, paddingHorizontal: 4 }}>
-                        <Ionicons name="bookmark-outline" size={24} color="#000" />
+                    <TouchableOpacity onPress={() => handleSavePost()}
+
+                        style={{ width: '48%', display: 'flex', justifyContent: 'center', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', borderRadius: 13, paddingHorizontal: 4 }}>
+
+                        {isSaved ? <Ionicons name="bookmark" size={24} color="#000" /> : <Ionicons name="bookmark-outline" size={24} color="#000" />}
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Save
                         </Text>
