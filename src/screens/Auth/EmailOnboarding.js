@@ -75,7 +75,7 @@ const EmailOnboarding = ({ navigation }) => {
                 if (refreshedUser?.emailVerified && email && password) {
                     // close modal and navigate
                     setIsModalVisible(false);
-                    navigation.navigate('EducationOnboarding', { email });
+                    navigation.navigate('EducationOnboarding', { email: email, password: password });
                 } else {
                     // not verified!
                 }

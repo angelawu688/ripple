@@ -1,8 +1,12 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native'
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import {getAuth} from 'firebase/auth';
+import FullLoadingScreen from "../shared/FullLoadingScreen";
 import * as ImagePicker from 'expo-image-picker';
+
 
 
 
@@ -10,8 +14,9 @@ import * as ImagePicker from 'expo-image-picker';
 const fields = [
     { label: 'Email', key: 'email', keyboardType: 'email-address' },
     { label: 'Name', key: 'name', keyboardType: 'default' },
-    { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true },
+    // { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true },
     { label: 'Major', key: 'major', keyboardType: 'default' },
+    { label: 'Concentration', key: 'concentration', keyboardType: 'default' },
     { label: 'Grad Year', key: 'gradYear', keyboardType: 'numeric' },
     { label: 'Instagram', key: 'instagram', keyboardType: 'default' },
     { label: 'LinkedIn', key: 'linkedin', keyboardType: 'url' },
@@ -25,27 +30,63 @@ const PersonalInformation = () => {
     const [input, setInput] = useState('')
     const [pfp, setPfp] = useState(undefined)
     const [errorMessage, setErrorMessage] = useState('')
+    const [loading, setLoading] = useState(true)
+    const [userData, setUserData] = useState({})
 
 
     // FOR TESTING PURPOSES
-    const [fakeUser, setFakeUser] = useState({
-        email: 'phunt22@uw.edu',
-        name: 'Schoolboy Q',
-        bio: undefined,
-        major: 'Not CS for long',
-        gradYear: '2026',
-        instagram: '@daxflame',
-        linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/',
-        twitter: '@beabadoobee',
-    })
+    // const [fakeUser, setFakeUser] = useState({
+    //     email: 'phunt22@uw.edu',
+    //     name: 'Schoolboy Q',
+    //     bio: undefined,
+    //     major: 'Not CS for long',
+    //     gradYear: '2026',
+    //     instagram: '@daxflame',
+    //     linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/',
+    //     twitter: '@beabadoobee',
+    // })
+
+
+    useEffect(() => {
+        console.log("component mount, user uid is " + user.uid);
+        const loadUserInfo = async () => {
+            // not getting userDoc????
+            try {
+                const auth = getAuth();
+                const db = getFirestore();
+                const user = auth.currentUser;
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                console.log("retrieve userDoc");
+                if (userSnap.exists()) {
+                    console.log("Document data:", userSnap.data());
+                    setUserData(userSnap.data());
+                } else {
+                    // docSnap.data() will be undefined in this case
+                    console.log("No such document!");
+                    setErrorMessage("No user available");
+                }
+            } catch (error) {
+                setErrorMessage(error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadUserInfo();
+    },[userData]);
+
+    if (loading) {
+        return <FullLoadingScreen />
+    }
 
 
     // this will give us the modal, and tell us what we are doing
     const handleNext = (field) => {
         setCurrentField(field)
-        // chanege this to the real user
+        // change this to the real user
         // basically we set the initial input to the current value
-        setInput(fakeUser[field.key] || '')
+        setInput(userData?.[field.key] || '')
         setModalVisible(true);
     }
 
@@ -61,18 +102,24 @@ const PersonalInformation = () => {
         }
 
         try {
-            fakeUser[currentField.key] = input;
-            // BACKEND CHANGES HERE!
-            // udpate the DB and user context
-            setFakeUser({ ...fakeUser, [currentField.key]: input });
-            // i.e. "setUser(NEW_USER)"
+
+            console.log(input)
+
+            const updatedInfo = {
+                [currentField.key]: input,
+            }
+
+            const auth = getAuth();
+            const db = getFirestore();
+            const user = auth.currentUser;
+            const userRef = doc(db, "users", user.uid);
+            await updateDoc(userRef, updatedInfo);
+
         } catch (e) {
             console.log(e)
         } finally {
             setModalVisible(false)
         }
-
-
         // update the selected state to the user input
     }
 
@@ -121,6 +168,11 @@ const PersonalInformation = () => {
 
     return (
         <View style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '90%', height: '100%', alignSelf: 'center' }}>
+            // display error message
+            <View style={{ height: 30, }}>
+                {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+            </View>
+
 
             <TouchableOpacity onPress={() => handleChangePfp()}
                 style={{ width: 50, height: 50, alignSelf: 'center' }}
@@ -134,6 +186,7 @@ const PersonalInformation = () => {
                     <View style={{ width: 50, height: 50, backgroundColor: 'gray', borderRadius: 50 }} />
                 }
             </TouchableOpacity>
+
             {fields.map((field, index) => (
                 <View
                     key={field.key}
@@ -149,7 +202,7 @@ const PersonalInformation = () => {
                             numberOfLines={field.multiline ? undefined : 1}
                             ellipsizeMode="tail"
                         >
-                            {fakeUser[field.key] || ''}
+                            {userData?.[field.key] || ''}
                         </Text>
                     </View>
                     {field.label !== 'Email' && <TouchableOpacity onPress={() => handleNext(field)}>
@@ -157,6 +210,7 @@ const PersonalInformation = () => {
                     </TouchableOpacity>}
                 </View>
             ))}
+
 
             <Modal
                 animationType="fade"
