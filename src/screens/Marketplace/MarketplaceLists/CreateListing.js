@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
+import { collection, addDoc, getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
+
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -61,7 +65,7 @@ const CreateListing = ({ navigation }) => {
     const [photos, setPhotos] = useState([]) // array of photos
     const [tags, setTags] = useState([]) // array of tags
     const [title, setTitle] = useState('')
-    const [price, setPrice] = useState('')
+    const [price, setPrice] = useState(0)
     const [description, setDescription] = useState('')
     const [tagInput, setTagInput] = useState('')
 
@@ -69,12 +73,11 @@ const CreateListing = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false)
 
     const handleAddTag = async (newTag) => {
-        if (newTag.length <= 15 && newTag.length > 0) {
+        if (newTag.length <= 15) {
             setTags([...tags, newTag])
             setTagInput('')
         }
     }
-
 
     const removeTag = async (tagToRemove) => {
         setTags(tags.filter((tag) => tag !== tagToRemove))
@@ -118,14 +121,22 @@ const CreateListing = ({ navigation }) => {
     };
 
     const handlePriceChange = (text) => {
-
-        const cleaned = text.replace(/[^0-9]/g, '') // replace all non-numeric chars
-        const priceInCents = cleaned === '' ? 0 : parseInt(cleaned, 10);
-        setPrice('$' + (priceInCents / 100).toFixed(2))
+        const formattedPrice = formatPrice(text);
+        setPrice(formattedPrice);
+        setErrorMessage('')
     }
 
+    const formatPrice = (input) => {
+        const cleanedPrice = input.replace(/[^0-9]/g, ''); // only allow numbers
+        const number = parseInt(cleanedPrice, 10);
+        if (isNaN(number)) {
+            return '' // reset if we get NAN
+        }
 
-    const handlePublish = () => {
+        return number.toLocaleString() // method to format with commas and such
+    }
+
+    const handlePublish = async () => {
         console.log(photos, title, price, description, tags)
 
         if (!title) {
@@ -144,7 +155,7 @@ const CreateListing = ({ navigation }) => {
         // if price is invalid
 
         if (description.length > 150) {
-            setErrorMessage('Description length mustf be under 150 characters!')
+            setErrorMessage('Description length must be under 150 characters!')
             return
         }
 
@@ -159,6 +170,19 @@ const CreateListing = ({ navigation }) => {
         setIsLoading(true)
         try {
             // TODO submission to DB! 
+            const db = getFirestore();
+            const auth = getAuth();
+            const user = auth.currentUser;
+            const listingData = {
+                title,
+                price,
+                description,
+                tags,
+                photos,
+                userId: user.uid,
+                createdAt: new Date()
+            }
+            const docRef = await addDoc(collection(db, "listings"), listingData);
             setTimeout(() => {
                 // just chill for a sec, simulating loading
                 // using navigation reset so that we dont get a back buttons
@@ -169,170 +193,168 @@ const CreateListing = ({ navigation }) => {
             }, [2500])
         } catch (e) {
             setErrorMessage(e.message)
+            console.log(e);
         } finally {
             setIsLoading(false)
         }
     }
 
     return (
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}
-        // this is so that the keyboard will dismiss when the user clicks off of it
+        <View
+            style={styles.container}
         >
-            <View style={styles.container}>
 
 
-                <View style={styles.inputContainer}>
-                    <Text style={styles.footerText}>
-                        Title
-                    </Text>
-                    <TextInput
-                        style={[styles.shadow, styles.middleInput]}
-                        placeholder="Title"
-                        placeholderTextColor="#7E7E7E"
-                        value={title}
-                        onChangeText={(text) => {
-                            setTitle(text)
-                            setErrorMessage('')
-                        }}
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.footerText}>
+                    Title
+                </Text>
+                <TextInput
+                    style={[styles.shadow, styles.middleInput]}
+                    placeholder="Title"
+                    placeholderTextColor="#7E7E7E"
+                    value={title}
+                    onChangeText={(text) => {
+                        setTitle(text)
+                        setErrorMessage('')
+                    }}
+                />
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.footerText}>
+                    Photos | {photos.length}/5
+                </Text>
+                {/* empty photos */}
+                {photos.length === 0 && <TouchableOpacity
+                    onPress={handleAddPhoto}
+                    style={[styles.shadow, styles.addPhotosContainer]}
+                >
+                    <View style={{ display: 'flex', flexDirection: 'row', }}>
+                        <Ionicons name="add-circle-outline" size={20} color='#7E7E7E' />
+                        <Text style={[styles.placeholderText, { marginLeft: 4 }]}>
+                            Add photos
+                        </Text>
+                    </View>
+
+                </TouchableOpacity>}
 
 
-                    />
-                </View>
+                {photos.length >= 1 && <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                    {photos.map((uri, index) => {
+                        return (
+                            <ImagePreview key={index} uri={uri} removePhoto={removePhoto} />
 
-                <View style={styles.inputContainer}>
-                    <Text style={styles.footerText}>
-                        Photos | {photos.length}/5
-                    </Text>
-                    {/* empty photos */}
-                    {photos.length === 0 && <TouchableOpacity
+                        )
+                    })}
+
+                    {photos.length !== 5 && <TouchableOpacity
                         onPress={handleAddPhoto}
-                        style={[styles.shadow, styles.addPhotosContainer]}
+                        style={{ width: imageSize, height: imageSize, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 7, }}
+                        hitSlop={16}
                     >
-                        <View style={{ display: 'flex', flexDirection: 'row', }}>
-                            <Ionicons name="add-circle-outline" size={20} color='#7E7E7E' />
-                            <Text style={[styles.placeholderText, { marginLeft: 4 }]}>
-                                Add photos
-                            </Text>
-                        </View>
-
+                        <Ionicons name="add-circle-outline" size={36} color='#7E7E7E' />
                     </TouchableOpacity>}
 
+                </View>}
 
-                    {photos.length >= 1 && <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                        {photos.map((uri, index) => {
-                            return (
-                                <ImagePreview key={index} uri={uri} removePhoto={removePhoto} />
-
-                            )
-                        })}
-
-                        {photos.length !== 5 && <TouchableOpacity
-                            onPress={handleAddPhoto}
-                            style={{ width: imageSize, height: imageSize, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 7, }}
-                            hitSlop={16}
-                        >
-                            <Ionicons name="add-circle-outline" size={36} color='#7E7E7E' />
-                        </TouchableOpacity>}
-
-                    </View>}
-
-                </View>
+            </View>
 
 
 
-                <View style={[styles.inputContainer]}>
-                    <Text style={styles.footerText}>
-                        Price
-                    </Text>
-                    <TextInput
-                        style={[styles.shadow, styles.middleInput]}
+            <View style={[styles.inputContainer]}>
+                <Text style={styles.footerText}>
+                    Price
+                </Text>
+                <TextInput
+                    style={[styles.shadow, styles.middleInput]}
+                    placeholder="0.00"
+                    placeholderTextColor="#7E7E7E"
+                    value={price}
+                    onChangeText={handlePriceChange}
+                    keyboardType="numeric"
+                />
+            </View>
 
-                        placeholder="0.00"
+            <View style={styles.inputContainer}>
+                <Text style={styles.footerText}>
+                    Tags | {tags.length}/3
+                </Text>
+                {/* TODO change this to be more representative of what we want to do */}
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+
+                    {tags.length < 3 && <TextInput
+                        style={[styles.shadow, styles.tagInput]}
+                        placeholder="Clothing"
                         placeholderTextColor="#7E7E7E"
-                        value={price}
-                        onChangeText={handlePriceChange}
-                        keyboardType="numeric"
-                        maxLength={10}
-                    />
-                </View>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.footerText}>
-                        Tags | {tags.length}/3
-                    </Text>
-                    {/* TODO change this to be more representative of what we want to do */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-
-
-                        {tags.length < 3 && <TextInput
-                            style={[styles.shadow, styles.tagInput]}
-                            placeholder="Clothing"
-                            placeholderTextColor="#7E7E7E"
-                            value={tagInput}
-                            onChangeText={(text) => {
-                                setTagInput(text)
-                                setErrorMessage('')
-                            }}
-                        />}
-                        {tags.length < 3 && <TouchableOpacity
-                            onPress={() => handleAddTag(tagInput)}
-                            style={{ marginLeft: 10 }}
-                        >
-                            <Ionicons name="add-circle-outline" size={24} color='#7E7E7E' />
-                        </TouchableOpacity>}
-                    </View>
-
-                    <View style={{ display: 'flex', flexDirection: 'row', marginTop: 6 }}>
-                        {tags.map((tag, index) => {
-                            return (
-                                <TagPreview key={index} tag={tag} removeTag={removeTag} />
-                            )
-                        })}
-                    </View>
-
-                    {/* capping the legnth of tags at 15 characters */}
-                    {tags.length < 3 && <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, tagInput.length > 15 && { color: 'red' }]}>
-                        {tagInput.length}/15 characters
-                    </Text>}
-                </View>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.footerText}>
-                        Description
-                    </Text>
-                    <TextInput
-                        style={[styles.shadow, styles.descriptionInput]}
-                        placeholder="Description"
-                        placeholderTextColor="#7E7E7E"
-                        value={description}
+                        value={tagInput}
                         onChangeText={(text) => {
-                            setDescription(text)
+                            console.log(tagInput)
+                            setTagInput(text)
                             setErrorMessage('')
                         }}
-                        multiline={true}
-                    />
-                    <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, description.length > 150 && { color: 'red' }]}>
-                        {description.length}/150 characters
-                    </Text>
-                </View>
-
-                <View style={styles.errorContainer}>
-                    {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
-                </View>
-
-                <TouchableOpacity
-                    onPress={() => handlePublish()}
-                    style={[styles.publishButton, styles.shadow, errorMessage && { borderWidth: 1, borderColor: 'red' }, title && price && photos.length > 0 && styles.publishButtonReady]}
-                >
-
-                    {!isLoading ? <Text style={[title && price && photos.length > 0 ? { fontSize: 16, color: 'white', fontFamily: 'inter', } : styles.placeholderText, { fontWeight: '600' }]}
+                    />}
+                    {tags.length < 3 && <TouchableOpacity
+                        onPress={() => handleAddTag(tagInput)}
+                        style={{ marginLeft: 10 }}
                     >
-                        Publish
-                    </Text> : <ActivityIndicator color='white' />}
-                </TouchableOpacity>
+                        <Ionicons name="add-circle-outline" size={24} color='#7E7E7E' />
+                    </TouchableOpacity>}
+                </View>
 
-            </View >
-        </TouchableWithoutFeedback>
+                <View style={{ display: 'flex', flexDirection: 'row', marginTop: 6 }}>
+                    {tags.map((tag, index) => {
+                        return (
+                            <TagPreview key={index} tag={tag} removeTag={removeTag} />
+                        )
+                    })}
+                </View>
+
+
+
+                {/* capping the legnth of tags at 15 characters */}
+                <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, tagInput.length > 15 && { color: 'red' }]}>
+                    {tagInput.length}/15 characters
+                </Text>
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.footerText}>
+                    Description
+                </Text>
+                <TextInput
+                    style={[styles.shadow, styles.descriptionInput]}
+                    placeholder="Description"
+                    placeholderTextColor="#7E7E7E"
+                    value={description}
+                    onChangeText={(text) => {
+                        setDescription(text)
+                        setErrorMessage('')
+                    }}
+                    multiline={true}
+                />
+                <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, description.length > 150 && { color: 'red' }]}>
+                    {description.length}/150 characters
+                </Text>
+            </View>
+
+            <View style={styles.errorContainer}>
+                {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+            </View>
+
+            <TouchableOpacity
+                onPress={() => handlePublish()}
+                style={[styles.publishButton, styles.shadow, errorMessage && { borderWidth: 1, borderColor: 'red' }, title && price && photos.length > 0 && styles.publishButtonReady]}
+            >
+
+                {!isLoading ? <Text style={[title && price && photos.length > 0 ? { fontSize: 16, color: 'white', fontFamily: 'inter', } : styles.placeholderText, { fontWeight: '600' }]}
+                >
+                    Publish
+                </Text> : <ActivityIndicator color='white' />}
+            </TouchableOpacity>
+        </View>
     )
 }
 

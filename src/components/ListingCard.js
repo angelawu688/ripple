@@ -5,8 +5,9 @@ import { useState } from 'react'
 
 
 // TODO we will want to pass in an entire listing eventually
-const ListingCard = ({ price, title, img, sold }) => {
-
+const ListingCard = ({ listing }) => {
+    const { price, title, photos, sold } = listing;
+    const img = photos && photos.length > 0 ? photos[0] : undefined;
     // this code will grab the width of the component. We set the height to make it a square + the title
     const [width, setWidth] = useState(0);
     const handleLayout = (event) => {

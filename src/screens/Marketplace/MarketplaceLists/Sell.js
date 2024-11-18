@@ -26,24 +26,21 @@ const Sell = ({ activeListings, navigation }) => {
                 ListHeaderComponent={null} // blank for now, this is where a header would go.
                 numColumns={2} // this is how we put them side by side
                 data={activeListings}
-                renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
-                    const listingID = listing.listingID
+                renderItem={({ item }) => { // note: need to keep as "items", we are just renaming it to be clear
+                    
                     return (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}
+                            onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
                             style={{ width: '49.75%' }}
                         >
                             <ListingCard
-                                price={listing.price}
-                                title={listing.title}
-                                img={listing.img}
-                                sold={listing.sold}
+                                listing = {item}
                             />
 
                         </TouchableOpacity>
                     )
                 }}
-                keyExtractor={listing => listing.listingID} // use the conversationID as a key
+                keyExtractor={item => item.id} // use the conversationID as a key
 
                 // this is where we will put the handling to load more
                 onEndReachedThreshold={null}

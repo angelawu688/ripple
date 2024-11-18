@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, collection, query, orderBy, getDocs } from "firebase/firestore";
 
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../colors'
@@ -50,15 +50,26 @@ const Marketplace = ({ navigation }) => {
     // possible options are foryou, friends, sell, search
     const [selectedOption, setSelectedOption] = useState('foryou')
 
+    const db = getFirestore();
     useEffect(() => {
-        // grab the posts on component mount
-        // we can memoize to prevent more renders
-        if (listings) {
-            setIsLoading(false)
-        } else {
-            // do nothing
-        }
-    }, [listings])
+        const fetchListings = async () => {
+          try {
+            const q = query(collection(db, "listings"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+            const listingsData = querySnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            setListings(listingsData);
+          } catch (error) {
+            console.error("Error fetching listings:", error);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+    
+        fetchListings();
+      }, []);
 
     const renderSelectedOption = () => {
         // NOTE:
@@ -68,9 +79,9 @@ const Marketplace = ({ navigation }) => {
             case 'foryou':
                 return <ForYou listings={listings} navigation={navigation} />
             case 'friends':
-                return <Friends listings={testFriendsListings} navigation={navigation} />
+                return <Friends listings={listings} navigation={navigation} />
             case 'sell':
-                return <Sell activeListings={testActiveListings} navigation={navigation} />
+                return <Sell activeListings={listings} navigation={navigation} />
             case 'search':
                 return <Search navigation={navigation} />
             default:
