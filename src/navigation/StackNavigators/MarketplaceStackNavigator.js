@@ -11,8 +11,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text, TouchableOpacity } from "react-native";
 import CreateListing from "../../screens/Marketplace/MarketplaceLists/CreateListing";
 
-
-
 const MarketplaceStack = createNativeStackNavigator();
 
 const MarketplaceStackNavigator = () => {
@@ -30,6 +28,7 @@ const MarketplaceStackNavigator = () => {
                 name="Marketplace"
                 component={Marketplace}
                 options={{
+                    headerLeft: () => (null),
                     headerTitle: () => (
                         <Logo />
                     ),

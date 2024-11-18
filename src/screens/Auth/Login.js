@@ -83,7 +83,7 @@ const Login = ({ navigation }) => {
 
       <TouchableOpacity
         onPress={() => { console.log('FORGOT PASSWORD') }}>
-        <Text style={styles.link} onPress={() => navigation.navigate('EmailOnboarding')}>
+        <Text style={styles.link}>
           Forgot password?
         </Text>
       </TouchableOpacity>
