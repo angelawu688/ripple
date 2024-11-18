@@ -1,13 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, AppState } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
-import { Syne_700Bold } from '@expo-google-fonts/syne';
-import { Inter_400Regular } from '@expo-google-fonts/inter';
-import { doc, getFirestore, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
-import { RotationGestureHandler } from 'react-native-gesture-handler';
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')
@@ -18,6 +13,7 @@ const EmailOnboarding = ({ navigation }) => {
     const [verifiedStatus, setVerifiedStatus] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false)
+    const [secureTextEntry, setSecureTextEntry] = useState(true)
 
     // this allows us to track if the app is in the background or foreground
     const isMounted = useRef(true);
@@ -32,6 +28,9 @@ const EmailOnboarding = ({ navigation }) => {
         }
     }, [])
 
+    const toggle = () => {
+        setSecureTextEntry(!secureTextEntry)
+    }
 
     // listener for auth changes
     useEffect(() => {
@@ -205,6 +204,7 @@ const EmailOnboarding = ({ navigation }) => {
                         keyboardType='email-address'
                         autoCapitalize='none'
                         autoCorrect={false}
+
                     />
                 </View>
 
@@ -220,8 +220,16 @@ const EmailOnboarding = ({ navigation }) => {
                             setPassword(text)
                             setErrorMessage('')
                         }}
-                        secureTextEntry
+                        secureTextEntry={secureTextEntry}
                     />
+                    <TouchableOpacity onPress={toggle}
+                        style={{
+                            width: 40, height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: 2,
+                            // top: errorMessage ? (88) : (71) 
+                            top: 28
+                        }}>
+                        {secureTextEntry ? (<Ionicons name='eye-off' size={24} color={'black'} />) : (<Ionicons name='eye' size={24} color={'black'} />)}
+                    </TouchableOpacity>
                 </View>
             </View>
 

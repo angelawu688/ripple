@@ -13,13 +13,18 @@ const testMessages = [
     { content: 'Im tryna buy your fridge', sentBy: '2', },
     { content: 'Bet how much', sentBy: '1', },
     { content: '10 bands', sentBy: '1', },
-    { content: 'Nah fuck that', sentBy: '2', },
+    { content: 'No thanks', sentBy: '2', },
     { content: 'Ill do 4', sentBy: '2', },
+    { content: undefined, sentBy: '1', }
 ]
 
 
 const MessageBubble = ({ message, activeUserID }) => {
     const { content, sentBy } = message
+    // TODO pull images from here and display within a message bubble
+    if (!content) {
+        return;
+    }
     const isCurrentUser = sentBy === activeUserID
     return (
         <View style={[styles.messageBubble, isCurrentUser ? styles.sent : styles.received]}>
@@ -54,6 +59,7 @@ const Conversation = ({ route }) => {
     }, [messages]);
 
     // testing, lets us see the image in the console after it is picked
+    // this is what will log undefined on render
     useEffect(() => {
         console.log(img)
     }, [img])
@@ -92,7 +98,6 @@ const Conversation = ({ route }) => {
                     name: asset.fileName || `photo_${Date.now()}.jpg`,
                     type: asset.type || 'image/jpeg',
                 }));
-                console.log(selectedImages[0])
 
                 // CHANGE PFP HERE
                 // TOOD update DB and userContext
@@ -187,6 +192,8 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderColor: '#ccc',
         backgroundColor: '#f9f9f9',
+        paddingTop: 5,
+        marginBottom: 4
     },
     input: {
         flex: 1,
