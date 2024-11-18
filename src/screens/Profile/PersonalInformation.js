@@ -2,15 +2,9 @@ import { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native'
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 
-const fakeUser = {
-    email: 'phunt22@uw.edu',
-    name: 'scHoolboy Q',
-    bio: undefined,
-    major: 'not CS for long',
-    gradYear: '2026',
-}
 
 // this defines the fields for us so that we can reuse our modal component
 const fields = [
@@ -18,7 +12,7 @@ const fields = [
     { label: 'Name', key: 'name', keyboardType: 'default' },
     { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true },
     { label: 'Major', key: 'major', keyboardType: 'default' },
-    { label: 'Graduation Year', key: 'gradYear', keyboardType: 'numeric' },
+    { label: 'Grad Year', key: 'gradYear', keyboardType: 'numeric' },
     { label: 'Instagram', key: 'instagram', keyboardType: 'default' },
     { label: 'LinkedIn', key: 'linkedin', keyboardType: 'url' },
     { label: 'Twitter/X', key: 'twitter', keyboardType: 'default' },
@@ -29,7 +23,9 @@ const PersonalInformation = () => {
     const [modalVisible, setModalVisible] = useState(false)
     const [currentField, setCurrentField] = useState('')
     const [input, setInput] = useState('')
+    const [pfp, setPfp] = useState(undefined)
     const [errorMessage, setErrorMessage] = useState('')
+
 
     // FOR TESTING PURPOSES
     const [fakeUser, setFakeUser] = useState({
@@ -65,7 +61,6 @@ const PersonalInformation = () => {
         }
 
         try {
-            console.log(input)
             fakeUser[currentField.key] = input;
             // BACKEND CHANGES HERE!
             // udpate the DB and user context
@@ -76,10 +71,6 @@ const PersonalInformation = () => {
         } finally {
             setModalVisible(false)
         }
-
-
-
-
 
 
         // update the selected state to the user input
@@ -93,10 +84,56 @@ const PersonalInformation = () => {
         return yearNum >= currentYear && yearNum <= currentYear + 10;
     };
 
+    const handleChangePfp = async () => {
+        try {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                alert('We need camera roll permissions to add photos!');
+                return;
+            }
 
+            // Launch image picker
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsMultipleSelection: true,
+                quality: 0.7,
+                selectionLimit: 1
+            });
+
+            if (!result.canceled) {
+                const selectedImages = result.assets.map(asset => ({
+                    uri: asset.uri,
+                    name: asset.fileName || `photo_${Date.now()}.jpg`,
+                    type: asset.type || 'image/jpeg',
+                }));
+                console.log(selectedImages[0])
+
+                // CHANGE PFP HERE
+                // TOOD update DB and userContext
+            } else {
+                // user cancelled, do nothing
+            }
+        } catch (e) {
+            console.log(e);
+        }
+
+    }
 
     return (
         <View style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '90%', height: '100%', alignSelf: 'center' }}>
+
+            <TouchableOpacity onPress={() => handleChangePfp()}
+                style={{ width: 50, height: 50, alignSelf: 'center' }}
+            >
+                {pfp ?
+                    <Image
+                        source={{ pfp }}
+                        style={{ width: 50, height: 50, borderRadius: 50 }}
+
+                    /> :
+                    <View style={{ width: 50, height: 50, backgroundColor: 'gray', borderRadius: 50 }} />
+                }
+            </TouchableOpacity>
             {fields.map((field, index) => (
                 <View
                     key={field.key}
@@ -115,9 +152,9 @@ const PersonalInformation = () => {
                             {fakeUser[field.key] || ''}
                         </Text>
                     </View>
-                    <TouchableOpacity onPress={() => handleNext(field)}>
+                    {field.label !== 'Email' && <TouchableOpacity onPress={() => handleNext(field)}>
                         <Ionicons name={'chevron-forward'} size={24} color={'black'} style={styles.icon} />
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
                 </View>
             ))}
 

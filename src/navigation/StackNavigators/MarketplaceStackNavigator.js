@@ -1,7 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Marketplace from '../../screens/Marketplace/Marketplace'
-import Search from '../../screens/Marketplace/Search'
 import ListingScreen from '../../screens/Marketplace/ListingScreen'
 import SellScreen from '../../screens/Marketplace/SellScreen'
 
@@ -34,20 +33,6 @@ const MarketplaceStackNavigator = () => {
                     ),
 
                 }}
-            />
-            <MarketplaceStack.Screen
-                name="Search"
-                component={Search}
-                options={({ navigation }) => ({
-                    headerTitle: () => (
-                        <Logo />
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    )
-                })}
             />
 
             {/* ensure that userID is passed in as a prop */}

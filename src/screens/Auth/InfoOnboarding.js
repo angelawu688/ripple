@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react'
 import { useRef, useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native'
 import {
     getAuth,
     createUserWithEmailAndPassword,
@@ -11,15 +11,17 @@ import { userContext } from '../../context/UserContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import FullLoadingScreen from '../shared/FullLoadingScreen'
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 
 const InfoOnboarding = ({ navigation, route }) => {
-    const { email, major, concentration } = route.params
-    const [gradYear, setGradYear] = useState('')
+    const { email, password, major, concentration, gradYear, } = route.params
     const [profPhoto, setProfPhoto] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-
+    const [name, setName] = useState('')
+    const [pfp, setPfp] = useState(undefined)
     const { setUser } = useContext(userContext);
 
     // focus the top text field on component mount
@@ -29,6 +31,7 @@ const InfoOnboarding = ({ navigation, route }) => {
             inputRef.current.focus();
         }
     }, []);
+
 
     const handleSignUp = async () => {
         setIsLoading(true)
@@ -47,12 +50,43 @@ const InfoOnboarding = ({ navigation, route }) => {
                 // profile photo requires firebase storage
             });
             setUser(user); // this will navigate to the home page
-
         } catch (error) {
             console.log(error.message);
             setErrorMessage(error.message);
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleChangePfp = async () => {
+        try {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                alert('We need camera roll permissions to add photos!');
+                return;
+            }
+
+            // Launch image picker
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsMultipleSelection: true,
+                quality: 0.7,
+                selectionLimit: 1
+            });
+
+            if (!result.canceled) {
+                const selectedImages = result.assets.map(asset => ({
+                    uri: asset.uri,
+                    name: asset.fileName || `photo_${Date.now()}.jpg`,
+                    type: asset.type || 'image/jpeg',
+                }));
+                console.log('first image', selectedImages[0])
+                setPfp(selectedImages[0]) // this will give us the image object (uri is most important)
+            } else {
+                // user cancelled, do nothing
+            }
+        } catch (e) {
+            console.log(e);
         }
     }
 
@@ -76,31 +110,41 @@ const InfoOnboarding = ({ navigation, route }) => {
             <View style={styles.lowerContainer}>
                 <View style={{ width: '100%', }}>
                     <Text style={styles.inputHeader}>
-                        Graduation year
+                        Name
                     </Text>
                     <TextInput
                         ref={inputRef}
                         style={styles.input}
                         placeholder=''
-                        value={gradYear}
-                        onChangeText={setGradYear}
+                        value={name}
+                        onChangeText={setName}
                     />
                 </View>
 
-                <View style={{ width: '100%' }}>
+                <View style={{ width: '100%', }}>
                     <Text style={styles.inputHeader}>
                         Upload profile picture
                     </Text>
-                    <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                        <Text>placeholder</Text>
-                    </View>
+                    <TouchableOpacity onPress={() => handleChangePfp()}
+
+                        style={{ width: 60, height: 60, borderWidth: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 50, borderStyle: 'dashed', borderColor: '#808080', marginLeft: 8, alignSelf: 'center', marginTop: 8 }}>
+                        {pfp ? (
+                            <Image
+                                source={{ uri: pfp.uri }}
+                                style={{ width: 60, height: 60, borderRadius: 50 }}
+
+
+                            />
+                        ) : (<Ionicons name={'share-outline'} size={24} color={'#808080'} style={{ marginBottom: 4 }} />)}
+
+                    </TouchableOpacity>
                 </View>
             </View>
 
 
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={styles.button}
+                style={[styles.button, { backgroundColor: name && pfp ? 'black' : '#D9D9D9' }]}
                 onPress={() => handleSignUp()}
             >
                 <Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />
@@ -149,7 +193,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        height: 140,
+        height: 180,
     },
     inputHeader: {
         fontSize: 16,

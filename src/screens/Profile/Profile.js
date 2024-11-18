@@ -14,36 +14,29 @@ const Profile = ({ navigation }) => {
         console.log('deleted user (not actually)')
         setUser(null)
     }
+
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.profileCardContainer}
                 onPress={() => navigation.navigate('PersonalInformation')}
-
             >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     {/* profile icon placeholder */}
-                    <View style={{ borderRadius: 50, width: 45, height: 45, backgroundColor: 'gray', marginRight: 10 }} />
-                    <Text style={{ fontSize: 18 }}>
+                    <View style={{ borderRadius: 50, width: 30, height: 30, backgroundColor: 'gray', marginRight: 10 }} />
+                    <Text style={{ fontSize: 18, marginLeft: 6 }}>
                         Account Center
                     </Text>
                 </View>
-
                 <Ionicons name={'chevron-forward'} size={24} color={'black'} />
-
-
             </TouchableOpacity>
 
 
             <View style={styles.cardsContainer}>
-
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={() => navigation.navigate('SavedItems')}
                 >
-
                     <Ionicons name={'bookmark-outline'} size={24} color={'black'} style={styles.icon} />
-
-
                     <Text style={styles.cardText}>
                         Saved Listings
                     </Text>

@@ -69,7 +69,7 @@ const CreateListing = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false)
 
     const handleAddTag = async (newTag) => {
-        if (newTag.length <= 15) {
+        if (newTag.length <= 15 && newTag.length > 0) {
             setTags([...tags, newTag])
             setTagInput('')
         }
@@ -185,9 +185,6 @@ const CreateListing = ({ navigation }) => {
         <View
             style={styles.container}
         >
-
-
-
             <View style={styles.inputContainer}>
                 <Text style={styles.footerText}>
                     Title
@@ -294,12 +291,10 @@ const CreateListing = ({ navigation }) => {
                     })}
                 </View>
 
-
-
                 {/* capping the legnth of tags at 15 characters */}
-                <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, tagInput.length > 15 && { color: 'red' }]}>
+                {tags.length < 3 && <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, tagInput.length > 15 && { color: 'red' }]}>
                     {tagInput.length}/15 characters
-                </Text>
+                </Text>}
             </View>
 
             <View style={styles.inputContainer}>

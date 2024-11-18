@@ -20,6 +20,7 @@ const testSearchResults = [
 
 const Search = ({ navigation }) => {
     // TODO add autocomplete API
+    // probably algolia
     const [recentSearches, setRecentSearches] = useState([]);
     const [query, setQuery] = useState('')
     const [displayResults, setDisplayResults] = useState(false)
@@ -42,6 +43,28 @@ const Search = ({ navigation }) => {
     // useEffect(() => {
     //     setDisplayResults(false)
     // }, [query])
+
+    // here is an example for how we should structure autocomplete
+    const handleAutocomplete = async (query) => {
+        // setIsLoadingAutocomplete(true)
+        try {
+            // basically we just get the top 5 matches for our query
+            const { hits } = await index.search(query, {
+                hitsPerPage: 5,
+                attributesToRetrieve: ['title']
+            });
+
+            // returns an array of the best completions
+            return hits.map((hit) => ({
+                title: hit.title
+            }))
+        } catch (e) {
+            console.log(e)
+            return []; // no results
+        } finally {
+            // setIsLoadingAutocomplete(true)
+        }
+    }
 
 
     useEffect(() => {

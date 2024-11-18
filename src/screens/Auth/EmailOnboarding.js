@@ -40,7 +40,7 @@ const EmailOnboarding = ({ navigation }) => {
                 await user.reload();
                 const refreshedUser = auth.currentUser;
                 if (refreshedUser?.emailVerified && email && password) {
-                    navigation.navigate('EducationOnboarding', { email: email })
+                    navigation.navigate('EducationOnboarding', { email: email, password: password })
                 }
             }
         });
@@ -135,7 +135,7 @@ const EmailOnboarding = ({ navigation }) => {
                 const refreshedUser = auth.currentUser;
                 if (refreshedUser?.emailVerified) {
                     setIsModalVisible(false);
-                    navigation.navigate('EducationOnboarding', { email });
+                    navigation.navigate('EducationOnboarding', { email: email, password: password });
                 } else {
                     setErrorMessage('Email not verified yet. Please check your inbox.');
                 }
@@ -227,7 +227,7 @@ const EmailOnboarding = ({ navigation }) => {
 
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={[styles.button, { backgroundColor: !isLoading && email && password ? 'black' : '#D9D9D9' }]}
+                style={[styles.button, { backgroundColor: !isLoading && email && password.length >= 6 ? 'black' : '#D9D9D9' }]}
 
                 disabled={isLoading || !email || !password} // disabled when loading
                 onPress={() => {
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // make back darker
     },
     modalContent: {
         backgroundColor: 'white',
@@ -392,6 +392,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         padding: 10,
         borderRadius: 5,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     modalCloseButtonText: {
         color: 'white',
@@ -399,14 +402,26 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textAlign: 'center',
     },
-    innerModalContainer: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '80%', alignSelf: 'center' },
-    modalButtonContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '75%', marginTop: 20 },
+    innerModalContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '80%',
+        alignSelf: 'center'
+    },
+    modalButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '85%',
+        marginTop: 20,
+        alignItems: 'center'
+    },
     manualCheckButton: {
         backgroundColor: '#f0f0f0',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
-        marginBottom: 10,
     },
 
 
