@@ -20,9 +20,9 @@ const Profile = ({ navigation }) => {
             <TouchableOpacity style={styles.profileCardContainer}
                 onPress={() => navigation.navigate('PersonalInformation')}
             >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', height: 50 }}>
                     {/* profile icon placeholder */}
-                    <View style={{ borderRadius: 50, width: 30, height: 30, backgroundColor: 'gray', marginRight: 10 }} />
+                    <View style={{ borderRadius: 50, width: 36, height: 36, backgroundColor: 'gray', marginRight: 10 }} />
                     <Text style={{ fontSize: 18, marginLeft: 6 }}>
                         Account Center
                     </Text>
@@ -119,14 +119,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '90%',
-        marginBottom: 35,
+        marginBottom: 40,
         marginTop: 40,
         borderWidth: 1,
         borderRadius: 12,
         padding: 8,
         borderColor: '#F2F0F0',
-
-
+        height: 60
     },
     cardText: {
         fontSize: 18,
