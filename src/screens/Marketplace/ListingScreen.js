@@ -1,7 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import {getAuth} from 'firebase/auth';
 import { useState, useEffect } from 'react';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
 
 
 const ListingScreen = ({ route }) => {
@@ -13,6 +14,7 @@ const ListingScreen = ({ route }) => {
     const [listing, setListing] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const { listingID } = route.params
+
     const db = getFirestore();
     useEffect(() => {
         const fetchListing = async () => {
@@ -45,6 +47,28 @@ const ListingScreen = ({ route }) => {
 
     const handleSavePost = () => {
         console.log('SAVE POST!')
+      setIsSaved(!isSaved) // toggle
+        // BACKEND LOGIC HERE
+
+        if (isSaved) {
+            // post should be in saved
+            try {
+                const auth = getAuth();
+                const db = getFirestore();
+                // get listing information
+                // put map of information?
+                const updatedSaves = {}
+                // get curr user
+                const user = auth.currentUser;
+                const userRef = doc(db, "users", user.uid);
+                await updateDoc(userRef, updatedSaves);
+
+            } catch (e) {
+                console.log(e)
+            }
+        } else {
+            // remove post from saved
+        }
         // no navigation
     }
 

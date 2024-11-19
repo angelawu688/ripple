@@ -4,7 +4,6 @@ import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import {getAuth} from 'firebase/auth';
-import FullLoadingScreen from "../shared/FullLoadingScreen";
 import * as ImagePicker from 'expo-image-picker';
 
 
@@ -24,15 +23,12 @@ const fields = [
 ];
 
 const PersonalInformation = () => {
-    const { user, setUser } = useContext(userContext)
+    const { userData, setUserData } = useContext(userContext)
     const [modalVisible, setModalVisible] = useState(false)
     const [currentField, setCurrentField] = useState('')
     const [input, setInput] = useState('')
     const [pfp, setPfp] = useState(undefined)
     const [errorMessage, setErrorMessage] = useState('')
-    const [loading, setLoading] = useState(true)
-    const [userData, setUserData] = useState({})
-
 
     // FOR TESTING PURPOSES
     // const [fakeUser, setFakeUser] = useState({
@@ -47,45 +43,10 @@ const PersonalInformation = () => {
     // })
 
 
-    useEffect(() => {
-        console.log("component mount, user uid is " + user.uid);
-        const loadUserInfo = async () => {
-            // not getting userDoc????
-            try {
-                const auth = getAuth();
-                const db = getFirestore();
-                const user = auth.currentUser;
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-                console.log("retrieve userDoc");
-                if (userSnap.exists()) {
-                    console.log("Document data:", userSnap.data());
-                    setUserData(userSnap.data());
-                } else {
-                    // docSnap.data() will be undefined in this case
-                    console.log("No such document!");
-                    setErrorMessage("No user available");
-                }
-            } catch (error) {
-                setErrorMessage(error.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        loadUserInfo();
-    },[userData]);
-
-    if (loading) {
-        return <FullLoadingScreen />
-    }
-
-
     // this will give us the modal, and tell us what we are doing
     const handleNext = (field) => {
         setCurrentField(field)
-        // change this to the real user
-        // basically we set the initial input to the current value
+        // set the initial input to the current value
         setInput(userData?.[field.key] || '')
         setModalVisible(true);
     }
@@ -102,19 +63,17 @@ const PersonalInformation = () => {
         }
 
         try {
-
             console.log(input)
-
             const updatedInfo = {
                 [currentField.key]: input,
             }
-
             const auth = getAuth();
             const db = getFirestore();
             const user = auth.currentUser;
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, updatedInfo);
-
+            const userDoc = await getDoc(userRef);
+            setUserData(userDoc.data());
         } catch (e) {
             console.log(e)
         } finally {
@@ -156,7 +115,7 @@ const PersonalInformation = () => {
                 console.log(selectedImages[0])
 
                 // CHANGE PFP HERE
-                // TOOD update DB and userContext
+                // TODO update DB and userContext
             } else {
                 // user cancelled, do nothing
             }
