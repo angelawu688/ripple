@@ -1,6 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import {getAuth} from 'firebase/auth';
+import FullLoadingScreen from "../shared/FullLoadingScreen";
 
 
 const ListingScreen = ({ navigation, route }) => {
@@ -14,13 +17,33 @@ const ListingScreen = ({ navigation, route }) => {
 
     const { listingID } = route.params
     const price = (4).toFixed(2)
-    const description = 'palceholder'
+    const description = 'placeholder'
     const pfp = undefined
 
 
-    const handleSavePost = () => {
+    const handleSavePost = async () => {
         setIsSaved(!isSaved) // toggle
         // BACKEND LOGIC HERE
+
+        if (isSaved) {
+            // post should be in saved
+            try {
+                const auth = getAuth();
+                const db = getFirestore();
+                // get listing information
+                // put map of information?
+                const updatedSaves = {}
+                // get curr user
+                const user = auth.currentUser;
+                const userRef = doc(db, "users", user.uid);
+                await updateDoc(userRef, updatedSaves);
+
+            } catch (e) {
+                console.log(e)
+            }
+        } else {
+            // remove post from saved
+        }
     }
 
     const handleSendHi = () => {
