@@ -2,15 +2,18 @@ import { View, Text, Image } from 'react-native'
 import { useState } from 'react'
 
 
-
-
 // TODO we will want to pass in an entire listing eventually
 const ListingCard = ({ listing }) => {
     if (!listing) {
+        console.log("undefined listing")
         return null;
     }
-    const { price, title, photos, sold } = listing;
-    const img = photos && photos.length > 0 ? photos[0] : undefined;
+    // no photos or sold fields yet
+    // const { price, title, photos, sold } = listing;
+    // const img = photos && photos.length > 0 ? photos[0] : undefined;
+    const img = undefined;
+    const sold = false;
+    const { price, title } = listing;
     // this code will grab the width of the component. We set the height to make it a square + the title
     const [width, setWidth] = useState(0);
     const handleLayout = (event) => {
