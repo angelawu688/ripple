@@ -3,7 +3,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ForYou from "./MarketplaceLists/ForYou";
 import { Ionicons } from "@expo/vector-icons";
 
-
 const UserProfile = ({ navigation, route }) => {
     const { userID } = route.params
     const [followingUser, setFollowingUser] = useState(false)

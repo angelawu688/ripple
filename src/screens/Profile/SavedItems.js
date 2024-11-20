@@ -4,7 +4,7 @@ import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
 import ListingCard from '../../components/ListingCard'
-import {getFirestore, query, where, collection, getDocs } from "firebase/firestore";
+import {getFirestore, query, where, collection, getDocs, orderBy} from "firebase/firestore";
 
 
 const SavedItems = ({ navigation }) => {
@@ -30,26 +30,29 @@ const SavedItems = ({ navigation }) => {
     const [savedListings, setSavedListings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(async () => {
-        setIsLoading(true)
-        try {
-            const db = getFirestore();
-            // grab the users saved listings on component mount
-            const savedPostsRef = collection(db, "savedPosts");
-            const queryPosts = query(savedPostsRef, where("user_id", "==", user.uid));
-            const querySnapshot = await getDocs(queryPosts);
-            const posts = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setSavedListings(posts);
-            console.log("Saved Listings", posts);
-        } catch (error) {
-            console.log(error.message)
-        } finally {
-            setIsLoading(false)
-        }
-    }, [])
+    // use context for this instead of on every re-render
+    useEffect(() => {
+        const fetchSaved= async () => {
+            try {
+                console.log("in this function")
+                const db = getFirestore();
+                const querySaved = query(collection(db, "savedPosts"), where("user_id", "==", user.uid));
+                const querySnapshot = await getDocs(querySaved);
+                const savedPosts = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setSavedListings(savedPosts);
+                console.log("Saved Listings", savedPosts);
+            } catch (error) {
+                console.error("Error fetching listings:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchSaved();
+    }, []);
 
     if (isLoading) {
         return <FullLoadingScreen />
@@ -64,20 +67,20 @@ const SavedItems = ({ navigation }) => {
             ListHeaderComponent={null} // blank for now, this is where a header would go.
             numColumns={2} // this is how we put them side by side
             data={savedListings}
-            // TODO: does this look at each document?
             renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
-                const listingID = listing.listing_id
-                // const { price, title, } = listing;
+                const listingID = listing.id
+                // our console.log here worked
+                console.log("listingID is:", listingID)
                 return (
                     <TouchableOpacity
                         onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}
                         style={{ width: '49.75%' }}
                     >
-                        <ListingCard
-                            price={listing.price}
-                            title={listing.title}
-                            img={listing.img}
-                            sold={listing.sold}
+                        <ListingCard listing = {listing}
+                            // price={listing.price || "0"}
+                            // title={listing.title || "na"}
+                            // img={listing.img || undefined}
+                            // sold={listing.sold !== undefined ? listing.sold : false}
                         />
 
                     </TouchableOpacity>
