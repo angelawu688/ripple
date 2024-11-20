@@ -3,8 +3,6 @@ import { useRef, useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native'
 import {
     getAuth,
-    createUserWithEmailAndPassword,
-    sendEmailVerification,
     signInWithEmailAndPassword
 } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
@@ -46,7 +44,8 @@ const InfoOnboarding = ({ navigation, route }) => {
                 createdAt: new Date(),
                 major: major,
                 concentration: concentration,
-                gradYear: gradYear
+                gradYear: gradYear,
+                name: name,
                 // profile photo requires firebase storage
             });
             setUser(user); // this will navigate to the home page

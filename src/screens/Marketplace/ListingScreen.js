@@ -1,9 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import { getFirestore, doc, getDoc, deleteDoc, setDoc } from "firebase/firestore";
-import { getAuth } from 'firebase/auth';
-import { useState, useEffect, useContext } from 'react';
-import { userContext } from "../../context/UserContext";
+import {getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, query, where} from "firebase/firestore";
+import {useState, useEffect, useContext} from 'react';
+import {userContext} from "../../context/UserContext";
 
 
 const ListingScreen = ({ route }) => {
@@ -14,6 +13,7 @@ const ListingScreen = ({ route }) => {
     };
     const [listing, setListing] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(true);
     const { listingID } = route.params;
     const { user } = useContext(userContext);
@@ -21,33 +21,49 @@ const ListingScreen = ({ route }) => {
     const db = getFirestore();
     useEffect(() => {
         const fetchListing = async () => {
-            try {
-                const docRef = doc(db, "listings", listingID);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    setListing({ id: docSnap.id, ...docSnap.data() });
-                } else {
-                    console.log("No such document!");
+          try {
+            const docRef = doc(db, "listings", listingID);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                setListing({ id: docSnap.id, ...docSnap.data() });
+                // check if listing is saved already
+                const savedPostsRef = collection(db, "savedPosts");
+                const queryPosts = query(savedPostsRef,
+                    where("user_id", "==", user.uid),
+                    where("listing_id", "==", listing.listing_id)
+                );
+                try {
+                    const savedSnapshot = await getDocs(queryPosts);
+                    if (!savedSnapshot.empty) {
+                        console.log("Listing is saved by the user.");
+                        setIsSaved(true);
+                    } else {
+                        console.log("Listing is not saved.");
+                        setIsSaved(false);
+                    }
+                } catch (error) {
+                    console.error("Error checking if listing is saved:", error);
                 }
-            } catch (error) {
-                console.error("Error fetching listing:", error);
-            } finally {
-                setIsLoading(false);
+
+            } else {
+              console.log("No such document!");
             }
+          } catch (error) {
+            console.error("Error fetching listing:", error);
+          } finally {
+            setIsLoading(false);
+          }
         };
-
+    
         fetchListing();
-    }, [listingID]);
-
-
-    if (isLoading) {
+      }, [listingID]);
+      if (isLoading) {
         return <View style={styles.container}><Text>Loading...</Text></View>;
-    }
-
-    if (!listing) {
+      }
+    
+      if (!listing) {
         return <View style={styles.container}><Text>Listing not found</Text></View>;
-    }
+      }
 
 
     const handleSavePost = async () => {
@@ -69,8 +85,9 @@ const ListingScreen = ({ route }) => {
             }
         } else if (listing) {
             // remove post from saved
-            const listingRef = doc(db, "savedPosts", listing.listing_id);
+            const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
             await deleteDoc(listingRef);
+            console.log("deleted");
         }
         else {
             // should never hit this case
@@ -87,7 +104,7 @@ const ListingScreen = ({ route }) => {
     const sharePost = () => {
         // will have to flesh out what this looks like, thinking like a pop up to send as a text?
     }
-
+    
 
 
     return (
@@ -118,7 +135,7 @@ const ListingScreen = ({ route }) => {
 
                 <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center', height: 45, paddingHorizontal: 12, marginBottom: 12 }}>
 
-
+                    
                     <Text style={{ fontFamily: 'inter', fontSize: 16, marginLeft: 12 }}>
                         FIRST LAST
                     </Text>
