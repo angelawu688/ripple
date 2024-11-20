@@ -4,6 +4,7 @@ import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
 import ListingCard from '../../components/ListingCard'
+import {getFirestore, query, where, collection, getDocs } from "firebase/firestore";
 
 
 const SavedItems = ({ navigation }) => {
@@ -20,22 +21,31 @@ const SavedItems = ({ navigation }) => {
     //     { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
     // ]
 
-    const testListings = [
-        { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
-    ]
-    const { user } = useContext(userContext)
+    // const testListings = [
+    //     { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
+    //     { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
+    // ]
+
+    const { user } = useContext(userContext);
     const [savedListings, setSavedListings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
+    useEffect(async () => {
         setIsLoading(true)
         try {
+            const db = getFirestore();
             // grab the users saved listings on component mount
-            // for now is test listings
-            setSavedListings(testListings)
-        } catch (e) {
-            setErrorMessage(e.message)
+            const savedPostsRef = collection(db, "savedPosts");
+            const queryPosts = query(savedPostsRef, where("user_id", "==", user.uid));
+            const querySnapshot = await getDocs(queryPosts);
+            const posts = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setSavedListings(posts);
+            console.log("Saved Listings", posts);
+        } catch (error) {
+            console.log(error.message)
         } finally {
             setIsLoading(false)
         }
@@ -54,8 +64,10 @@ const SavedItems = ({ navigation }) => {
             ListHeaderComponent={null} // blank for now, this is where a header would go.
             numColumns={2} // this is how we put them side by side
             data={savedListings}
+            // TODO: does this look at each document?
             renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
-                const listingID = listing.listingID
+                const listingID = listing.listing_id
+                // const { price, title, } = listing;
                 return (
                     <TouchableOpacity
                         onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}
@@ -71,7 +83,7 @@ const SavedItems = ({ navigation }) => {
                     </TouchableOpacity>
                 )
             }}
-            keyExtractor={listing => listing.listingID} // use the conversationID as a key
+            keyExtractor={listing => listing.listing_id} // use the conversationID as a key
 
             // this is where we will put the handling to load more
             onEndReachedThreshold={null}
