@@ -8,18 +8,6 @@ import {getFirestore, query, where, collection, getDocs, orderBy} from "firebase
 
 
 const SavedItems = ({ navigation }) => {
-    // const testPosts = [
-    //     { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-    //     { listingID: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
-    //     { listingID: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
-    //     { listingID: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: false },
-    //     { listingID: 5, img: undefined, title: 'Catan Set', price: 10, sold: false },
-    //     { listingID: 6, img: undefined, title: 'Catan Expansion Pack', price: 10, sold: false },
-    //     { listingID: 7, img: undefined, title: 'Exploding Kittens', price: 40, sold: true },
-    //     { listingID: 8, img: undefined, title: 'Macbook Pro', price: 100, sold: false },
-    //     { listingID: 9, img: undefined, title: 'Comfy Couch', price: 40, sold: false },
-    //     { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
-    // ]
 
     // const testListings = [
     //     { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
@@ -30,11 +18,11 @@ const SavedItems = ({ navigation }) => {
     const [savedListings, setSavedListings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
-    // use context for this instead of on every re-render
+    // use context for this instead of on every re-render?
+    // userContext would need to update when savedPosts is updated though
     useEffect(() => {
         const fetchSaved= async () => {
             try {
-                console.log("in this function")
                 const db = getFirestore();
                 const querySaved = query(collection(db, "savedPosts"), where("user_id", "==", user.uid));
                 const querySnapshot = await getDocs(querySaved);
@@ -43,7 +31,6 @@ const SavedItems = ({ navigation }) => {
                     ...doc.data()
                 }));
                 setSavedListings(savedPosts);
-                console.log("Saved Listings", savedPosts);
             } catch (error) {
                 console.error("Error fetching listings:", error);
             } finally {
@@ -68,15 +55,16 @@ const SavedItems = ({ navigation }) => {
             numColumns={2} // this is how we put them side by side
             data={savedListings}
             renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
+                // TODO: make sure this matches id of document in listings collection
                 const listingID = listing.id
                 // our console.log here worked
-                console.log("listingID is:", listingID)
+                // console.log("listingID is:", listingID)
                 return (
                     <TouchableOpacity
                         onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}
                         style={{ width: '49.75%' }}
                     >
-                        <ListingCard listing = {listing}
+                        <ListingCard listing = {listing} // pass in entire listing
                             // price={listing.price || "0"}
                             // title={listing.title || "na"}
                             // img={listing.img || undefined}
