@@ -7,5 +7,6 @@ export const colors = {
     gradientTop: '#9BE5E5',
     gradientBottom: '#3CA2A2',
     loginBlue: '#006780',
-    loginGray: '#D9D9D9'
+    loginGray: '#D9D9D9',
+    uwPurple: '#39275B'
 }

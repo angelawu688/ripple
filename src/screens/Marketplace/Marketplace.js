@@ -42,6 +42,7 @@ const testActiveListings = [
 const Marketplace = ({ navigation }) => {
     // TODO refactor for clarity
 
+    const totalUsers = '2.3k'
 
 
     const [listings, setListings] = useState(testPosts)
@@ -53,23 +54,23 @@ const Marketplace = ({ navigation }) => {
     const db = getFirestore();
     useEffect(() => {
         const fetchListings = async () => {
-          try {
-            const q = query(collection(db, "listings"), orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            const listingsData = querySnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            }));
-            setListings(listingsData);
-          } catch (error) {
-            console.error("Error fetching listings:", error);
-          } finally {
-            setIsLoading(false);
-          }
+            try {
+                const q = query(collection(db, "listings"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                const listingsData = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setListings(listingsData);
+            } catch (error) {
+                console.error("Error fetching listings:", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
-    
+
         fetchListings();
-      }, []);
+    }, []);
 
     const renderSelectedOption = () => {
         // NOTE:
@@ -136,11 +137,11 @@ const Marketplace = ({ navigation }) => {
             {selectedOption !== 'sell' && selectedOption !== 'search' && <View style={styles.collegeHeaderContainer}>
 
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ marginRight: 8, }}><Ionicons name={'location'} size={24} color={'black'} /></View>
+                    <View style={{ marginRight: 8, }}><Ionicons name={'location'} size={24} color={colors.uwPurple} /></View>
 
-                    <Text style={styles.tabTextStyle}>University of Washington</Text>
+                    <Text style={[styles.tabTextStyle, { color: colors.uwPurple }]}>University of Washington</Text>
                 </View>
-                <Text style={{ color: colors.darkgray, fontSize: 14, fontFamily: 'inter' }}>2.3k Users</Text>
+                <Text style={{ color: colors.darkgray, fontSize: 14, fontFamily: 'inter' }}>{totalUsers} users</Text>
             </View>
             }
 
@@ -178,8 +179,7 @@ const styles = StyleSheet.create({
     },
     tabTextStyle: {
         fontSize: 18,
-        fontFamily: 'inter'
-
+        fontFamily: 'inter',
     },
     upperContainer: {
         display: 'flex',
@@ -191,13 +191,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     shadow: {
-        shadowColor: "#000",
+        shadowColor: colors.loginBlue,
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 0,
         },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
         elevation: 8,
     },
     topTitle: {
