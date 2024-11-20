@@ -26,9 +26,9 @@ const AuthStackNavigator = () => {
       <AuthStack.Screen
         name="LandingPage"
         component={LandingPage}
-        options={({ navigation }) => ({
-          headerTitle: () => <Logo />,
-        })}
+        options={{
+          headerShown: false
+        }}
       />
 
       <AuthStack.Screen

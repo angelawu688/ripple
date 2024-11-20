@@ -1,25 +1,29 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import Logo from "../../components/Logo";
+import { colors } from "../../colors";
 
 
 const LandingPage = ({ navigation }) => {
+    // TODO on component mount, we fade in the other pieces and have them be animated and stuff
     return (
         <View style={styles.container}>
 
-            <Text style={{ fontSize: 90, fontWeight: '800', fontFamily: 'inter', marginTop: -150 }}>
-                LOGO
-            </Text>
+            <View style={{ marginTop: '-35%' }}>
+                <Logo fontSize={65} />
+            </View>
+
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={() => navigation.navigate('EmailOnboarding')}
-                    style={[styles.button, { backgroundColor: 'black' }]}>
+                    style={[styles.button, { backgroundColor: colors.loginBlue }]}>
                     <Text style={[styles.buttonText, { color: 'white' }]}>
                         Create account
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('Login')}
-                    style={[styles.button, { backgroundColor: 'white', borderColor: 'black', borderWidth: 1 }]}>
-                    <Text style={[styles.buttonText, { color: 'black' }]}>
-                        Log in
+                    style={[styles.button, { backgroundColor: 'white', borderColor: colors.loginBlue, borderWidth: 1 }]}>
+                    <Text style={[styles.buttonText, { color: colors.loginBlue }]}>
+                        Login
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -37,6 +41,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: '100%',
         width: '100%',
+        flexDirection: 'column'
+
     },
     button: {
         width: '90%',
@@ -48,7 +54,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontFamily: 'inter',
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: '600'
     },
     buttonContainer: {

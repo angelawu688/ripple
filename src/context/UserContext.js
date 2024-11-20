@@ -7,6 +7,7 @@ export const userContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [savedPosts, setSavedPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export const UserProvider = ({ children }) => {
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             setUserData(userDoc.data());
+            // grab user posts here
           } else {
             console.warn("No such document!");
             setUserData(null);
@@ -38,7 +40,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <userContext.Provider value={{ user, setUser, userData, setUserData, isLoading }}>
+    <userContext.Provider value={{ user, setUser, savedPosts, setSavedPosts, userData, setUserData, isLoading }}>
       {children}
     </userContext.Provider>
   );

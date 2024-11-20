@@ -38,21 +38,17 @@ const TabNavigator = () => {
                             ? 'person'
                             : 'person-outline';
                     }
-                    return <Ionicons name={iconName} size={size} color={color} />
-
+                    return <Ionicons name={iconName} size={size} color={'white'} />
                 },
-
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false, // applied here
-
-
-
                 // styling for all of the tabs, generally: 
                 tabBarActiveTintColor: colors.black,
                 tabBarInactiveTintColor: colors.black,
                 tabBarShowLabel: false,
                 tabBarStyle: {
-                    backgroundColor: colors.lightgray
+                    backgroundColor: colors.darkblue,
+                    paddingTop: 10
                 },
 
             })}

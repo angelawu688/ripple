@@ -1,19 +1,12 @@
 import { FlatList, View, Text, TouchableOpacity } from "react-native"
-import ListingCard from "../../../components/ListingCard"
+import ListingCard from "./ListingCard"
 
 
-
-
-const ForYou = ({ listings, navigation }) => {
-
+const ListingsList = ({ listings, navigation, emptyMessage }) => {
+    console.log(listings)
+    // we want to return nothing if there are no listings
     if (!listings) {
-        return (
-            <View style={{ display: 'flex', height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                {/* <Text>
-                    Posts from your friends will show up here!
-                </Text> */}
-            </View>
-        )
+        return null
     }
 
 
@@ -50,4 +43,4 @@ const ForYou = ({ listings, navigation }) => {
     )
 }
 
-export default ForYou;
+export default ListingsList;

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'reac
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
-import {getAuth} from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
 
 
@@ -13,7 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 const fields = [
     { label: 'Email', key: 'email', keyboardType: 'email-address' },
     { label: 'Name', key: 'name', keyboardType: 'default' },
-    // { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true },
+    { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true },
     { label: 'Major', key: 'major', keyboardType: 'default' },
     { label: 'Concentration', key: 'concentration', keyboardType: 'default' },
     { label: 'Grad Year', key: 'gradYear', keyboardType: 'numeric' },
@@ -127,7 +127,6 @@ const PersonalInformation = () => {
 
     return (
         <View style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '90%', height: '100%', alignSelf: 'center' }}>
-            // display error message
             <View style={{ height: 30, }}>
                 {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
             </View>
@@ -151,7 +150,7 @@ const PersonalInformation = () => {
                     key={field.key}
                     style={[
                         styles.cardContainer,
-                        index === fields.length - 1 && { borderBottomWidth: 0 },
+                        index === fields.length - 1 && { borderBottomWidth: 0 }, // prevent border on the last one
                     ]}
                 >
                     <View style={styles.textContainer}>
@@ -165,7 +164,7 @@ const PersonalInformation = () => {
                         </Text>
                     </View>
                     {field.label !== 'Email' && <TouchableOpacity onPress={() => handleNext(field)}>
-                        <Ionicons name={'chevron-forward'} size={24} color={'black'} style={styles.icon} />
+                        <Ionicons name={'chevron-forward'} size={24} color={'black'} />
                     </TouchableOpacity>}
                 </View>
             ))}
@@ -229,8 +228,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderBottomColor: 'gray',
         borderBottomWidth: 1,
-        paddingVertical: 14,
-        marginTop: 12,
+        paddingVertical: 0,
+        // marginVertical: 6,
+        // marginVertical: 6
+        marginVertical: 5,
     },
     textContainer: {
         display: 'flex',
@@ -239,7 +240,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 0,
         maxWidth: '85%'
-
     },
     upperText: {
         fontSize: 12,
@@ -247,7 +247,8 @@ const styles = StyleSheet.create({
         color: 'gray'
     },
     lowerText: {
-        fontFamily: 'inter', fontSize: 16,
+        fontFamily: 'inter',
+        fontSize: 16,
         color: 'black'
     },
 

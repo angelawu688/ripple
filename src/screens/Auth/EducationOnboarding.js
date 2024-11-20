@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { userContext } from '../../context/UserContext'
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { colors } from '../../colors';
 
 
 const EducationOnboarding = ({ navigation, route }) => {
@@ -38,7 +39,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                     <TextInput
                         ref={inputRef}
                         style={styles.input}
-                        placeholder=''
+                        placeholder='CS'
                         value={major}
                         onChangeText={setMajor}
                     />
@@ -68,7 +69,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                     </Text>
                     <TextInput
                         style={styles.input}
-                        placeholder=""
+                        placeholder="Data Science"
                         value={concentration}
                         onChangeText={setConcentration}
                     />
@@ -79,7 +80,7 @@ const EducationOnboarding = ({ navigation, route }) => {
 
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={[styles.button, { backgroundColor: major && gradYear.length === 4 ? 'black' : '#D9D9D9' }]}
+                style={[styles.button, { backgroundColor: major && gradYear.length === 4 ? colors.loginBlue : colors.loginGray }]}
                 onPress={() => {
                     if (!major) {
                         // concentration not required
@@ -116,7 +117,8 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 26,
         fontWeight: '600',
-        fontFamily: 'Syne_700Bold'
+        fontFamily: 'Syne_700Bold',
+        color: colors.loginBlue
     },
     input: {
         backgroundColor: 'white',

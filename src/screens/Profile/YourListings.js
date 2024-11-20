@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
 import ListingCard from '../../components/ListingCard'
+import ListingsList from '../../components/ListingsList'
 
 const YourListings = ({ navigation }) => {
     const testListings = [
@@ -30,41 +31,42 @@ const YourListings = ({ navigation }) => {
     if (isLoading) {
         return <FullLoadingScreen />
     }
+
+    if (!yourListings) {
+        return (
+            <View>
+                <Text>
+                    Your active listings will appear here!
+                </Text>
+            </View>
+        )
+    }
+
+
     return (
-        <FlatList
-            style={{ width: '99%', alignSelf: 'center' }}
-            columnWrapperStyle={{
-                justifyContent: 'space-between',
-                marginTop: 0
-            }}
-            ListHeaderComponent={null} // blank for now, this is where a header would go.
-            numColumns={2} // this is how we put them side by side
-            data={yourListings}
-            renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
-                const listingID = listing.listingID
-                return (
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}
-                        style={{ width: '49.75%' }}
-                    >
-                        <ListingCard
-                            price={listing.price}
-                            title={listing.title}
-                            img={listing.img}
-                            sold={listing.sold}
-                        />
-
-                    </TouchableOpacity>
-                )
-            }}
-            keyExtractor={listing => listing.listingID} // use the conversationID as a key
-
-            // this is where we will put the handling to load more
-            onEndReachedThreshold={null}
-            onEndReached={null}
-
+        <ListingsList
+            navigation={navigation}
+            listings={yourListings}
         />
     )
 }
 
 export default YourListings;
+
+const styles = StyleSheet.create({
+    container: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '90%',
+        alignSelf: 'center'
+    },
+    text: {
+        fontFamily: 'inter',
+        fontSize: 24,
+        fontWeight: '500',
+        maxWidth: '75%',
+        textAlign: 'center'
+    }
+})

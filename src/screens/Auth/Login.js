@@ -3,6 +3,7 @@ import { View, TextInput, Button, StyleSheet, Text, Touchable, TouchableOpacity 
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../colors';
 
 const Login = ({ navigation }) => {
   // TODO IMPLEMENT FORGOT PASSWORD
@@ -67,7 +68,6 @@ const Login = ({ navigation }) => {
           <TouchableOpacity onPress={toggle}
             style={{
               width: 40, height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: 2,
-              // top: errorMessage ? (88) : (71) 
               top: 28
             }}>
             {secureTextEntry ? (<Ionicons name='eye-off' size={24} color={'black'} />) : (<Ionicons name='eye' size={24} color={'black'} />)}
@@ -78,7 +78,7 @@ const Login = ({ navigation }) => {
       <TouchableOpacity
         onPress={handleLogin}
         hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-        style={styles.button}
+        style={[styles.button, { backgroundColor: email && password ? colors.loginBlue : colors.loginGray }]}
       >
         <Text style={styles.buttonText}>
           Log in
@@ -125,9 +125,10 @@ const styles = StyleSheet.create({
     fontFamily: 'inter',
   },
   link: {
-    color: 'blue',
+    color: colors.loginBlue,
     marginTop: 15,
     textAlign: 'center',
+    marginLeft: 15
   },
   container: {
     display: 'flex',
@@ -140,7 +141,8 @@ const styles = StyleSheet.create({
   upperText: {
     fontSize: 26,
     fontWeight: '600',
-    fontFamily: 'Syne_700Bold'
+    fontFamily: 'Syne_700Bold',
+    color: colors.loginBlue
   },
   lowerContainer: {
     width: '100%',

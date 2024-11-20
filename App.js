@@ -20,6 +20,7 @@ export default function App() {
   });
 
   if (!fontsLoaded) {
+    // TODO replace this with the splash
     return <View>
       <ActivityIndicator size={'large'} />
     </View>

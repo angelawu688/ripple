@@ -17,85 +17,150 @@ const Profile = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.profileCardContainer}
-                onPress={() => navigation.navigate('PersonalInformation')}
-            >
-                <View style={{ flexDirection: 'row', alignItems: 'center', height: 50 }}>
-                    {/* profile icon placeholder */}
-                    <View style={{ borderRadius: 50, width: 36, height: 36, backgroundColor: 'gray', marginRight: 10 }} />
-                    <Text style={{ fontSize: 18, marginLeft: 6 }}>
-                        Account Center
-                    </Text>
-                </View>
-                <Ionicons name={'chevron-forward'} size={24} color={'black'} />
-            </TouchableOpacity>
+            {/* Your account */}
+            <View>
+                {/* account center */}
+                <Text style={styles.title}>
+                    Your account
+                </Text>
 
+                <TouchableOpacity style={styles.profileCard}
+                    onPress={() => navigation.navigate('PersonalInformation')}
+                >
+                    <View style={styles.profileCardLeft}>
+                        {/* profile icon placeholder */}
+                        <Ionicons name={'person-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={{ fontSize: 18, marginLeft: 6 }}>
+                            Account Center
+                        </Text>
+                    </View>
 
-            <View style={styles.cardsContainer}>
+                    <Ionicons name={'chevron-forward'} size={24} color={'black'} />
+                </TouchableOpacity>
+            </View>
+
+            {/* Storage */}
+            <View>
+                <Text style={styles.title}>
+                    Storage
+                </Text>
+
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={() => navigation.navigate('SavedItems')}
                 >
-                    <Ionicons name={'bookmark-outline'} size={24} color={'black'} style={styles.icon} />
-                    <Text style={styles.cardText}>
-                        Saved Listings
-                    </Text>
-                </TouchableOpacity>
+                    <View style={styles.profileCardLeft}>
+                        <Ionicons name={'bookmark-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={styles.cardText}>
+                            Saved listings
+                        </Text>
+                    </View>
 
+                    <Ionicons name={'chevron-forward'} size={24} color={'black'} />
+                </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={() => navigation.navigate('YourListings')}>
-                    {/* TODO FIX THIS ICON, FIND SOMETHING BETTER */}
-                    <Ionicons name={'business-outline'} size={24} color={'black'} style={styles.icon} />
-                    <Text style={styles.cardText}>
-                        Your Listings
-                    </Text>
-                </TouchableOpacity>
+                    <View style={styles.profileCardLeft}>
+                        <Ionicons name={'business-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={styles.cardText}>
+                            Your listings
+                        </Text>
+                    </View>
 
+                    <Ionicons name={'chevron-forward'} size={24} color={'black'} />
+                </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={() => navigation.navigate('SoldItems')}
                 >
-                    <Ionicons name={'cart-outline'} size={24} color={'black'} style={styles.icon} />
-                    <Text style={styles.cardText}>
-                        Sold Items
-                    </Text>
+                    <View style={styles.profileCardLeft}>
+                        <Ionicons name={'cart-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={styles.cardText}>
+                            Sold tems
+                        </Text>
+                    </View>
+                    <Ionicons name={'chevron-forward'} size={24} color={'black'} />
                 </TouchableOpacity>
+            </View >
+
+            {/* About */}
+            < View >
+                <Text style={styles.title}>
+                    About Ripple
+                </Text>
 
                 <TouchableOpacity
                     style={styles.profileCard}
-                    onPress={(() => navigation.navigate('Analytics'))}
+                    onPress={() => console.log('OPEN WEB URL TO LINK')}
                 >
-                    <Ionicons name={'analytics-outline'} size={24} color={'black'} style={styles.icon} />
-                    <Text style={styles.cardText}>
-                        Analytics
-                    </Text>
+                    <View style={styles.profileCardLeft}>
+                        <Ionicons name={'next-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={styles.cardText}>
+                            Join our email list
+                        </Text>
+                    </View>
+                    <Ionicons name={'chevron-forward'} size={24} color={'black'} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.profileCard}
+                    onPress={() => console.log('OPEN WEB URL TO LINK')}
+                >
+                    <View style={styles.profileCardLeft}>
+                        <Ionicons name={'next-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={styles.cardText}>
+                            Feedback form
+                        </Text>
+                    </View>
+                    <Ionicons name={'chevron-forward'} size={24} color={'black'} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.profileCard}
+                    onPress={() => console.log('OPEN WEB URL TO LINK')}
+                >
+                    <View style={styles.profileCardLeft}>
+                        <Ionicons name={'next-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={styles.cardText}>
+                            About Us
+                        </Text>
+                    </View>
+                    <Ionicons name={'chevron-forward'} size={24} color={'black'} />
                 </TouchableOpacity>
 
+            </View >
+
+            {/* Delete Account, log out */}
+            < View >
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={(() => handleLogout())}
                 >
-                    <Ionicons name={'exit-outline'} size={24} color={'black'} style={styles.icon} />
-                    <Text style={styles.cardText}>
-                        Log Out
-                    </Text>
+                    <View style={styles.profileCardLeft}>
+                        <Ionicons name={'exit-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={styles.cardText}>
+                            Logout
+                        </Text>
+                    </View>
+                    {/* need this for formatting */}
+                    <View />
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={(() => handleDeleteAccount())}
                 >
-                    <Ionicons name={'trash-outline'} size={24} color={'black'} style={styles.icon} />
-                    <Text style={styles.cardText}>
-                        Delete Account
-                    </Text>
+                    <View style={styles.profileCardLeft}>
+                        <Ionicons name={'trash-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Text style={styles.cardText}>
+                            Delete account
+                        </Text>
+                    </View>
+                    {/* need this for formatting */}
+                    <View />
                 </TouchableOpacity>
-
-
-            </View>
+            </View >
         </View >
     )
 }
@@ -105,13 +170,14 @@ export default Profile
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
-        alignItems: 'center'
-    },
-    cardsContainer: {
-        width: '90%',
         display: 'flex',
+        width: '90%',
+        paddingVertical: 12,
+        paddingBottom: 20,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         alignItems: 'center',
+        alignSelf: 'center'
     },
     profileCardContainer: {
         display: 'flex',
@@ -132,18 +198,27 @@ const styles = StyleSheet.create({
     },
     profileCard: {
         width: '100%',
-        height: 60,
+        height: 45,
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#F2F0F0',
         display: 'flex',
         flexDirection: 'row',
         marginBottom: 12,
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingRight: 5
     },
     icon: {
         marginLeft: 16,
-        marginRight: 10
+        marginRight: 20
+    },
+    profileCardLeft: { flexDirection: 'row', alignItems: 'center', height: 50 },
+    title: {
+        fontSize: 16,
+        fontFamily: 'inter',
+        fontWeight: '500',
+        marginBottom: 12
     }
 
 })
