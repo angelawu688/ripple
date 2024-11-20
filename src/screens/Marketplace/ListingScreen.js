@@ -1,8 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, deleteDoc, setDoc } from "firebase/firestore";
 import {getAuth} from 'firebase/auth';
-import { useState, useEffect } from 'react';
+import {useState, useEffect, useContext} from 'react';
+import {userContext} from "../../context/UserContext";
 
 
 const ListingScreen = ({ route }) => {
@@ -13,7 +14,9 @@ const ListingScreen = ({ route }) => {
     };
     const [listing, setListing] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const { listingID } = route.params
+    const [isSaved, setIsSaved] = useState(true);
+    const { listingID } = route.params;
+    const { user } = useContext(userContext);
 
     const db = getFirestore();
     useEffect(() => {
@@ -45,29 +48,31 @@ const ListingScreen = ({ route }) => {
       }
 
 
-    const handleSavePost = () => {
-        console.log('SAVE POST!')
-      setIsSaved(!isSaved) // toggle
+    const handleSavePost = async () => {
+        setIsSaved(!isSaved) // toggle
         // BACKEND LOGIC HERE
-
-        if (isSaved) {
+        if (isSaved && listing) {
             // post should be in saved
+            console.log('SAVE POST!')
             try {
-                const auth = getAuth();
-                const db = getFirestore();
-                // get listing information
-                // put map of information?
-                const updatedSaves = {}
-                // get curr user
-                const user = auth.currentUser;
-                const userRef = doc(db, "users", user.uid);
-                await updateDoc(userRef, updatedSaves);
-
-            } catch (e) {
-                console.log(e)
+                await setDoc(doc(db, "savedPosts", user.uid + listing.listing_id), {
+                    user_id: user.uid,
+                    listing_id: listing.listing_id,
+                    price: listing.price,
+                    title: listing.title
+                    // listing images requires firebase storage
+                });
+            } catch (error) {
+                console.log(error.message);
             }
-        } else {
+        } else if (listing) {
             // remove post from saved
+            const listingRef = doc(db, "savedPosts", listing.listing_id);
+            await deleteDoc(listingRef);
+        }
+        else {
+            // should never hit this case
+            setIsLoading(true);
         }
         // no navigation
     }
@@ -146,7 +151,9 @@ const ListingScreen = ({ route }) => {
                         </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={{ width: '48%', display: 'flex', justifyContent: 'center', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', borderRadius: 13, paddingHorizontal: 4 }}>
+                    <TouchableOpacity
+                        onPress={() => handleSavePost()}
+                        style={{ width: '48%', display: 'flex', justifyContent: 'center', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', borderRadius: 13, paddingHorizontal: 4 }}>
                         <Ionicons name="bookmark-outline" size={24} color="#000" />
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Save
