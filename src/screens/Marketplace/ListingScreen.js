@@ -6,6 +6,7 @@ import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
 import { User, Storefront, PaperPlaneTilt } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
+import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 
 
 const ListingScreen = ({ route }) => {
@@ -68,8 +69,10 @@ const ListingScreen = ({ route }) => {
 
         fetchListing();
     }, [listingID]);
+
+
     if (isLoading) {
-        return <View style={styles.container}><Text>Loading...</Text></View>;
+        return <ListingScreenFullSkeletonLoader />
     }
 
     if (!listing) {
@@ -366,14 +369,5 @@ const PhotoCarousel = ({ photos }) => {
                 ))}
             </View>
         </View >
-    )
-}
-
-const ListingScreenSkeletonLoader = () => {
-
-    return (
-        <View>
-
-        </View>
     )
 }

@@ -11,5 +11,6 @@ export const colors = {
     accentGray: '#7E7E7E',
     uwPurple: '#39275B',
     errorMessage: 'red',
-    neonBlue: '#5FAFBA'
+    neonBlue: '#5FAFBA',
+    skeletonGray: '#D9D9D9',
 }
