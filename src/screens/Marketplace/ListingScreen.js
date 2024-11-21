@@ -9,7 +9,7 @@ import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 
 
-const ListingScreen = ({ route }) => {
+const ListingScreen = ({ navigation, route }) => {
     const [width, setWidth] = useState(0);
     const handleLayout = (event) => {
         const { width } = event.nativeEvent.layout;
@@ -25,6 +25,7 @@ const ListingScreen = ({ route }) => {
 
 
     const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
+    const otherUserID = 'TcxxqAtEwuPxzYLSoQdv12vWqp83';
     const testPhotos = [
         { id: '1', color: 'yellow' },
         { id: '2', color: 'green' },
@@ -32,6 +33,7 @@ const ListingScreen = ({ route }) => {
         { id: '4', color: 'purple' },
         { id: '5', color: 'blue' },
     ]
+
 
     const db = getFirestore();
     useEffect(() => {
@@ -132,7 +134,7 @@ const ListingScreen = ({ route }) => {
 
 
 
-        // // BACKEND LOGIC HERE
+        // This was the old version. Wouldnt allow for frontend updates and was broken
         // if (isSaved && listing) {
         //     // post should be in saved
         //     console.log('SAVE POST!')
@@ -161,8 +163,16 @@ const ListingScreen = ({ route }) => {
     }
 
     const handleSendHi = () => {
+        // TODO
+        // conditionally add a conversation on the backend and frontend
+        // loading states, etc. 
+
+        // this will navigate with the 
+        navigation.navigate('MessagesStack', {
+            screen: 'Conversation',
+            params: { listing },
+        });
         console.log('SEND HI')
-        // navigate to where the message will be sent
     }
 
     const sharePost = () => {
@@ -198,7 +208,11 @@ const ListingScreen = ({ route }) => {
 
             {/* profile card */}
             <View style={styles.sectionContainer}>
-                <TouchableOpacity style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('UserProfile', { userID: otherUserID })
+                }}
+
+                    style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
 
                     {user?.pfp?.uri ? (
                         <Image
@@ -229,7 +243,9 @@ const ListingScreen = ({ route }) => {
             {/* IF THIS IS NOT OUR POST */}
             {/* prompt section */}
             <View style={styles.sectionContainer}>
-                <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', paddingHorizontal: 12, borderRadius: 13 }}>
+                <TouchableOpacity onPress={() => handleSendHi()}
+
+                    style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', paddingHorizontal: 12, borderRadius: 13 }}>
                     <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', }}>
                         <Storefront color='black' size={28} />
                         <Text style={{ marginLeft: 20, fontFamily: 'inter', fontSize: 18 }}>

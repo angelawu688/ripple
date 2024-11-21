@@ -1,26 +1,49 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ForYou from "./MarketplaceLists/ForYou";
 import { Ionicons } from "@expo/vector-icons";
-import {collection, doc, getDoc, getFirestore} from "firebase/firestore";
+import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
+import ListingsList from '../../components/ListingsList'
 
 const UserProfile = ({ navigation, route }) => {
     const { userID } = route.params
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
-    const [user, setUser] = useState(null)
+    const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
+
+    // Below is for testing
+    const [testUser, setTestUser] = useState({
+        pfp: undefined,
+        name: 'Alex Smith',
+        netID: 'asmith@uw.edu',
+        major: 'info',
+        concentration: 'hci',
+        gradYear: '2025',
+        instagram: 'alex.smith',
+        linkedin: 'SOME URL HERE',
+        bio: "Jonah Coleman's favorite arist is EBK Yeebo. You should check him out",
+        posts: testUserPosts
+    })
+    //
+    const testUserPosts = [
+        { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
+        { listingID: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
+        { listingID: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
+        { listingID: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: true },
+        { listingID: 5, img: undefined, title: 'Catan Set', price: 10, sold: true },
+    ]
 
     // grab the profile from the backend by the userID.
     // use on component mount so useEffect? or use userContext?
     useEffect(() => {
-        const getProfile= async () => {
+        const getProfile = async () => {
             try {
                 const db = getFirestore();
                 const userRef = doc(db, "users", userID);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
-                    setUser(userDoc.data())
+                    setUserProfile(userDoc.data())
                 }
                 else {
                     console.error("No such user")
@@ -48,33 +71,10 @@ const UserProfile = ({ navigation, route }) => {
         console.log('gonna implement soon')
     }
 
-    // Below is for testing
-    const [testUser, setTestUser] = useState({
-        pfp: undefined,
-        name: 'Alex Smith',
-        netID: 'asmith@uw.edu',
-        major: 'info',
-        concentration: 'hci',
-        gradYear: '2025',
-        instagram: 'alex.smith',
-        linkedin: 'SOME URL HERE',
-        bio: "Jonah Coleman's favorite arist is EBK Yeebo. You should check him out",
-        posts: testUserPosts
-    })
-    //
-    const testUserPosts = [
-        { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        { listingID: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
-        { listingID: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
-        { listingID: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: true },
-        { listingID: 5, img: undefined, title: 'Catan Set', price: 10, sold: true },
-    ]
-
-
     return (
         <View style={styles.container}>
             <View style={styles.topContainer}>
-                {testUser.pfp ? (<Image
+                {userProfile.pfp ? (<Image
                 // pfp would go here
 
                 />) :
@@ -82,7 +82,7 @@ const UserProfile = ({ navigation, route }) => {
                 }
                 <View style={styles.headerTextContainer}>
                     <Text style={styles.nameText}>
-                        {user?.name || "no name provided"}
+                        {userProfile?.name || "Nameless"}
                     </Text>
                 </View>
             </View>
@@ -90,9 +90,8 @@ const UserProfile = ({ navigation, route }) => {
 
 
             <View style={styles.bioContainer}>
-                {/*TODO: why is user.major weirdly italicized*/}
                 <Text style={{ fontSize: 16, color: 'black', fontFamily: 'inter', fontWeight: '500', marginTop: 10, }}>
-                    {user.gradYear} | {user.major} | {user?.concentration || ""}
+                    {userProfile.gradYear} | {userProfile.major} | {userProfile?.concentration || ""}
                 </Text>
                 <View style={styles.socials}>
                     <TouchableOpacity style={styles.socialBubblePlaceholder}
@@ -106,7 +105,7 @@ const UserProfile = ({ navigation, route }) => {
                     />
                 </View>
                 <Text style={{ fontSize: 14, color: 'black', fontFamily: 'inter', fontWeight: '400', marginTop: 10, }}>
-                    {testUser.bio}
+                    {userProfile.bio}
                 </Text>
             </View>
 
@@ -136,7 +135,7 @@ const UserProfile = ({ navigation, route }) => {
 
 
 
-            <ForYou listings={testUserPosts} navigation={navigation} />
+            <ListingsList listings={testUserPosts} navigation={navigation} />
 
 
 

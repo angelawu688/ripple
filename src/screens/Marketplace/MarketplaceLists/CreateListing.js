@@ -209,6 +209,7 @@ const CreateListing = ({ navigation }) => {
             console.log(e);
         } finally {
             setIsLoading(false)
+            navigation.goBack(); // navigate back to the previous screen. This isnt ideal but should play for now
         }
     }
 

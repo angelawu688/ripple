@@ -23,11 +23,17 @@ const ListingCard = ({ listing }) => {
     };
     return (
         <View onLayout={handleLayout}
-            style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%' }}>
-            <View style={{ borderRadius: 12, width: '100%', height: width, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F2F0F0' }}>
-                {img && (
-                    <Image source={{ uri: img.uri }} />
-                )}
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', marginBottom: 15 }}>
+            <View style={{ borderRadius: 12, width: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#F2F0F0' }}>
+                {img ? (
+                    <Image
+                        source={{ uri: img.uri }}
+                        style={{ width: '100%', aspectRatio: 1, }}
+
+                    />) : (<View
+                        style={{ width: '100%', aspectRatio: 1, }}
+                    />)
+                }
 
                 {sold && (
                     <Text style={{ color: 'black', fontSize: 70, opacity: 0.4, fontWeight: '900', position: 'absolute' }}>SOLD</Text>
@@ -35,14 +41,12 @@ const ListingCard = ({ listing }) => {
 
             </View>
 
-
-
             <Text
                 style={{
                     fontSize: 18,
                     marginLeft: '5%',
                     marginTop: 10,
-                    marginBottom: 15,
+                    marginBottom: 0,
                     fontWeight: '500'
                 }}
                 numberOfLines={1}
