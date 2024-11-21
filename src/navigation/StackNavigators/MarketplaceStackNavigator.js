@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Marketplace from '../../screens/Marketplace/Marketplace'
 import ListingScreen from '../../screens/Marketplace/ListingScreen'
-import SellScreen from '../../screens/Marketplace/SellScreen'
 
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
@@ -51,7 +50,7 @@ const MarketplaceStackNavigator = () => {
                 })}
             />
 
-            <MarketplaceStack.Screen
+            {/* <MarketplaceStack.Screen
                 name="SellScreen"
                 component={SellScreen}
                 options={({ navigation }) => ({
@@ -64,7 +63,7 @@ const MarketplaceStackNavigator = () => {
                         </TouchableOpacity>
                     )
                 })}
-            />
+            /> */}
 
             <MarketplaceStack.Screen
                 name="CreateListing"

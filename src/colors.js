@@ -10,5 +10,6 @@ export const colors = {
     loginGray: '#D9D9D9',
     accentGray: '#7E7E7E',
     uwPurple: '#39275B',
-    errorMessage: 'red'
+    errorMessage: 'red',
+    neonBlue: '#5FAFBA'
 }

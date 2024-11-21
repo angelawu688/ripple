@@ -146,6 +146,7 @@ const PersonalInformation = () => {
                 setPfp(selectedImages[0])
             } else {
                 // user cancelled, do nothing
+                setIsLoadingImagePicker(false)
             }
         } catch (e) {
             console.log(e);
