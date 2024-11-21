@@ -4,6 +4,8 @@ import { getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, quer
 import { useState, useEffect, useContext, useRef } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
+import { User, Storefront, PaperPlaneTilt } from 'phosphor-react-native';
+import { LocalRouteParamsContext } from 'expo-router/build/Route';
 
 
 const ListingScreen = ({ route }) => {
@@ -17,7 +19,7 @@ const ListingScreen = ({ route }) => {
     // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(true);
     const { listingID } = route.params;
-    const { user } = useContext(userContext);
+    const { user, userData } = useContext(userContext);
 
     const testPhotos = [
         { id: '1', color: 'yellow' },
@@ -124,84 +126,107 @@ const ListingScreen = ({ route }) => {
         >
             <PhotoCarousel photos={testPhotos} />
 
-
-            {/* the below details container */}
-
-            <View style={{ width: '92%', alignSelf: 'center', marginTop: 4 }}>
-                <View style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', marginTop: 6, }}>
+            {/* name, price, date */}
+            <View style={styles.sectionContainer}>
+                <View style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
                     <Text numberOfLines={1}
                         style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 22, marginTop: 0 }}>
                         {listing.title}
                     </Text>
-                    <Text style={{ fontSize: 18, fontFamily: 'inter', marginTop: 0, fontWeight: '500' }}>
+                    <Text style={{ fontSize: 22, fontFamily: 'inter', marginTop: 0, fontWeight: '500', color: colors.loginBlue }}>
                         ${listing.price}
                     </Text>
                 </View>
-                <Text style={{ fontFamily: 'inter', fontSize: 14, color: '#767676', marginBottom: 10 }}>
+                {/* todofix */}
+                <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', color: colors.accentGray }}>
                     {new Date(listing.createdAt.toDate()).toLocaleDateString()}
                 </Text>
+            </View>
 
+            {/* profile card */}
+            <View style={styles.sectionContainer}>
+                <TouchableOpacity style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
 
-                <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center', height: 45, paddingHorizontal: 12, marginBottom: 12 }}>
+                    {user?.pfp?.uri ? (
+                        <Image
+                            source={{ uri: user.pfp.uri }}
+                            style={{ width: 60, height: 60, borderRadius: 60 }}
+                        />
+                    ) : (
+                        <View
+                            style={{ height: 60, width: 60, borderRadius: 60, backgroundColor: colors.loginGray, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                        >
+                            <User color='black' size={32} />
+                        </View>
+                    )}
 
-
-                    <Text style={{ fontFamily: 'inter', fontSize: 16, marginLeft: 12 }}>
-                        FIRST LAST
-                    </Text>
-
-
+                    <View>
+                        <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: 'black', fontWeight: '500' }} >
+                            {userData.name || 'oops'}
+                        </Text>
+                        <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: colors.accentGray }} >
+                            {user.email}
+                        </Text>
+                    </View>
 
                 </TouchableOpacity>
+            </View>
 
+
+            {/* IF THIS IS NOT OUR POST */}
+            {/* prompt section */}
+            <View style={styles.sectionContainer}>
                 <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', paddingHorizontal: 12, borderRadius: 13 }}>
                     <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', }}>
-                        <Ionicons name="business-outline" size={24} color="#000" />
+                        <Storefront color='black' size={28} />
                         <Text style={{ marginLeft: 20, fontFamily: 'inter', fontSize: 18 }}>
                             "Hi, is this still available?"
                         </Text>
                     </View>
 
                     <View
-                        style={[{ height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 13, backgroundColor: 'white', paddingHorizontal: 10 }, styles.shadow]}
+                        style={[{ height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 13, backgroundColor: colors.neonBlue, paddingHorizontal: 10 }, styles.shadow]}
                     >
-                        <Text style={{ fontSize: 14, fontFamily: 'inter' }}>Send</Text>
+                        <Text style={{ fontSize: 14, fontFamily: 'inter', fontWeight: '600', color: "white" }}>Send</Text>
                     </View>
 
                 </TouchableOpacity>
 
 
-                <View style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, marginTop: 14 }}>
+                <View style={styles.bottomButtonContainer}>
 
-                    <TouchableOpacity style={{ width: '48%', display: 'flex', justifyContent: 'center', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', borderRadius: 13, paddingHorizontal: 4 }}>
-                        <Ionicons name="mail-outline" size={24} color="#000" />
-                        <Text style={{ marginLeft: 20, fontFamily: 'inter', fontSize: 18 }}>
+                    <TouchableOpacity style={styles.bottomButton}>
+                        <PaperPlaneTilt size={26} color="black" s />
+                        <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Share
                         </Text>
                     </TouchableOpacity>
 
+
                     <TouchableOpacity
                         onPress={() => handleSavePost()}
-                        style={{ width: '48%', display: 'flex', justifyContent: 'center', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', borderRadius: 13, paddingHorizontal: 4 }}>
+                        style={styles.bottomButton}>
                         <Ionicons name="bookmark-outline" size={24} color="#000" />
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Save
                         </Text>
                     </TouchableOpacity>
+
                 </View>
 
+            </View>
 
+            {/* description section */}
+            <View style={styles.sectionContainer}>
                 <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '500', marginBottom: 4, marginTop: 16 }}>
                     Description
                 </Text>
                 <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
                     {listing.description}
                 </Text>
-
-
-
-
             </View>
-        </ScrollView>
+
+        </ScrollView >
     )
 }
 
@@ -219,6 +244,42 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 8,
     },
+    priceNameContainer: {
+        alignSelf: 'center',
+        width: '95%',
+        marginTop: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start'
+    },
+    sectionContainer: {
+        width: '92%',
+        alignSelf: 'center',
+        flexDirection: 'column',
+        marginTop: 16
+
+    },
+    bottomButton: {
+        display: 'flex',
+        width: '47%',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 45,
+        borderWidth: 1,
+        borderColor: '#F2F0F0',
+        borderRadius: 13,
+        paddingHorizontal: 4,
+
+    },
+    bottomButtonContainer: {
+        width: '100%',
+        display: 'flex', justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 40,
+        marginTop: 12,
+    }
 })
 
 
@@ -255,6 +316,7 @@ const PhotoCarousel = ({ photos }) => {
         activeIndicator: {
             backgroundColor: colors.neonBlue,
         },
+
     })
 
 
@@ -307,3 +369,11 @@ const PhotoCarousel = ({ photos }) => {
     )
 }
 
+const ListingScreenSkeletonLoader = () => {
+
+    return (
+        <View>
+
+        </View>
+    )
+}

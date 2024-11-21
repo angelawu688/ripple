@@ -13,7 +13,7 @@ import { isLoading } from 'expo-font';
 // this defines the fields for us so that we can reuse our modal component
 const fields = [
     { label: 'Email', key: 'email', keyboardType: 'email-address', },
-    { label: 'Name', key: 'name', keyboardType: 'default', },
+    { label: 'name', key: 'name', keyboardType: 'default', },
     { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true, description: 'What makes you unique?' },
     { label: 'Major', key: 'major', keyboardType: 'default', },
     { label: 'Concentration', key: 'concentration', keyboardType: 'default', },

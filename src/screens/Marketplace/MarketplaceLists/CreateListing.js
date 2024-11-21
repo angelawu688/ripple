@@ -129,7 +129,6 @@ const CreateListing = ({ navigation }) => {
     };
 
     const removePhoto = (uri) => {
-        setImageErrorMessage('Failed to read  image')
         setPhotos(photos.filter(photoURI => photoURI !== uri));
         // no backend update needed
     };
