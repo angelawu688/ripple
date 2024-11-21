@@ -8,5 +8,7 @@ export const colors = {
     gradientBottom: '#3CA2A2',
     loginBlue: '#006780',
     loginGray: '#D9D9D9',
-    uwPurple: '#39275B'
+    accentGray: '#7E7E7E',
+    uwPurple: '#39275B',
+    errorMessage: 'red'
 }
