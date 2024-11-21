@@ -3,6 +3,9 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { userContext } from "../../context/UserContext";
 import { Ionicons } from '@expo/vector-icons';
 
+import { ChatTeardropText, User, Storefront, Bookmark, BookmarkSimple, ShoppingCart, ShareFat } from 'phosphor-react-native';
+
+
 
 const Profile = ({ navigation }) => {
     const { user, setUser } = useContext(userContext);
@@ -29,7 +32,8 @@ const Profile = ({ navigation }) => {
                 >
                     <View style={styles.profileCardLeft}>
                         {/* profile icon placeholder */}
-                        <Ionicons name={'person-outline'} size={24} color={'black'} style={styles.icon} />
+                        <User size={24} color={'black'} style={styles.icon} />
+                        {/* <Ionicons name={'person-outline'} size={24} color={'black'} style={styles.icon} /> */}
                         <Text style={{ fontSize: 18, marginLeft: 6 }}>
                             Account Center
                         </Text>
@@ -50,7 +54,8 @@ const Profile = ({ navigation }) => {
                     onPress={() => navigation.navigate('SavedItems')}
                 >
                     <View style={styles.profileCardLeft}>
-                        <Ionicons name={'bookmark-outline'} size={24} color={'black'} style={styles.icon} />
+                        <BookmarkSimple size={24} color={'black'} style={styles.icon} />
+                        {/* <Ionicons name={'bookmark-outline'} size={24} color={'black'} style={styles.icon} /> */}
                         <Text style={styles.cardText}>
                             Saved listings
                         </Text>
@@ -63,7 +68,7 @@ const Profile = ({ navigation }) => {
                     style={styles.profileCard}
                     onPress={() => navigation.navigate('YourListings')}>
                     <View style={styles.profileCardLeft}>
-                        <Ionicons name={'business-outline'} size={24} color={'black'} style={styles.icon} />
+                        <Storefront size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
                             Your listings
                         </Text>
@@ -77,7 +82,7 @@ const Profile = ({ navigation }) => {
                     onPress={() => navigation.navigate('SoldItems')}
                 >
                     <View style={styles.profileCardLeft}>
-                        <Ionicons name={'cart-outline'} size={24} color={'black'} style={styles.icon} />
+                        <ShoppingCart size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
                             Sold tems
                         </Text>
@@ -96,8 +101,9 @@ const Profile = ({ navigation }) => {
                     style={styles.profileCard}
                     onPress={() => console.log('OPEN WEB URL TO LINK')}
                 >
+
                     <View style={styles.profileCardLeft}>
-                        <Ionicons name={'next-outline'} size={24} color={'black'} style={styles.icon} />
+                        <ShareFat size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
                             Join our email list
                         </Text>
@@ -109,7 +115,7 @@ const Profile = ({ navigation }) => {
                     onPress={() => console.log('OPEN WEB URL TO LINK')}
                 >
                     <View style={styles.profileCardLeft}>
-                        <Ionicons name={'next-outline'} size={24} color={'black'} style={styles.icon} />
+                        <ShareFat size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
                             Feedback form
                         </Text>
@@ -121,7 +127,7 @@ const Profile = ({ navigation }) => {
                     onPress={() => console.log('OPEN WEB URL TO LINK')}
                 >
                     <View style={styles.profileCardLeft}>
-                        <Ionicons name={'next-outline'} size={24} color={'black'} style={styles.icon} />
+                        <ShareFat size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
                             About Us
                         </Text>

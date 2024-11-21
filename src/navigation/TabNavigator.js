@@ -10,6 +10,8 @@ import Logo from '../components/Logo'
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../colors'
 
+import { ChatTeardropText, User, Storefront } from 'phosphor-react-native';
+
 
 
 const Tab = createBottomTabNavigator();
@@ -21,24 +23,24 @@ const TabNavigator = () => {
         <Tab.Navigator initialRouteName="MarketplaceStack"
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
-                    let iconName;
+                    let icon;
                     // TODO
                     // modify this code to have custom icons, right now these are ionicons
 
                     if (route.name === 'MessagesStack') {
-                        iconName = focused
-                            ? 'chatbubble'
-                            : 'chatbubble-outline';
+                        icon = focused
+                            ? <ChatTeardropText size={28} color={'white'} weight="fill" />
+                            : <ChatTeardropText size={28} color={'white'} />;
                     } else if (route.name === 'MarketplaceStack') {
-                        iconName = focused
-                            ? 'cash'
-                            : 'cash-outline';
+                        icon = focused
+                            ? <Storefront size={28} color={'white'} weight="fill" />
+                            : <Storefront size={28} color={'white'} />;
                     } else if (route.name === 'ProfileStack') {
-                        iconName = focused
-                            ? 'person'
-                            : 'person-outline';
+                        icon = focused
+                            ? <User size={28} color={'white'} weight="fill" />
+                            : <User size={28} color={'white'} />;
                     }
-                    return <Ionicons name={iconName} size={size} color={'white'} />
+                    return icon;
                 },
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false, // applied here
@@ -48,7 +50,7 @@ const TabNavigator = () => {
                 tabBarShowLabel: false,
                 tabBarStyle: {
                     backgroundColor: colors.darkblue,
-                    paddingTop: 10
+                    paddingTop: 12
                 },
 
             })}

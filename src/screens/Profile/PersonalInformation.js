@@ -7,6 +7,7 @@ import { getAuth } from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../colors'
 import { isLoading } from 'expo-font';
+import { Pencil } from 'phosphor-react-native';
 
 
 
@@ -173,9 +174,13 @@ const PersonalInformation = () => {
                 }
 
                 <View style={{ position: 'absolute', top: 32, right: 32 }}>
-                    {isLoadingImagePicker ? <ActivityIndicator color={colors.accentGray} /> : <View style={{ marginRight: -8, marginTop: -8, }}>
-                        <Ionicons name='pencil-outline' color={colors.accentGray} size={35} />
-                    </View>
+                    {isLoadingImagePicker ? <ActivityIndicator color={'white'} /> :
+                        <View style={{ marginTop: -8, marginRight: -10 }}>
+                            <Pencil color={'white'} size={40} />
+                        </View>
+
+                        // <Ionicons name='pencil-outline' color={colors.accentGray} size={35} />
+
                     }
                 </View>
 

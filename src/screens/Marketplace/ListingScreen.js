@@ -21,7 +21,10 @@ const ListingScreen = ({ route }) => {
     const [isSaved, setIsSaved] = useState(true);
     const { listingID } = route.params;
     const { user, userData } = useContext(userContext);
+    const [isLoadingSave, setIsLoadingSave] = useState(false)
 
+
+    const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
     const testPhotos = [
         { id: '1', color: 'yellow' },
         { id: '2', color: 'green' },
@@ -33,6 +36,7 @@ const ListingScreen = ({ route }) => {
     const db = getFirestore();
     useEffect(() => {
         const fetchListing = async () => {
+            setIsLoading(true)
             try {
                 const docRef = doc(db, "listings", listingID);
                 const docSnap = await getDoc(docRef);
@@ -42,16 +46,19 @@ const ListingScreen = ({ route }) => {
                     const savedPostsRef = collection(db, "savedPosts");
                     const queryPosts = query(savedPostsRef,
                         where("user_id", "==", user.uid),
+                        // this throws an error every time. Listing is undefined, thats why this runs
+                        // this will never get the initial state
                         where("listing_id", "==", listing.listing_id)
                     );
                     try {
-                        const savedSnapshot = await getDocs(queryPosts);
+                        // since undefined up there, we get an empty snapshot down here every time
+                        const savedSnapshot = await getDocs(queryPosts)
                         if (!savedSnapshot.empty) {
-                            console.log("Listing is saved by the user.");
-                            setIsSaved(true);
-                        } else {
-                            console.log("Listing is not saved.");
+                            console.log("Listing is not saved by the user.");
                             setIsSaved(false);
+                        } else {
+                            console.log("Listing is  saved.");
+                            setIsSaved(true);
                         }
                     } catch (error) {
                         console.error("Error checking if listing is saved:", error);
@@ -75,18 +82,28 @@ const ListingScreen = ({ route }) => {
         return <ListingScreenFullSkeletonLoader />
     }
 
+    if (isOwnPost) {
+        // put three dots in the top right
+    }
+
     if (!listing) {
         return <View style={styles.container}><Text>Listing not found</Text></View>;
     }
 
 
     const handleSavePost = async () => {
-        setIsSaved(!isSaved) // toggle
-        // BACKEND LOGIC HERE
-        if (isSaved && listing) {
-            // post should be in saved
-            console.log('SAVE POST!')
-            try {
+        // frontend change
+        setIsSaved(!isSaved)
+        setIsLoadingSave(true)
+
+        if (!listing) {
+            return;
+        }
+
+        // we probably should throttle this
+        try {
+            if (isSaved) {
+                // add it
                 await setDoc(doc(db, "savedPosts", user.uid + listing.listing_id), {
                     user_id: user.uid,
                     listing_id: listing.listing_id,
@@ -94,19 +111,52 @@ const ListingScreen = ({ route }) => {
                     title: listing.title
                     // listing images requires firebase storage
                 });
-            } catch (error) {
-                console.log(error.message);
+            } else {
+                // delete it
+                // what about the case where it isnt there???
+                const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
+
+                // if (!listingRef) {
+                //     // we dont
+                //     return;
+                // }
+                await deleteDoc(listingRef)
             }
-        } else if (listing) {
-            // remove post from saved
-            const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
-            await deleteDoc(listingRef);
-            console.log("deleted");
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setIsLoadingSave(false)
         }
-        else {
-            // should never hit this case
-            setIsLoading(true);
-        }
+
+
+
+
+
+        // // BACKEND LOGIC HERE
+        // if (isSaved && listing) {
+        //     // post should be in saved
+        //     console.log('SAVE POST!')
+        //     try {
+        //         await setDoc(doc(db, "savedPosts", user.uid + listing.listing_id), {
+        //             user_id: user.uid,
+        //             listing_id: listing.listing_id,
+        //             price: listing.price,
+        //             title: listing.title
+        //             // listing images requires firebase storage
+        //         });
+        //     } catch (error) {
+        //         console.log(error.message);
+        //     }
+        // } else if (listing) {
+        //     // remove post from saved
+        //     const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
+        //     await deleteDoc(listingRef);
+        //     console.log("deleted");
+        // }
+        // else {
+        //     // should never hit this case
+        //     setIsLoading(true);
+        // }
         // no navigation
     }
 
@@ -198,7 +248,7 @@ const ListingScreen = ({ route }) => {
 
                 <View style={styles.bottomButtonContainer}>
 
-                    <TouchableOpacity style={styles.bottomButton}>
+                    <TouchableOpacity style={styles.bottomButton} onPress={() => console.log('share')}>
                         <PaperPlaneTilt size={26} color="black" s />
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Share
@@ -208,8 +258,15 @@ const ListingScreen = ({ route }) => {
 
                     <TouchableOpacity
                         onPress={() => handleSavePost()}
-                        style={styles.bottomButton}>
-                        <Ionicons name="bookmark-outline" size={24} color="#000" />
+                        style={styles.bottomButton}
+                    >
+
+                        {isSaved ? (
+                            <Ionicons name="bookmark" size={24} color="#000" />
+                        ) : (
+                            <Ionicons name="bookmark-outline" size={24} color="#000" />
+                        )}
+
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Save
                         </Text>

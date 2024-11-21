@@ -4,7 +4,7 @@ import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
 import ListingCard from '../../components/ListingCard'
-import {getFirestore, query, where, collection, getDocs, orderBy} from "firebase/firestore";
+import { getFirestore, query, where, collection, getDocs, orderBy } from "firebase/firestore";
 
 
 const SavedItems = ({ navigation }) => {
@@ -21,7 +21,7 @@ const SavedItems = ({ navigation }) => {
     // use context for this instead of on every re-render?
     // userContext would need to update when savedPosts is updated though
     useEffect(() => {
-        const fetchSaved= async () => {
+        const fetchSaved = async () => {
             try {
                 const db = getFirestore();
                 const querySaved = query(collection(db, "savedPosts"), where("user_id", "==", user.uid));
@@ -44,6 +44,17 @@ const SavedItems = ({ navigation }) => {
     if (isLoading) {
         return <FullLoadingScreen />
     }
+
+    if (savedListings?.length === 0) {
+        return (
+            <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                <Text style={{ fontFamily: 'inter', fontSize: 18, fontWeight: '500' }}>
+                    Your saved listings will appear here!
+                </Text>
+            </View>
+        )
+    }
+
     return (
         <FlatList
             style={{ width: '99%', alignSelf: 'center' }}
@@ -64,11 +75,11 @@ const SavedItems = ({ navigation }) => {
                         onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}
                         style={{ width: '49.75%' }}
                     >
-                        <ListingCard listing = {listing} // pass in entire listing
-                            // price={listing.price || "0"}
-                            // title={listing.title || "na"}
-                            // img={listing.img || undefined}
-                            // sold={listing.sold !== undefined ? listing.sold : false}
+                        <ListingCard listing={listing} // pass in entire listing
+                        // price={listing.price || "0"}
+                        // title={listing.title || "na"}
+                        // img={listing.img || undefined}
+                        // sold={listing.sold !== undefined ? listing.sold : false}
                         />
 
                     </TouchableOpacity>
