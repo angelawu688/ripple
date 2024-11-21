@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, FlatList, Dimensions } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import {getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, query, where} from "firebase/firestore";
-import {useState, useEffect, useContext} from 'react';
-import {userContext} from "../../context/UserContext";
+import { getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, query, where } from "firebase/firestore";
+import { useState, useEffect, useContext, useRef } from 'react';
+import { userContext } from "../../context/UserContext";
+import { colors } from '../../colors'
 
 
 const ListingScreen = ({ route }) => {
@@ -18,52 +19,60 @@ const ListingScreen = ({ route }) => {
     const { listingID } = route.params;
     const { user } = useContext(userContext);
 
+    const testPhotos = [
+        { id: '1', color: 'yellow' },
+        { id: '2', color: 'green' },
+        { id: '3', color: 'red' },
+        { id: '4', color: 'purple' },
+        { id: '5', color: 'blue' },
+    ]
+
     const db = getFirestore();
     useEffect(() => {
         const fetchListing = async () => {
-          try {
-            const docRef = doc(db, "listings", listingID);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                setListing({ id: docSnap.id, ...docSnap.data() });
-                // check if listing is saved already
-                const savedPostsRef = collection(db, "savedPosts");
-                const queryPosts = query(savedPostsRef,
-                    where("user_id", "==", user.uid),
-                    where("listing_id", "==", listing.listing_id)
-                );
-                try {
-                    const savedSnapshot = await getDocs(queryPosts);
-                    if (!savedSnapshot.empty) {
-                        console.log("Listing is saved by the user.");
-                        setIsSaved(true);
-                    } else {
-                        console.log("Listing is not saved.");
-                        setIsSaved(false);
+            try {
+                const docRef = doc(db, "listings", listingID);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    setListing({ id: docSnap.id, ...docSnap.data() });
+                    // check if listing is saved already
+                    const savedPostsRef = collection(db, "savedPosts");
+                    const queryPosts = query(savedPostsRef,
+                        where("user_id", "==", user.uid),
+                        where("listing_id", "==", listing.listing_id)
+                    );
+                    try {
+                        const savedSnapshot = await getDocs(queryPosts);
+                        if (!savedSnapshot.empty) {
+                            console.log("Listing is saved by the user.");
+                            setIsSaved(true);
+                        } else {
+                            console.log("Listing is not saved.");
+                            setIsSaved(false);
+                        }
+                    } catch (error) {
+                        console.error("Error checking if listing is saved:", error);
                     }
-                } catch (error) {
-                    console.error("Error checking if listing is saved:", error);
-                }
 
-            } else {
-              console.log("No such document!");
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.error("Error fetching listing:", error);
+            } finally {
+                setIsLoading(false);
             }
-          } catch (error) {
-            console.error("Error fetching listing:", error);
-          } finally {
-            setIsLoading(false);
-          }
         };
-    
+
         fetchListing();
-      }, [listingID]);
-      if (isLoading) {
+    }, [listingID]);
+    if (isLoading) {
         return <View style={styles.container}><Text>Loading...</Text></View>;
-      }
-    
-      if (!listing) {
+    }
+
+    if (!listing) {
         return <View style={styles.container}><Text>Listing not found</Text></View>;
-      }
+    }
 
 
     const handleSavePost = async () => {
@@ -104,19 +113,19 @@ const ListingScreen = ({ route }) => {
     const sharePost = () => {
         // will have to flesh out what this looks like, thinking like a pop up to send as a text?
     }
-    
+
 
 
     return (
         <ScrollView
-            onLayout={handleLayout}
-            contentContainerStyle={{ alignItems: 'center' }}
-            style={{ flex: 1, width: '100%' }}
-        >
-            {/* BIG PHOTO */}
-            <View style={{ height: width - 8, width: width - 8, backgroundColor: 'yellow', borderRadius: 10, alignSelf: 'center' }}>
+            contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
+            style={{ width: '100%' }}
 
-            </View>
+        >
+            <PhotoCarousel photos={testPhotos} />
+
+
+            {/* the below details container */}
 
             <View style={{ width: '92%', alignSelf: 'center', marginTop: 4 }}>
                 <View style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', marginTop: 6, }}>
@@ -135,7 +144,7 @@ const ListingScreen = ({ route }) => {
 
                 <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center', height: 45, paddingHorizontal: 12, marginBottom: 12 }}>
 
-                    
+
                     <Text style={{ fontFamily: 'inter', fontSize: 16, marginLeft: 12 }}>
                         FIRST LAST
                     </Text>
@@ -211,3 +220,90 @@ const styles = StyleSheet.create({
         elevation: 8,
     },
 })
+
+
+const PhotoCarousel = ({ photos }) => {
+    const { width } = Dimensions.get("window");
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const flatListRef = useRef(null);
+    // styles up top to allow this to be moved if needed
+    const carouselStyles = StyleSheet.create({
+        container: {
+            flex: 1,
+            justifyContent: "center",
+        },
+        imageContainer: {
+            width: width,
+            height: width,
+            borderRadius: 10,
+            alignSelf: "center",
+        },
+        indicatorContainer: {
+            position: "absolute",
+            bottom: 25,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignSelf: "center",
+        },
+        indicatorButton: {
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: colors.loginGray,
+            marginHorizontal: 8,
+        },
+        activeIndicator: {
+            backgroundColor: colors.neonBlue,
+        },
+    })
+
+
+    const handleScroll = (event) => {
+        // basically round into the nearest box
+        const index = Math.round(event.nativeEvent.contentOffset.x / width);
+        setCurrentIndex(index);
+    };
+
+    const navigateToIndex = (index) => {
+        flatListRef.current?.scrollToIndex({
+            index,
+            animated: true,
+        });
+        setCurrentIndex(index);
+    };
+
+    return (
+        <View style={carouselStyles.container} >
+            <FlatList
+                pagingEnabled
+                ref={flatListRef}
+                horizontal={true}
+                data={photos}
+                renderItem={(item) => {
+                    return (
+                        // TODO change this to be an image
+                        <View style={{ height: width, width: width, backgroundColor: item.item.color, alignSelf: 'center' }} />
+                    )
+                }}
+                keyExtractor={(item, index) => index.toString()}
+                showsHorizontalScrollIndicator={false}
+                onScroll={handleScroll} // manage state variable
+                scrollEventThrottle={16} // slows down the rate of the event handler
+            />
+            <View style={carouselStyles.indicatorContainer}>
+                {photos.map((_, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        onPress={() => navigateToIndex(index)}
+                        style={[
+                            carouselStyles.indicatorButton,
+                            currentIndex === index && carouselStyles.activeIndicator
+                        ]}
+
+                    />
+                ))}
+            </View>
+        </View >
+    )
+}
+
