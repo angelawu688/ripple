@@ -30,7 +30,7 @@ const ListingsList = ({ listings, navigation }) => {
                     </TouchableOpacity>
                 )
             }}
-            keyExtractor={item => item.id} // use the conversationID as a key
+            keyExtractor={item => item.listingID} // use the conversationID as a key
             // this is where we will put the handling to load more
             onEndReachedThreshold={null}
             onEndReached={null}

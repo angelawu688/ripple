@@ -7,8 +7,6 @@ import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
 import { TouchableOpacity } from "react-native";
 
-
-
 const MessagesStack = createNativeStackNavigator();
 
 const MessagesStackNavigator = () => {

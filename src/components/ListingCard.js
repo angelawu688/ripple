@@ -6,7 +6,6 @@ import { colors } from '../colors';
 // TODO we will want to pass in an entire listing eventually
 const ListingCard = ({ listing }) => {
     if (!listing) {
-        console.log("undefined listing")
         return null;
     }
     // no photos or sold fields yet
