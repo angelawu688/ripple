@@ -10,7 +10,7 @@ import ForYou from './MarketplaceLists/ForYou'
 import Friends from './MarketplaceLists/Friends'
 import Sell from './MarketplaceLists/Sell'
 import Search from './MarketplaceLists/Search'
-import { Plus } from "phosphor-react-native";
+import { MapPin, Plus } from "phosphor-react-native";
 
 
 const testPosts = [
@@ -136,7 +136,10 @@ const Marketplace = ({ navigation }) => {
             {selectedOption !== 'sell' && selectedOption !== 'search' && <View style={styles.collegeHeaderContainer}>
 
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ marginRight: 8, }}><Ionicons name={'location'} size={24} color={colors.uwPurple} /></View>
+                    <View style={{ marginRight: 8, }}>
+                        <MapPin size={24} weight={'fill'} color={colors.uwPurple} />
+
+                    </View>
 
                     <Text style={[styles.tabTextStyle, { color: colors.uwPurple }]}>University of Washington</Text>
                 </View>

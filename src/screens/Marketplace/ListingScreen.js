@@ -4,7 +4,7 @@ import { getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, quer
 import { useState, useEffect, useContext, useRef } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
-import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple } from 'phosphor-react-native';
+import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 
@@ -22,10 +22,11 @@ const ListingScreen = ({ navigation, route }) => {
     const { listingID } = route.params;
     const { user, userData } = useContext(userContext);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
-    const [editSelected, setEditSelected] = useState(true) // used for toggling bt edit and delete buttons
-    const [postSold, setPostSold] = useState(false)
+    // edit, delete, markSold | used for toggling buttons
+    const [selectedBottomButton, setSelectedBottomButton] = useState('markSold')
 
 
+    const [postSold, setPostSold] = useState(false) // grab this on init
     const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
     const otherUserID = 'TcxxqAtEwuPxzYLSoQdv12vWqp83';
     const testPhotos = [
@@ -135,19 +136,19 @@ const ListingScreen = ({ navigation, route }) => {
                         style: "cancel",
                     },
                     {
-                        text: "Delete",
-                        onPress: () => markAsSold(),
+                        text: "Mark as Active",
+                        onPress: () => setPostSold(!postSold),
                         style: "destructive",
                     },
                 ],
                 { cancelable: true } // Allows dismissal by tapping outside the alert
             );
+        } else {
+            setPostSold(!postSold)
         }
     }
 
-    const markAsSold = () => {
-        setPostSold(!postSold)
-    }
+
 
 
 
@@ -342,33 +343,46 @@ const ListingScreen = ({ navigation, route }) => {
                 </View>
             </View>}
 
-            {isOwnPost && <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '92%', alignSelf: 'center', height: 40, marginTop: 12 }}>
-                <TouchableOpacity onPress={() => {
-                    if (editSelected) {
-                        handleEditListing()
-                    } else {
-                        setEditSelected(true)
-                    }
-                }}
+            {isOwnPost &&
+                <View style={styles.sectionContainer}>
+                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', alignSelf: 'center', height: 40, marginTop: 12 }}>
 
-                    style={[{ width: editSelected ? '70%' : '25%' }, styles.ownPostBottomButton]}>
-                    {!editSelected ? (<PencilSimple color={colors.accentGray} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.accentGray }]}>Edit Listing</Text>)}
+                        <TouchableOpacity onPress={() => {
+                            if (selectedBottomButton === 'markSold') {
+                                handleMarkAsSold()
+                            } else {
+                                setSelectedBottomButton('markSold')
+                            }
+                        }}
+                            style={[{ width: selectedBottomButton === 'markSold' ? '50%' : '20%' }, styles.ownPostBottomButton]}>
+                            {selectedBottomButton !== 'markSold' ? (<Package color={colors.black} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.black }]}> Mark as {postSold ? 'Active' : 'Sold'}</Text>)}
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            if (selectedBottomButton === 'edit') {
+                                handleEditListing()
+                            } else {
+                                setSelectedBottomButton('edit')
+                            }
+                        }}
+                            style={[{ width: selectedBottomButton === 'edit' ? '50%' : '20%' }, styles.ownPostBottomButton]}>
+                            {selectedBottomButton !== 'edit' ? (<PencilSimple color={colors.accentGray} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.accentGray }]}>Edit Listing</Text>)}
 
-                </TouchableOpacity>
+                        </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => {
-                    if (editSelected) {
-                        setEditSelected(false)
-                    } else {
-                        handleDeleteListing()
-                    }
-                }}
-                    style={[styles.ownPostBottomButton, { width: editSelected ? '25%' : '70%', borderColor: editSelected ? (colors.accentGray) : (colors.errorMessage) },]}>
-                    {editSelected ? (<TrashSimple color={colors.errorMessage} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.errorMessage }]}>Delete Listing</Text>)}
+                        <TouchableOpacity onPress={() => {
+                            if (selectedBottomButton !== 'delete') {
+                                setSelectedBottomButton('delete')
+                            } else {
+                                handleDeleteListing()
+                            }
+                        }}
+                            style={[styles.ownPostBottomButton, { width: selectedBottomButton === 'delete' ? '50%' : '20%', borderColor: selectedBottomButton !== 'delete' ? (colors.accentGray) : (colors.errorMessage) },]}>
+                            {selectedBottomButton !== 'delete' ? (<TrashSimple color={colors.errorMessage} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.errorMessage }]}>Delete Listing</Text>)}
+                        </TouchableOpacity>
+                    </View>
+                </View>
 
-
-                </TouchableOpacity>
-            </View>}
+            }
 
             {/* description section */}
             <View style={styles.sectionContainer}>
@@ -439,8 +453,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        height: '100%',
         borderColor: colors.accentGray,
+        height: 40,
         borderRadius: 8
     },
     ownPostBottomButtonText: { fontSize: 18, fontFamily: 'inter', fontWeight: '600' }
