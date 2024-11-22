@@ -10,6 +10,7 @@ import ForYou from './MarketplaceLists/ForYou'
 import Friends from './MarketplaceLists/Friends'
 import Sell from './MarketplaceLists/Sell'
 import Search from './MarketplaceLists/Search'
+import { Plus } from "phosphor-react-native";
 
 
 const testPosts = [
@@ -38,11 +39,9 @@ const testActiveListings = [
     { listingID: 9, img: undefined, title: 'Comfy Couch', price: 40, sold: false },
 ]
 
-
 const Marketplace = ({ navigation }) => {
     // TODO refactor for clarity
-
-    const totalUsers = '2.3k'
+    const totalUsers = '2.3k' // grab the total rows from the users DB and cache it
 
 
     const [listings, setListings] = useState(testPosts)
@@ -148,6 +147,12 @@ const Marketplace = ({ navigation }) => {
 
 
             {isLoading ? <ActivityIndicator size="large" /> : renderSelectedOption()}
+
+            <TouchableOpacity onPress={() => navigation.navigate('CreateListing')}
+
+                style={{ backgroundColor: 'white', borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, borderWidth: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.4, shadowRadius: 3, position: 'absolute', bottom: 15, right: 15 }}>
+                <Plus color={colors.darkblue} size={30} />
+            </TouchableOpacity>
         </View>
     )
 }

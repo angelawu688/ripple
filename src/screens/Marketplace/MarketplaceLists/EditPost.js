@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
@@ -36,7 +36,6 @@ const ImagePreview = ({ uri, removePhoto }) => {
 
 // renders the little card for the tag
 const TagPreview = ({ tag, removeTag }) => {
-    console.log('tag', tag)
     return (
         <View style={[{
             display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', padding: 6, paddingHorizontal: 8, borderRadius: 12, marginRight: 8,
@@ -52,34 +51,35 @@ const TagPreview = ({ tag, removeTag }) => {
     )
 }
 
+const EditPost = ({ navigation, route }) => {
+    const { listing } = route.params
 
-const CreateListing = ({ navigation }) => {
-    // TODO 
-    // make keyboard friendly
-    // accept photo input
-    // re-navigate
-
-    const [photos, setPhotos] = useState([]) // array of photos
-    const [tags, setTags] = useState([]) // array of tags
-    const [title, setTitle] = useState('')
-    const [price, setPrice] = useState(0)
-    const [description, setDescription] = useState('')
+    const [photos, setPhotos] = useState(listing.photos || []) // array of photos
+    const [tags, setTags] = useState(listing.tags || []) // array of tags
+    const [title, setTitle] = useState(listing.title || '')
+    const [price, setPrice] = useState(listing.price || 0)
+    const [description, setDescription] = useState(listing.description || '')
     const [tagInput, setTagInput] = useState('')
+
 
     const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isLoadingPhotoPicker, setIsLoadingPhotoPicker] = useState(false)
     const [imageErrorMessage, setImageErrorMessage] = useState('')
+    const [changes, setChanges] = useState(false)
+
 
     const handleAddTag = async (newTag) => {
         if (newTag.length <= 15) {
             setTags([...tags, newTag])
             setTagInput('')
+            setChanges(true)
         }
     }
 
     const removeTag = async (tagToRemove) => {
         setTags(tags.filter((tag) => tag !== tagToRemove))
+        setChanges(true)
     }
 
     // this will use the expo photo picker library to pick a photo from the user
@@ -109,6 +109,7 @@ const CreateListing = ({ navigation }) => {
                     type: asset.type || 'image/jpeg',
                 }));
                 setPhotos([...photos, ...selectedImages.map(img => img.uri)]);
+                setChanges(true)
                 setIsLoadingPhotoPicker(false)
             } else {
                 // user cancelled
@@ -126,6 +127,7 @@ const CreateListing = ({ navigation }) => {
 
     const removePhoto = (uri) => {
         setPhotos(photos.filter(photoURI => photoURI !== uri));
+        setChanges(true)
         // no backend update needed
     };
 
@@ -133,6 +135,7 @@ const CreateListing = ({ navigation }) => {
         const formattedPrice = formatPrice(text);
         setPrice(formattedPrice);
         setErrorMessage('')
+        setChanges(true)
         setImageErrorMessage('')
     }
 
@@ -147,8 +150,6 @@ const CreateListing = ({ navigation }) => {
     }
 
     const handlePublish = async () => {
-        console.log(photos, title, price, description, tags)
-
         if (!title) {
             setErrorMessage('Enter a title!')
             return
@@ -192,10 +193,16 @@ const CreateListing = ({ navigation }) => {
                 userId: user.uid,
                 createdAt: new Date()
             }
+            // this is gonna need to change to updateDoc instead of addDoc I think? Not sure about overwrite behavior
+            // as of rn it will just create another doc because the listingData is (slightly) different. This sucks and gives us duplicate key issues
             const docRef = await addDoc(collection(db, "listings"), listingData);
+
+
             setTimeout(() => {
                 // just chill for a sec, simulating loading
                 // using navigation reset so that we dont get a back buttons
+
+                // I think that we should keep this, but worth a convo on where to redirect next
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'Marketplace' }],
@@ -230,6 +237,7 @@ const CreateListing = ({ navigation }) => {
                         value={title}
                         onChangeText={(text) => {
                             setTitle(text)
+                            setChanges(true)
                             setErrorMessage('')
                             setImageErrorMessage('')
                         }}
@@ -312,7 +320,6 @@ const CreateListing = ({ navigation }) => {
                             placeholderTextColor="#7E7E7E"
                             value={tagInput}
                             onChangeText={(text) => {
-                                console.log(tagInput)
                                 setTagInput(text)
                                 setErrorMessage('')
                                 setImageErrorMessage('')
@@ -353,6 +360,7 @@ const CreateListing = ({ navigation }) => {
                         value={description}
                         onChangeText={(text) => {
                             setDescription(text)
+                            setChanges(true)
                             setErrorMessage('')
                             setImageErrorMessage('')
                         }}
@@ -369,12 +377,12 @@ const CreateListing = ({ navigation }) => {
 
                 <TouchableOpacity
                     onPress={() => handlePublish()}
-                    style={[styles.publishButton, styles.shadow, errorMessage && { borderWidth: 1, borderColor: 'red' }, title && price && photos.length > 0 && styles.publishButtonReady]}
+                    style={[styles.publishButton, styles.shadow, errorMessage && { borderWidth: 1, borderColor: 'red' }, changes && styles.publishButtonReady]}
                 >
 
-                    {!isLoading ? <Text style={[title && price && photos.length > 0 ? { fontSize: 20, color: 'white', fontFamily: 'inter', } : styles.placeholderText, { fontWeight: '600' }]}
+                    {!isLoading ? <Text style={[changes ? { fontSize: 20, color: 'white', fontFamily: 'inter', } : styles.placeholderText, { fontWeight: '600' }]}
                     >
-                        Publish
+                        Save
                     </Text> : <ActivityIndicator color='white' />}
                 </TouchableOpacity>
             </View>
@@ -382,7 +390,7 @@ const CreateListing = ({ navigation }) => {
     )
 }
 
-export default CreateListing;
+export default EditPost;
 
 const styles = StyleSheet.create({
     container: {

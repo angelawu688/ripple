@@ -43,7 +43,7 @@ export default ListingsList;
 const styles = StyleSheet.create({
     container: {
         width: '99%',
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
     skeletonCard: {
         width: '49.75%'

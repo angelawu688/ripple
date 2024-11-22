@@ -1,10 +1,10 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, FlatList, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, FlatList, Dimensions, Alert } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, query, where } from "firebase/firestore";
 import { useState, useEffect, useContext, useRef } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
-import { User, Storefront, PaperPlaneTilt } from 'phosphor-react-native';
+import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 
@@ -22,6 +22,8 @@ const ListingScreen = ({ navigation, route }) => {
     const { listingID } = route.params;
     const { user, userData } = useContext(userContext);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
+    const [editSelected, setEditSelected] = useState(true) // used for toggling bt edit and delete buttons
+    const [postSold, setPostSold] = useState(false)
 
 
     const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
@@ -91,6 +93,62 @@ const ListingScreen = ({ navigation, route }) => {
     if (!listing) {
         return <View style={styles.container}><Text>Listing not found</Text></View>;
     }
+
+    const handleEditListing = () => {
+        navigation.navigate('EditPost', { listing: listing })
+    }
+
+    const handleDeleteListing = () => {
+        Alert.alert(
+            "Are you sure?",
+            "You can't undelete a post",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel", // Makes the "Cancel" button bold on iOS
+                },
+                {
+                    text: "Delete",
+                    onPress: () => deletePost(),
+                    style: "destructive", // makes it red
+                },
+            ],
+            { cancelable: true } // Allows dismissal by tapping outside the alert
+        );
+    }
+
+    const deletePost = () => {
+        console.log('DELETE POST')
+        // handle backlend states, navigation, etc.
+    }
+
+    const handleMarkAsSold = () => {
+        if (postSold) {
+            Alert.alert(
+                "Are you sure?",
+                "This will mark your post as active to other users",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel",
+                    },
+                    {
+                        text: "Delete",
+                        onPress: () => markAsSold(),
+                        style: "destructive",
+                    },
+                ],
+                { cancelable: true } // Allows dismissal by tapping outside the alert
+            );
+        }
+    }
+
+    const markAsSold = () => {
+        setPostSold(!postSold)
+    }
+
 
 
     const handleSavePost = async () => {
@@ -164,7 +222,7 @@ const ListingScreen = ({ navigation, route }) => {
 
     const handleSendHi = () => {
         // TODO
-        // conditionally add a conversation on the backend and frontend
+        // conditionally create a new conversation on the backend and frontend
         // loading states, etc. 
 
         // this will navigate with the 
@@ -242,9 +300,8 @@ const ListingScreen = ({ navigation, route }) => {
 
             {/* IF THIS IS NOT OUR POST */}
             {/* prompt section */}
-            <View style={styles.sectionContainer}>
+            {!isOwnPost && <View style={styles.sectionContainer}>
                 <TouchableOpacity onPress={() => handleSendHi()}
-
                     style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', paddingHorizontal: 12, borderRadius: 13 }}>
                     <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', }}>
                         <Storefront color='black' size={28} />
@@ -261,7 +318,6 @@ const ListingScreen = ({ navigation, route }) => {
 
                 </TouchableOpacity>
 
-
                 <View style={styles.bottomButtonContainer}>
 
                     <TouchableOpacity style={styles.bottomButton} onPress={() => console.log('share')}>
@@ -270,27 +326,49 @@ const ListingScreen = ({ navigation, route }) => {
                             Share
                         </Text>
                     </TouchableOpacity>
-
-
                     <TouchableOpacity
                         onPress={() => handleSavePost()}
                         style={styles.bottomButton}
                     >
-
                         {isSaved ? (
                             <Ionicons name="bookmark" size={24} color="#000" />
                         ) : (
                             <Ionicons name="bookmark-outline" size={24} color="#000" />
                         )}
-
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Save
                         </Text>
                     </TouchableOpacity>
-
                 </View>
+            </View>}
 
-            </View>
+            {isOwnPost && <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '92%', alignSelf: 'center', height: 40, marginTop: 12 }}>
+                <TouchableOpacity onPress={() => {
+                    if (editSelected) {
+                        handleEditListing()
+                    } else {
+                        setEditSelected(true)
+                    }
+                }}
+
+                    style={[{ width: editSelected ? '70%' : '25%' }, styles.ownPostBottomButton]}>
+                    {!editSelected ? (<PencilSimple color={colors.accentGray} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.accentGray }]}>Edit Listing</Text>)}
+
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    if (editSelected) {
+                        setEditSelected(false)
+                    } else {
+                        handleDeleteListing()
+                    }
+                }}
+                    style={[styles.ownPostBottomButton, { width: editSelected ? '25%' : '70%', borderColor: editSelected ? (colors.accentGray) : (colors.errorMessage) },]}>
+                    {editSelected ? (<TrashSimple color={colors.errorMessage} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.errorMessage }]}>Delete Listing</Text>)}
+
+
+                </TouchableOpacity>
+            </View>}
 
             {/* description section */}
             <View style={styles.sectionContainer}>
@@ -355,7 +433,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 40,
         marginTop: 12,
-    }
+    },
+    ownPostBottomButton: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        height: '100%',
+        borderColor: colors.accentGray,
+        borderRadius: 8
+    },
+    ownPostBottomButtonText: { fontSize: 18, fontFamily: 'inter', fontWeight: '600' }
 })
 
 
@@ -377,7 +465,7 @@ const PhotoCarousel = ({ photos }) => {
         },
         indicatorContainer: {
             position: "absolute",
-            bottom: 25,
+            bottom: 35,
             flexDirection: "row",
             justifyContent: "center",
             alignSelf: "center",
@@ -391,6 +479,7 @@ const PhotoCarousel = ({ photos }) => {
         },
         activeIndicator: {
             backgroundColor: colors.neonBlue,
+            width: 10 // can make this bigger if you want
         },
 
     })
