@@ -24,20 +24,33 @@ const ListingScreen = ({ route }) => {
           try {
             const docRef = doc(db, "listings", listingID);
             const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                setListing({ id: docSnap.id, ...docSnap.data() });
-                // check if listing is saved already
-                if (savedPosts !== undefined && savedPosts.length !== 0 && savedPosts.some((post) => post.listing_id === listingID)) {
-                    console.log("Listing is saved by the user.");
-                    setIsSaved(true);
-                }
-                else {
-                    console.log("Listing is not saved.");
-                    setIsSaved(false);
-                }
-            } else {
-              console.log("No such document!");
-            }
+              if (docSnap.exists()) {
+                  setListing({ id: docSnap.id, ...docSnap.data() });
+                  // check if listing is saved already
+                  const savedPostsRef = collection(db, "savedPosts");
+                  const queryPosts = query(savedPostsRef,
+                      where("user_id", "==", user.uid),
+                      // this throws an error every time. Listing is undefined, thats why this runs
+                      // this will never get the initial state
+                      where("listing_id", "==", listingID)
+                  );
+                  try {
+                      // since undefined up there, we get an empty snapshot down here every time
+                      const savedSnapshot = await getDocs(queryPosts)
+                      if (!savedSnapshot.empty) {
+                          console.log("Listing is not saved by the user.");
+                          setIsSaved(false);
+                      } else {
+                          console.log("Listing is  saved.");
+                          setIsSaved(true);
+                      }
+                  } catch (error) {
+                      console.error("Error checking if listing is saved:", error);
+                  }
+
+              } else {
+                  console.log("No such document!");
+              }
           } catch (error) {
             console.error("Error fetching listing:", error);
           } finally {
