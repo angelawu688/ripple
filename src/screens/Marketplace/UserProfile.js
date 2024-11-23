@@ -9,11 +9,11 @@ import { Check, EnvelopeSimple, InstagramLogo, LinkedinLogo, Mailbox, Plus, User
 import { colors } from "../../colors";
 
 const testUserPosts = [
-    { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-    { listingID: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
-    { listingID: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
-    { listingID: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: true },
-    { listingID: 5, img: undefined, title: 'Catan Set', price: 10, sold: true },
+    { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
+    { id: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
+    { id: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
+    { id: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: true },
+    { id: 5, img: undefined, title: 'Catan Set', price: 10, sold: true },
 ]
 const UserProfile = ({ navigation, route }) => {
     const { userID } = route.params
@@ -57,7 +57,7 @@ const UserProfile = ({ navigation, route }) => {
                     console.error("No such user")
                 }
             } catch (error) {
-                console.error("Error fetching listings:", error);
+                console.error("Error fetching user:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -158,7 +158,7 @@ const UserProfile = ({ navigation, route }) => {
             <View style={styles.topContainer}>
                 {userProfile.pfp ? (<Image
                     // pfp would go here
-                    style={{ idth: 45, height: 45, borderRadius: 75, }}
+                    style={{ width: 45, height: 45, borderRadius: 75, }}
                     source={{ uri: userProfile?.pfp }}
 
                 />) :
@@ -267,9 +267,6 @@ const UserProfile = ({ navigation, route }) => {
                     </View>
                 )
             }
-
-
-
 
         </View >
     )
