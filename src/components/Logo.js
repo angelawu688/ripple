@@ -1,14 +1,40 @@
-import { View, Text } from 'react-native'
+import React from "react";
+import { Text, View } from "react-native";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors } from '../colors';
 
 
-const Logo = () => {
+const Logo = ({ fontSize }) => {
+
+    const size = fontSize || 20
+
     return (
-        <View style={{ borderRadius: 4, borderWidth: 1, borderColor: 'black', paddingHorizontal: 12 }}>
-            <Text>LOGO</Text>
+        <View style={{ justifyContent: "center", alignItems: "center", }}>
+            <GradientText style={{ fontSize: size, fontFamily: 'Syne_700Bold' }}>Ripple</GradientText>
         </View>
-    )
-
+    );
 }
+
+const GradientText = (props) => {
+    return (
+        <MaskedView
+            style={{ flexDirection: "row" }}
+            maskElement={
+                <Text {...props} style={[props.style, { backgroundColor: "transparent" }]} />
+            }
+        >
+            <LinearGradient
+                colors={[colors.gradientTop, colors.gradientBottom]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={{}}
+            >
+                <Text {...props} style={[props.style, { opacity: 0 }]} />
+            </LinearGradient>
+        </MaskedView>
+    );
+};
 
 
 export default Logo;

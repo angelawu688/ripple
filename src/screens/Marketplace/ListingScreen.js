@@ -1,11 +1,15 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, FlatList, Dimensions, Alert } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import {getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, query, where} from "firebase/firestore";
-import {useState, useEffect, useContext} from 'react';
-import {userContext} from "../../context/UserContext";
+import { getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, query, where } from "firebase/firestore";
+import { useState, useEffect, useContext, useRef } from 'react';
+import { userContext } from "../../context/UserContext";
+import { colors } from '../../colors'
+import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package } from 'phosphor-react-native';
+import { LocalRouteParamsContext } from 'expo-router/build/Route';
+import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 
 
-const ListingScreen = ({ route }) => {
+const ListingScreen = ({ navigation, route }) => {
     const [width, setWidth] = useState(0);
     const handleLayout = (event) => {
         const { width } = event.nativeEvent.layout;
@@ -16,200 +20,346 @@ const ListingScreen = ({ route }) => {
     // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(false);
     const { listingID } = route.params;
-    const { user, savedPosts, setSavedPosts } = useContext(userContext);
+    const { user, userData } = useContext(userContext);
+    const [isLoadingSave, setIsLoadingSave] = useState(false)
+    // edit, delete, markSold | used for toggling buttons
+    const [selectedBottomButton, setSelectedBottomButton] = useState('markSold')
+
+
+    const [postSold, setPostSold] = useState(false) // grab this on init
+    const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
+    const otherUserID = 'TcxxqAtEwuPxzYLSoQdv12vWqp83';
+    const testPhotos = [
+        { id: '1', color: 'yellow' },
+        { id: '2', color: 'green' },
+        { id: '3', color: 'red' },
+        { id: '4', color: 'purple' },
+        { id: '5', color: 'blue' },
+    ]
 
     const db = getFirestore();
     useEffect(() => {
         const fetchListing = async () => {
-          try {
-            const docRef = doc(db, "listings", listingID);
-            const docSnap = await getDoc(docRef);
-              if (docSnap.exists()) {
-                  setListing({ id: docSnap.id, ...docSnap.data() });
-                  // check if listing is saved already
-                  const savedPostsRef = collection(db, "savedPosts");
-                  const queryPosts = query(savedPostsRef,
-                      where("user_id", "==", user.uid),
-                      // this throws an error every time. Listing is undefined, thats why this runs
-                      // this will never get the initial state
-                      where("listing_id", "==", listingID)
-                  );
-                  try {
-                      // since undefined up there, we get an empty snapshot down here every time
-                      const savedSnapshot = await getDocs(queryPosts)
-                      if (!savedSnapshot.empty) {
-                          console.log("Listing is not saved by the user.");
-                          setIsSaved(false);
-                      } else {
-                          console.log("Listing is  saved.");
-                          setIsSaved(true);
-                      }
-                  } catch (error) {
-                      console.error("Error checking if listing is saved:", error);
-                  }
+            setIsLoading(true)
+            try {
+                const docRef = doc(db, "listings", listingID);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    setListing({ id: docSnap.id, ...docSnap.data() });
+                    // check if listing is saved already
+                    const savedPostsRef = collection(db, "savedPosts");
+                    const queryPosts = query(savedPostsRef,
+                        where("user_id", "==", user.uid),
+                        // this throws an error every time. Listing is undefined, thats why this runs
+                        // this will never get the initial state
+                        where("listing_id", "==", listing.listing_id)
+                    );
+                    try {
+                        // since undefined up there, we get an empty snapshot down here every time
+                        const savedSnapshot = await getDocs(queryPosts)
+                        if (!savedSnapshot.empty) {
+                            console.log("Listing is not saved by the user.");
+                            setIsSaved(false);
+                        } else {
+                            console.log("Listing is  saved.");
+                            setIsSaved(true);
+                        }
+                    } catch (error) {
+                        console.error("Error checking if listing is saved:", error);
+                    }
 
-              } else {
-                  console.log("No such document!");
-              }
-          } catch (error) {
-            console.error("Error fetching listing:", error);
-          } finally {
-            setIsLoading(false);
-          }
+                } else {
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.error("Error fetching listing:", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
-    
+
         fetchListing();
-      }, [listingID]);
-      if (isLoading) {
-        return <View style={styles.container}><Text>Loading...</Text></View>;
-      }
-    
-      if (!listing) {
+    }, [listingID]);
+
+
+    if (isLoading) {
+        return <ListingScreenFullSkeletonLoader />
+    }
+
+    if (isOwnPost) {
+        // put three dots in the top right
+    }
+
+    if (!listing) {
         return <View style={styles.container}><Text>Listing not found</Text></View>;
-      }
+    }
+
+    const handleEditListing = () => {
+        navigation.navigate('EditPost', { listing: listing })
+    }
+
+    const handleDeleteListing = () => {
+        Alert.alert(
+            "Are you sure?",
+            "You can't undelete a post",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel", // Makes the "Cancel" button bold on iOS
+                },
+                {
+                    text: "Delete",
+                    onPress: () => deletePost(),
+                    style: "destructive", // makes it red
+                },
+            ],
+            { cancelable: true } // Allows dismissal by tapping outside the alert
+        );
+    }
+
+    const deletePost = () => {
+        console.log('DELETE POST')
+        // handle backlend states, navigation, etc.
+    }
+
+    const handleMarkAsSold = () => {
+        if (postSold) {
+            Alert.alert(
+                "Are you sure?",
+                "This will mark your post as active to other users",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel",
+                    },
+                    {
+                        text: "Mark as Active",
+                        onPress: () => setPostSold(!postSold),
+                        style: "destructive",
+                    },
+                ],
+                { cancelable: true } // Allows dismissal by tapping outside the alert
+            );
+        } else {
+            setPostSold(!postSold)
+        }
+    }
+
+
+
 
 
     const handleSavePost = async () => {
-        console.log("isSaved before is ", isSaved)
-          if (isSaved) {
-              setIsSaved(false);
-          }
-          else {
-              setIsSaved(true);
-          }
-        // TODO: fix this toggle
-        // setIsSaved(!isSaved) // toggle
-        console.log("isSaved is now", isSaved)
-        console.log("savedPosts is ", savedPosts)
-        // BACKEND LOGIC HERE
-        if (isSaved && listing) {
-            // post should be in saved
-            console.log('SAVE POST!')
-            try {
-                const newSaved = await setDoc(doc(db, "savedPosts", user.uid + listingID), {
+        // frontend change
+        setIsSaved(!isSaved)
+        setIsLoadingSave(true)
+
+        if (!listing) {
+            return;
+        }
+
+        // we probably should throttle this
+        try {
+            if (isSaved) {
+                // add it
+                await setDoc(doc(db, "savedPosts", user.uid + listing.listing_id), {
                     user_id: user.uid,
                     listing_id: listingID,
                     price: listing.price,
                     title: listing.title
                     // listing images requires firebase storage
-                });
-                // do i need to update context here
-                setSavedPosts((prevSavedPosts) => [...prevSavedPosts, newSaved]);
-                console.log("savedPosts is ", savedPosts)
-            } catch (error) {
-                console.log(error.message);
+            } else {
+                // delete it
+                // what about the case where it isnt there???
+                const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
+
+                // if (!listingRef) {
+                //     // we dont
+                //     return;
+                // }
+                await deleteDoc(listingRef)
             }
-        } else if (!isSaved && listing) {
-            // remove post from saved
-            const listingRef = doc(db, "savedPosts", user.uid + listingID);
-            await deleteDoc(listingRef);
-            setSavedPosts((prevSavedPosts) => prevSavedPosts.filter((post) => post.listing_id !== listingID));
-            console.log("deleted");
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setIsLoadingSave(false)
         }
-        else {
-            // should never hit this case
-            setIsLoading(true);
-        }
-        // no navigation
     }
 
     const handleSendHi = () => {
+        // TODO
+        // conditionally create a new conversation on the backend and frontend
+        // loading states, etc. 
+
+        // this will navigate with the 
+        navigation.navigate('MessagesStack', {
+            screen: 'Conversation',
+            params: { listing },
+        });
         console.log('SEND HI')
-        // navigate to where the message will be sent
     }
 
     const sharePost = () => {
         // will have to flesh out what this looks like, thinking like a pop up to send as a text?
     }
-    
-
 
     return (
         <ScrollView
-            onLayout={handleLayout}
-            contentContainerStyle={{ alignItems: 'center' }}
-            style={{ flex: 1, width: '100%' }}
+            contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
+            style={{ width: '100%' }}
+
         >
-            {/* BIG PHOTO */}
-            <View style={{ height: width - 8, width: width - 8, backgroundColor: 'yellow', borderRadius: 10, alignSelf: 'center' }}>
+            <PhotoCarousel photos={testPhotos} />
 
-            </View>
-
-            <View style={{ width: '92%', alignSelf: 'center', marginTop: 4 }}>
-                <View style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', marginTop: 6, }}>
+            {/* name, price, date */}
+            <View style={styles.sectionContainer}>
+                <View style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
                     <Text numberOfLines={1}
                         style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 22, marginTop: 0 }}>
                         {listing.title}
                     </Text>
-                    <Text style={{ fontSize: 18, fontFamily: 'inter', marginTop: 0, fontWeight: '500' }}>
+                    <Text style={{ fontSize: 22, fontFamily: 'inter', marginTop: 0, fontWeight: '500', color: colors.loginBlue }}>
                         ${listing.price}
                     </Text>
                 </View>
-                <Text style={{ fontFamily: 'inter', fontSize: 14, color: '#767676', marginBottom: 10 }}>
+                {/* todofix */}
+                <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', color: colors.accentGray }}>
                     {new Date(listing.createdAt.toDate()).toLocaleDateString()}
                 </Text>
+            </View>
 
+            {/* profile card */}
+            <View style={styles.sectionContainer}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('UserProfile', { userID: otherUserID })
+                }}
 
-                <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center', height: 45, paddingHorizontal: 12, marginBottom: 12 }}>
+                    style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
 
-                    
-                    <Text style={{ fontFamily: 'inter', fontSize: 16, marginLeft: 12 }}>
-                        FIRST LAST
-                    </Text>
+                    {user?.pfp?.uri ? (
+                        <Image
+                            source={{ uri: user.pfp.uri }}
+                            style={{ width: 60, height: 60, borderRadius: 60 }}
+                        />
+                    ) : (
+                        <View
+                            style={{ height: 60, width: 60, borderRadius: 60, backgroundColor: colors.loginGray, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                        >
+                            <User color='black' size={32} />
+                        </View>
+                    )}
 
-
+                    <View>
+                        <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: 'black', fontWeight: '500' }} >
+                            {userData.name || 'oops'}
+                        </Text>
+                        <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: colors.accentGray }} >
+                            {user.email}
+                        </Text>
+                    </View>
 
                 </TouchableOpacity>
+            </View>
 
-                <TouchableOpacity style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', paddingHorizontal: 12, borderRadius: 13 }}>
+
+            {/* IF THIS IS NOT OUR POST */}
+            {/* prompt section */}
+            {!isOwnPost && <View style={styles.sectionContainer}>
+                <TouchableOpacity onPress={() => handleSendHi()}
+                    style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', paddingHorizontal: 12, borderRadius: 13 }}>
                     <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', }}>
-                        <Ionicons name="business-outline" size={24} color="#000" />
+                        <Storefront color='black' size={28} />
                         <Text style={{ marginLeft: 20, fontFamily: 'inter', fontSize: 18 }}>
                             "Hi, is this still available?"
                         </Text>
                     </View>
 
                     <View
-                        style={[{ height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 13, backgroundColor: 'white', paddingHorizontal: 10 }, styles.shadow]}
+                        style={[{ height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 13, backgroundColor: colors.neonBlue, paddingHorizontal: 10 }, styles.shadow]}
                     >
-                        <Text style={{ fontSize: 14, fontFamily: 'inter' }}>Send</Text>
+                        <Text style={{ fontSize: 14, fontFamily: 'inter', fontWeight: '600', color: "white" }}>Send</Text>
                     </View>
 
                 </TouchableOpacity>
 
+                <View style={styles.bottomButtonContainer}>
 
-                <View style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', height: 45, marginTop: 14 }}>
-
-                    <TouchableOpacity style={{ width: '48%', display: 'flex', justifyContent: 'center', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', borderRadius: 13, paddingHorizontal: 4 }}>
-                        <Ionicons name="mail-outline" size={24} color="#000" />
-                        <Text style={{ marginLeft: 20, fontFamily: 'inter', fontSize: 18 }}>
+                    <TouchableOpacity style={styles.bottomButton} onPress={() => console.log('share')}>
+                        <PaperPlaneTilt size={26} color="black" s />
+                        <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Share
                         </Text>
                     </TouchableOpacity>
-
                     <TouchableOpacity
                         onPress={() => handleSavePost()}
-                        style={{ width: '48%', display: 'flex', justifyContent: 'center', flexDirection: 'row', alignItems: 'center', height: 45, borderWidth: 1, borderColor: '#F2F0F0', borderRadius: 13, paddingHorizontal: 4 }}>
-                        <Ionicons name="bookmark-outline" size={24} color="#000" />
+                        style={styles.bottomButton}
+                    >
+                        {isSaved ? (
+                            <Ionicons name="bookmark" size={24} color="#000" />
+                        ) : (
+                            <Ionicons name="bookmark-outline" size={24} color="#000" />
+                        )}
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Save
                         </Text>
                     </TouchableOpacity>
                 </View>
+            </View>}
 
+            {isOwnPost &&
+                <View style={styles.sectionContainer}>
+                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', alignSelf: 'center', height: 40, marginTop: 12 }}>
 
+                        <TouchableOpacity onPress={() => {
+                            if (selectedBottomButton === 'markSold') {
+                                handleMarkAsSold()
+                            } else {
+                                setSelectedBottomButton('markSold')
+                            }
+                        }}
+                            style={[{ width: selectedBottomButton === 'markSold' ? '50%' : '20%' }, styles.ownPostBottomButton]}>
+                            {selectedBottomButton !== 'markSold' ? (<Package color={colors.black} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.black }]}> Mark as {postSold ? 'Active' : 'Sold'}</Text>)}
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            if (selectedBottomButton === 'edit') {
+                                handleEditListing()
+                            } else {
+                                setSelectedBottomButton('edit')
+                            }
+                        }}
+                            style={[{ width: selectedBottomButton === 'edit' ? '50%' : '20%' }, styles.ownPostBottomButton]}>
+                            {selectedBottomButton !== 'edit' ? (<PencilSimple color={colors.accentGray} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.accentGray }]}>Edit Listing</Text>)}
+
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => {
+                            if (selectedBottomButton !== 'delete') {
+                                setSelectedBottomButton('delete')
+                            } else {
+                                handleDeleteListing()
+                            }
+                        }}
+                            style={[styles.ownPostBottomButton, { width: selectedBottomButton === 'delete' ? '50%' : '20%', borderColor: selectedBottomButton !== 'delete' ? (colors.accentGray) : (colors.errorMessage) },]}>
+                            {selectedBottomButton !== 'delete' ? (<TrashSimple color={colors.errorMessage} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.errorMessage }]}>Delete Listing</Text>)}
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+            }
+
+            {/* description section */}
+            <View style={styles.sectionContainer}>
                 <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '500', marginBottom: 4, marginTop: 16 }}>
                     Description
                 </Text>
                 <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
                     {listing.description}
                 </Text>
-
-
-
-
             </View>
-        </ScrollView>
+
+        </ScrollView >
     )
 }
 
@@ -227,4 +377,138 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 8,
     },
+    priceNameContainer: {
+        alignSelf: 'center',
+        width: '95%',
+        marginTop: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start'
+    },
+    sectionContainer: {
+        width: '92%',
+        alignSelf: 'center',
+        flexDirection: 'column',
+        marginTop: 16
+
+    },
+    bottomButton: {
+        display: 'flex',
+        width: '47%',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 45,
+        borderWidth: 1,
+        borderColor: '#F2F0F0',
+        borderRadius: 13,
+        paddingHorizontal: 4,
+
+    },
+    bottomButtonContainer: {
+        width: '100%',
+        display: 'flex', justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 40,
+        marginTop: 12,
+    },
+    ownPostBottomButton: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.accentGray,
+        height: 40,
+        borderRadius: 8
+    },
+    ownPostBottomButtonText: { fontSize: 18, fontFamily: 'inter', fontWeight: '600' }
 })
+
+
+const PhotoCarousel = ({ photos }) => {
+    const { width } = Dimensions.get("window");
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const flatListRef = useRef(null);
+    // styles up top to allow this to be moved if needed
+    const carouselStyles = StyleSheet.create({
+        container: {
+            flex: 1,
+            justifyContent: "center",
+        },
+        imageContainer: {
+            width: width,
+            height: width,
+            borderRadius: 10,
+            alignSelf: "center",
+        },
+        indicatorContainer: {
+            position: "absolute",
+            bottom: 35,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignSelf: "center",
+        },
+        indicatorButton: {
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: colors.loginGray,
+            marginHorizontal: 8,
+        },
+        activeIndicator: {
+            backgroundColor: colors.neonBlue,
+            width: 10 // can make this bigger if you want
+        },
+
+    })
+
+
+    const handleScroll = (event) => {
+        // basically round into the nearest box
+        const index = Math.round(event.nativeEvent.contentOffset.x / width);
+        setCurrentIndex(index);
+    };
+
+    const navigateToIndex = (index) => {
+        flatListRef.current?.scrollToIndex({
+            index,
+            animated: true,
+        });
+        setCurrentIndex(index);
+    };
+
+    return (
+        <View style={carouselStyles.container} >
+            <FlatList
+                pagingEnabled
+                ref={flatListRef}
+                horizontal={true}
+                data={photos}
+                renderItem={(item) => {
+                    return (
+                        // TODO change this to be an image
+                        <View style={{ height: width, width: width, backgroundColor: item.item.color, alignSelf: 'center' }} />
+                    )
+                }}
+                keyExtractor={(item, index) => index.toString()}
+                showsHorizontalScrollIndicator={false}
+                onScroll={handleScroll} // manage state variable
+                scrollEventThrottle={16} // slows down the rate of the event handler
+            />
+            <View style={carouselStyles.indicatorContainer}>
+                {photos.map((_, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        onPress={() => navigateToIndex(index)}
+                        style={[
+                            carouselStyles.indicatorButton,
+                            currentIndex === index && carouselStyles.activeIndicator
+                        ]}
+
+                    />
+                ))}
+            </View>
+        </View >
+    )
+}

@@ -1,4 +1,4 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createNativeStackNavigator, TransitionPresets } from "@react-navigation/native-stack";
 import MessagesOverview from "../../screens/Messages/MessagesOverview";
 import Conversation from "../../screens/Messages/Conversation";
 import { Ionicons } from '@expo/vector-icons';
@@ -6,8 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
 import { TouchableOpacity } from "react-native";
-
-
 
 const MessagesStack = createNativeStackNavigator();
 
@@ -26,6 +24,7 @@ const MessagesStackNavigator = () => {
                 name="MessagesOverview"
                 component={MessagesOverview}
                 options={{
+                    animation: 'slide_from_left',
                     headerTitle: () => (
                         <Logo />
                     )
@@ -41,10 +40,14 @@ const MessagesStackNavigator = () => {
                         <Logo />
                     ),
                     headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
+
+                        <TouchableOpacity onPress={() => navigation.reset({
+                            index: 0,
+                            routes: [{ name: 'MessagesOverview' }],
+                        })}>
                             <Ionicons name="chevron-back" size={24} color="#000" />
                         </TouchableOpacity>
-                    )
+                    ),
                 })}
             />
         </MessagesStack.Navigator>

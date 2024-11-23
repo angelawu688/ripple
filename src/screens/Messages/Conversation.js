@@ -1,52 +1,87 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useEffect, useRef, useState } from 'react'
-import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
+import ListingCard from '../../components/ListingCard';
+import { XCircle } from 'phosphor-react-native';
+import { colors } from '../../colors';
 
 
 
 // not to represent the structure––we need time as well
 // I am assuming that they will be sorted by time in the DB
 const testMessages = [
-    { content: 'Hi!', sentBy: '2', },
-    { content: 'Hello', sentBy: '1', },
-    { content: 'Im tryna buy your fridge', sentBy: '2', },
-    { content: 'Bet how much', sentBy: '1', },
-    { content: '10 bands', sentBy: '1', },
-    { content: 'No thanks', sentBy: '2', },
-    { content: 'Ill do 4', sentBy: '2', },
-    { content: undefined, sentBy: '1', }
+    { textContent: 'Hi!', imageContent: undefined, postContent: undefined, sentBy: '2', },
+    { textContent: 'Hello', imageContent: undefined, postContent: undefined, sentBy: '1', },
+    { textContent: 'Im tryna buy your fridge', imageContent: undefined, postContent: undefined, sentBy: '2', },
+    { textContent: 'Bet how much', imageContent: undefined, postContent: undefined, sentBy: '1', },
+    { textContent: '10 bands', imageContent: undefined, postContent: undefined, sentBy: '1', },
+    { textContent: 'No thanks', imageContent: undefined, postContent: undefined, sentBy: '2', },
+    { textContent: 'Ill do 4', imageContent: undefined, postContent: undefined, sentBy: '2', },
+    { textContent: undefined, imageContent: undefined, postContent: undefined, sentBy: '1', }
 ]
 
 
 const MessageBubble = ({ message, activeUserID }) => {
-    const { content, sentBy } = message
+    const { textContent, imageContent, postContent, sentBy } = message
+
     // TODO pull images from here and display within a message bubble
-    if (!content) {
+    if (!textContent && !imageContent && !postContent) {
         return;
     }
     const isCurrentUser = sentBy === activeUserID
+
+    // add suport for images and posts
+
+    // TODO make look cleaner
     return (
-        <View style={[styles.messageBubble, isCurrentUser ? styles.sent : styles.received]}>
-            <Text style={[styles.messageText, { color: isCurrentUser ? 'white' : 'black' }]}>
-                {content}
-            </Text>
+        <View style={{ flexDirection: 'column', alignItems: isCurrentUser ? 'flex-end' : 'flex-start' }}>
+            {postContent && (
+                <View style={{
+                    width: 150,
+                    aspectRatio: 1,
+                    marginBottom: 10
+                }}>
+                    <ListingCard listing={postContent} containerWidth={170} />
+                </View>
+            )}
+
+            {imageContent && (
+                <Image
+                    style={{ width: 170, height: 170, borderWidth: 1, borderColor: colors.loginGray, borderRadius: 8 }}
+                    source={{ uri: imageContent.uri }}
+                />
+            )}
+            {textContent && textContent.length !== 0 && (
+                <View style={[styles.messageBubble, isCurrentUser ? styles.sent : styles.received]}>
+
+                    <Text style={[styles.messageText, { color: isCurrentUser ? 'white' : 'black' }]}>
+                        {textContent}
+                    </Text>
+
+                </View>
+            )}
+
         </View>
+
+
     )
 }
 
 
 const Conversation = ({ route }) => {
-    const { conversationID } = route.params
+    // pass in the listing from the route
+    const { listing } = route.params
+    const [inputListing, setInputListing] = useState(listing || null)
+
+
     // FOR TESTING AND DISPLAY
     // grab the userID from the logged in user
     // grab the messages from the db
     const [messages, setMessages] = useState(testMessages)
     const currentUserID = '1';
 
-
-
-    const [input, setInput] = useState('')
+    const [input, setInput] = useState(listing ? ('Hi, is this still available?') : '')
     const [img, setImg] = useState(undefined)
     const [openingImagePicker, setOpeningImagePicker] = useState(false)
 
@@ -58,26 +93,37 @@ const Conversation = ({ route }) => {
         }
     }, [messages]);
 
-    // testing, lets us see the image in the console after it is picked
-    // this is what will log undefined on render
-    useEffect(() => {
-        console.log(img)
-    }, [img])
-
-    const handleSendMessage = () => {
-        if (!input.trim()) {
+    const handleSendMessage = (text, image, post, clearInputs) => {
+        // if we arent sending anything, return
+        if (!text.trim() && !image && !post) {
             return
         }
+
         // again, this is a test––update to reflect the actual schema
-        const newMessage = { content: input, sentBy: currentUserID }
-        setMessages([...messages, newMessage]) // update the frontend
+        // right now we have the option to send text, images, or posts
+        const newMessage = {
+            textContent: text,
+            imageContent: image,
+            postContent: post,
+            sentBy: currentUserID
+        };
+        // frontend update
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+
         // UPDATE THE BACKEND HERE
+        clearInputs()
+    }
+
+    const clearInputs = () => {
         setInput('')
+        setImg(null)
     }
 
 
+    // opens the image picker and updates the selectedImage state 
     const handleAddImage = async () => {
         try {
+            setOpeningImagePicker(true)
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
                 alert('We need camera roll permissions to add photos!');
@@ -91,6 +137,7 @@ const Conversation = ({ route }) => {
                 quality: 0.7,
                 selectionLimit: 1
             });
+            setOpeningImagePicker(false)
 
             if (!result.canceled) {
                 const selectedImages = result.assets.map(asset => ({
@@ -98,14 +145,13 @@ const Conversation = ({ route }) => {
                     name: asset.fileName || `photo_${Date.now()}.jpg`,
                     type: asset.type || 'image/jpeg',
                 }));
-
-                // CHANGE PFP HERE
-                // TOOD update DB and userContext
+                setImg(selectedImages[0])
             } else {
                 // user cancelled, do nothing
             }
         } catch (e) {
             console.log(e);
+            setOpeningImagePicker(false)
         }
     }
 
@@ -114,7 +160,7 @@ const Conversation = ({ route }) => {
         <KeyboardAvoidingView // make sure that we can see input and keyboard
             style={{ flex: 1 }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={90} // Adjust offset for iOS status bar height
+            keyboardVerticalOffset={90}
         >
             <View style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%', }}>
                 <ScrollView
@@ -127,12 +173,41 @@ const Conversation = ({ route }) => {
                             <MessageBubble key={index} message={message} activeUserID={currentUserID} />
                         )
                     })}
+
                     {!messages || messages.length === 0 &&
                         <View style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                             <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
                                 Start a conversation!
-                            </Text></View>}
+                            </Text>
+                        </View>
+                    }
                 </ScrollView>
+
+
+
+                {/* preview for listing  */}
+                {inputListing && (
+                    <View style={styles.previewImageContainer}>
+                        <View style={{ alignSelf: 'center', width: 150, height: 150, marginBottom: 45 }}>
+                            <ListingCard listing={inputListing} />
+                        </View>
+
+                        <TouchableOpacity onPress={() => setInputListing(null)} style={styles.removePreviewButtonListing}>
+                            <XCircle weight='fill' size={30} color={colors.loginGray} />
+
+                        </TouchableOpacity>
+                    </View>
+                )}
+
+                {/* Preview for Image */}
+                {img?.uri && (
+                    <View style={styles.previewImageContainer}>
+                        <Image source={{ uri: img?.uri }} style={styles.previewImage} />
+                        <TouchableOpacity onPress={() => setImg(null)} style={styles.removePreviewButton}>
+                            <XCircle weight='fill' size={30} color={colors.loginGray} />
+                        </TouchableOpacity>
+                    </View>
+                )}
 
                 {/* input bar at the bottom */}
                 <View style={styles.inputBar}>
@@ -148,22 +223,22 @@ const Conversation = ({ route }) => {
                         {openingImagePicker ? <ActivityIndicator color='#767676' /> : <Ionicons name='add-outline' size={20} color='#767676' />}
                     </TouchableOpacity>
 
-                    {/* TODO */}
-                    {/* if image, some logic to replace this with the image */}
+
                     <TextInput
                         placeholder='Message'
                         value={input}
                         onChangeText={setInput}
                         style={styles.input}
+                        onSubmitEditing={() => handleSendMessage(input, img, inputListing, clearInputs)}
                     />
 
-                    <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() ? 'black' : '#D9D9D9' }]} onPress={handleSendMessage}>
+                    <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() || img || inputListing ? 'black' : '#D9D9D9' }]} onPress={() => handleSendMessage(input, img, inputListing, clearInputs)}>
                         <Ionicons name='arrow-redo-outline' size={20} color='white' />
                     </TouchableOpacity>
 
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingView >
     )
 }
 
@@ -218,6 +293,55 @@ const styles = StyleSheet.create({
     },
     messageText: {
         fontFamily: 'inter'
+    },
+    previewImageContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+        width: 150,
+        height: 150,
+        alignSelf: 'flex-end',
+        marginRight: 10
+    },
+    previewImage: {
+        width: 150,
+        height: 150,
+        borderRadius: 5,
+        marginRight: 10,
+        borderWidth: 1,
+        borderColor: colors.loginGray,
+        borderRadius: 8
+
+    },
+    previewPost: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 5,
+
+    },
+    previewPostTitle: {
+        fontWeight: 'bold',
+        marginRight: 10,
+    },
+    previewPostDescription: {
+        color: '#555',
+    },
+    removePreviewButton: {
+        marginLeft: 10,
+        padding: 5,
+        position: 'absolute',
+        top: -18,
+        left: -28
+    },
+    removePreviewButtonListing: {
+        marginLeft: 10,
+        padding: 5,
+        position: 'absolute',
+        top: -53,
+        left: -28
     }
 
 })

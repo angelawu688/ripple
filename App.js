@@ -6,10 +6,11 @@ import { UserProvider } from './src/context/UserContext';
 import 'react-native-url-polyfill/auto';
 import { AppRegistry } from 'react-native';
 import './firebaseConfig';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFonts, Roboto_400Regular } from '@expo-google-fonts/roboto';
 import { Syne_700Bold, Syne_400Regular } from '@expo-google-fonts/syne';
 import { Inter_400Regular } from '@expo-google-fonts/inter'
+import * as SplashScreen from 'expo-splash-screen';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -19,10 +20,16 @@ export default function App() {
     Inter_400Regular
   });
 
+  // keep the splash up until the fonts are loaded
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  // dont load the app until the fonts are loaded
   if (!fontsLoaded) {
-    return <View>
-      <ActivityIndicator size={'large'} />
-    </View>
+    return;
   }
 
   return (

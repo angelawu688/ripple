@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Marketplace from '../../screens/Marketplace/Marketplace'
 import ListingScreen from '../../screens/Marketplace/ListingScreen'
-import SellScreen from '../../screens/Marketplace/SellScreen'
 
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
@@ -10,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text, TouchableOpacity } from "react-native";
 import CreateListing from "../../screens/Marketplace/MarketplaceLists/CreateListing";
 import UserProfile from "../../screens/Marketplace/UserProfile";
+import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
 
 const MarketplaceStack = createNativeStackNavigator();
 
@@ -51,7 +51,7 @@ const MarketplaceStackNavigator = () => {
                 })}
             />
 
-            <MarketplaceStack.Screen
+            {/* <MarketplaceStack.Screen
                 name="SellScreen"
                 component={SellScreen}
                 options={({ navigation }) => ({
@@ -64,7 +64,7 @@ const MarketplaceStackNavigator = () => {
                         </TouchableOpacity>
                     )
                 })}
-            />
+            /> */}
 
             <MarketplaceStack.Screen
                 name="CreateListing"
@@ -83,6 +83,18 @@ const MarketplaceStackNavigator = () => {
             <MarketplaceStack.Screen
                 name="UserProfile"
                 component={UserProfile}
+                options={({ navigation }) => ({
+                    headerTitle: () => '',
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
+            <MarketplaceStack.Screen
+                name="EditPost"
+                component={EditPost}
                 options={({ navigation }) => ({
                     headerTitle: () => '',
                     headerLeft: () => (

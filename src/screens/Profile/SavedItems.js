@@ -4,7 +4,7 @@ import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
 import ListingCard from '../../components/ListingCard'
-import {getFirestore, query, where, collection, getDocs, orderBy} from "firebase/firestore";
+import { getFirestore, query, where, collection, getDocs, orderBy } from "firebase/firestore";
 
 
 const SavedItems = ({ navigation }) => {
@@ -40,11 +40,11 @@ const SavedItems = ({ navigation }) => {
                         onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}
                         style={{ width: '49.75%' }}
                     >
-                        <ListingCard listing = {listing} // pass in entire listing
-                            // price={listing.price || "0"}
-                            // title={listing.title || "na"}
-                            // img={listing.img || undefined}
-                            // sold={listing.sold !== undefined ? listing.sold : false}
+                        <ListingCard listing={listing} // pass in entire listing
+                        // price={listing.price || "0"}
+                        // title={listing.title || "na"}
+                        // img={listing.img || undefined}
+                        // sold={listing.sold !== undefined ? listing.sold : false}
                         />
 
                     </TouchableOpacity>

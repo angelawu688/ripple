@@ -11,11 +11,11 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { colors } from '../../colors';
 
 
 const InfoOnboarding = ({ navigation, route }) => {
     const { email, password, major, concentration, gradYear, } = route.params
-    const [profPhoto, setProfPhoto] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [name, setName] = useState('')
@@ -114,7 +114,7 @@ const InfoOnboarding = ({ navigation, route }) => {
                     <TextInput
                         ref={inputRef}
                         style={styles.input}
-                        placeholder=''
+                        placeholder='Michael Penix Jr.'
                         value={name}
                         onChangeText={setName}
                     />
@@ -124,32 +124,39 @@ const InfoOnboarding = ({ navigation, route }) => {
                     <Text style={styles.inputHeader}>
                         Upload profile picture
                     </Text>
-                    <TouchableOpacity onPress={() => handleChangePfp()}
 
-                        style={{ width: 60, height: 60, borderWidth: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 50, borderStyle: 'dashed', borderColor: '#808080', marginLeft: 8, alignSelf: 'center', marginTop: 8 }}>
-                        {pfp ? (
+                    {!pfp ? (<TouchableOpacity onPress={() => handleChangePfp()}
+                        style={{ width: '100%', height: 65, borderWidth: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 15, borderStyle: 'dashed', borderColor: '#808080', marginLeft: 8, alignSelf: 'center', marginTop: 8 }}>
+                        <Ionicons name={'share-outline'} size={24} color={'#808080'} style={{ marginBottom: 4 }} />
+                    </TouchableOpacity>) : (
+                        <TouchableOpacity onPress={() => handleChangePfp()}
+                            style={{ width: 65, height: 65, borderWidth: 5, borderColor: colors.loginGray, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 50, marginLeft: 8, alignSelf: 'center', marginTop: 8 }}>
+
+
                             <Image
                                 source={{ uri: pfp.uri }}
-                                style={{ width: 60, height: 60, borderRadius: 50 }}
-
-
+                                style={{ width: 64, height: 64, borderRadius: 50 }}
                             />
-                        ) : (<Ionicons name={'share-outline'} size={24} color={'#808080'} style={{ marginBottom: 4 }} />)}
+                        </TouchableOpacity>
+                    )
+                    }
 
-                    </TouchableOpacity>
+
+
+
                 </View>
             </View>
 
 
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={[styles.button, { backgroundColor: name && pfp ? 'black' : '#D9D9D9' }]}
+                style={[styles.button, { backgroundColor: name && pfp ? colors.loginBlue : colors.loginGray }]}
                 onPress={() => handleSignUp()}
             >
                 <Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />
 
             </TouchableOpacity>
-        </View>
+        </View >
     )
 }
 

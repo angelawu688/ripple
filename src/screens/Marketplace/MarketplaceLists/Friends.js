@@ -5,8 +5,8 @@ import ListingCard from "../../../components/ListingCard"
 const Friends = ({ listings, navigation }) => {
     if (!listings) {
         return (
-            <View style={{ display: 'flex', height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                <Text>
+            <View style={{ display: 'flex', height: '70%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '500', maxWidth: '60%', textAlign: 'center' }}>
                     Posts from your friends will show up here!
                 </Text>
             </View>
@@ -26,14 +26,14 @@ const Friends = ({ listings, navigation }) => {
             data={listings}
             renderItem={({ item }) => { // note: need to keep as "items", we are just renaming it to be clear
 
-                
+
                 return (
                     <TouchableOpacity
                         onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
                         style={{ width: '49.75%' }}
                     >
                         <ListingCard
-                            listing = {item}
+                            listing={item}
                         />
 
                     </TouchableOpacity>
@@ -44,7 +44,6 @@ const Friends = ({ listings, navigation }) => {
             // this is where we will put the handling to load more
             onEndReachedThreshold={null}
             onEndReached={null}
-
         />
     )
 

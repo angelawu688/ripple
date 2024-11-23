@@ -7,7 +7,11 @@ export const userContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
+<<<<<<< HEAD
   const [savedPosts, setSavedPosts] = useState(null);
+=======
+  const [savedPosts, setSavedPosts] = useState([]);
+>>>>>>> master
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +32,7 @@ export const UserProvider = ({ children }) => {
               ...doc.data()
             }));
             setUserData(userDoc.data());
-            setSavedPosts(savedListings);
+            // grab user posts here
           } else {
             console.warn("No such document!");
             setUserData(null);
@@ -48,7 +52,11 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
+<<<<<<< HEAD
     <userContext.Provider value={{ user, setUser, userData, setUserData, isLoading, savedPosts, setSavedPosts }}>
+=======
+    <userContext.Provider value={{ user, setUser, savedPosts, setSavedPosts, userData, setUserData, isLoading }}>
+>>>>>>> master
       {children}
     </userContext.Provider>
   );

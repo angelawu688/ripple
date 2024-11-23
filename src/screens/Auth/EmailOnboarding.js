@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ActivityInd
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../colors';
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')
@@ -225,7 +226,6 @@ const EmailOnboarding = ({ navigation }) => {
                     <TouchableOpacity onPress={toggle}
                         style={{
                             width: 40, height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: 2,
-                            // top: errorMessage ? (88) : (71) 
                             top: 28
                         }}>
                         {secureTextEntry ? (<Ionicons name='eye-off' size={24} color={'black'} />) : (<Ionicons name='eye' size={24} color={'black'} />)}
@@ -235,7 +235,7 @@ const EmailOnboarding = ({ navigation }) => {
 
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={[styles.button, { backgroundColor: !isLoading && email && password.length >= 6 ? 'black' : '#D9D9D9' }]}
+                style={[styles.button, { backgroundColor: !isLoading && email && password.length >= 6 ? colors.loginBlue : colors.loginGray }]}
 
                 disabled={isLoading || !email || !password} // disabled when loading
                 onPress={() => {
@@ -325,7 +325,8 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 26,
         fontWeight: '600',
-        fontFamily: 'Syne_700Bold'
+        fontFamily: 'Syne_700Bold',
+        color: colors.loginBlue
     },
     input: {
         backgroundColor: 'white',

@@ -1,29 +1,18 @@
-import { FlatList, View, Text, TouchableOpacity } from "react-native"
-import ListingCard from "../../../components/ListingCard"
+import { FlatList, View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import ListingCard from "./ListingCard"
+import { MotiView } from 'moti';
 
 
 
-
-const ForYou = ({ listings, navigation }) => {
-
-    if (!listings) {
-        return (
-            <View style={{ display: 'flex', height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                {/* <Text>
-                    Posts from your friends will show up here!
-                </Text> */}
-            </View>
-        )
+const ListingsList = ({ listings, navigation }) => {
+    if (!listings || listings.length === 0) {
+        return null
     }
-
 
     return (
         <FlatList
-            style={{ width: '99%', alignSelf: 'center' }}
-            columnWrapperStyle={{
-                justifyContent: 'space-between',
-                marginTop: 0
-            }}
+            style={styles.container}
+            columnWrapperStyle={styles.column}
             ListHeaderComponent={null} // blank for now, this is where a header would go.
             numColumns={2} // this is how we put them side by side
             data={listings}
@@ -41,8 +30,7 @@ const ForYou = ({ listings, navigation }) => {
                     </TouchableOpacity>
                 )
             }}
-            keyExtractor={item => item.id} // use the conversationID as a key
-
+            keyExtractor={item => item.listingID} // use the conversationID as a key
             // this is where we will put the handling to load more
             onEndReachedThreshold={null}
             onEndReached={null}
@@ -50,4 +38,18 @@ const ForYou = ({ listings, navigation }) => {
     )
 }
 
-export default ForYou;
+export default ListingsList;
+
+const styles = StyleSheet.create({
+    container: {
+        width: '99%',
+        alignSelf: 'center',
+    },
+    skeletonCard: {
+        width: '49.75%'
+    },
+    column: {
+        justifyContent: 'space-between',
+        marginTop: 0
+    }
+})

@@ -10,6 +10,7 @@ import ForYou from './MarketplaceLists/ForYou'
 import Friends from './MarketplaceLists/Friends'
 import Sell from './MarketplaceLists/Sell'
 import Search from './MarketplaceLists/Search'
+import { MapPin, Plus } from "phosphor-react-native";
 
 
 const testPosts = [
@@ -38,10 +39,9 @@ const testActiveListings = [
     { listingID: 9, img: undefined, title: 'Comfy Couch', price: 40, sold: false },
 ]
 
-
 const Marketplace = ({ navigation }) => {
     // TODO refactor for clarity
-
+    const totalUsers = '2.3k' // grab the total rows from the users DB and cache it
 
 
     const [listings, setListings] = useState(testPosts)
@@ -53,23 +53,23 @@ const Marketplace = ({ navigation }) => {
     const db = getFirestore();
     useEffect(() => {
         const fetchListings = async () => {
-          try {
-            const q = query(collection(db, "listings"), orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            const listingsData = querySnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            }));
-            setListings(listingsData);
-          } catch (error) {
-            console.error("Error fetching listings:", error);
-          } finally {
-            setIsLoading(false);
-          }
+            try {
+                const q = query(collection(db, "listings"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                const listingsData = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setListings(listingsData);
+            } catch (error) {
+                console.error("Error fetching listings:", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
-    
+
         fetchListings();
-      }, []);
+    }, []);
 
     const renderSelectedOption = () => {
         // NOTE:
@@ -136,17 +136,26 @@ const Marketplace = ({ navigation }) => {
             {selectedOption !== 'sell' && selectedOption !== 'search' && <View style={styles.collegeHeaderContainer}>
 
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ marginRight: 8, }}><Ionicons name={'location'} size={24} color={'black'} /></View>
+                    <View style={{ marginRight: 8, }}>
+                        <MapPin size={24} weight={'fill'} color={colors.uwPurple} />
 
-                    <Text style={styles.tabTextStyle}>University of Washington</Text>
+                    </View>
+
+                    <Text style={[styles.tabTextStyle, { color: colors.uwPurple }]}>University of Washington</Text>
                 </View>
-                <Text style={{ color: colors.darkgray, fontSize: 14, fontFamily: 'inter' }}>2.3k Users</Text>
+                <Text style={{ color: colors.darkgray, fontSize: 14, fontFamily: 'inter' }}>{totalUsers} users</Text>
             </View>
             }
 
 
 
             {isLoading ? <ActivityIndicator size="large" /> : renderSelectedOption()}
+
+            <TouchableOpacity onPress={() => navigation.navigate('CreateListing')}
+
+                style={{ backgroundColor: 'white', borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, borderWidth: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.4, shadowRadius: 3, position: 'absolute', bottom: 15, right: 15 }}>
+                <Plus color={colors.darkblue} size={30} />
+            </TouchableOpacity>
         </View>
     )
 }
@@ -178,8 +187,7 @@ const styles = StyleSheet.create({
     },
     tabTextStyle: {
         fontSize: 18,
-        fontFamily: 'inter'
-
+        fontFamily: 'inter',
     },
     upperContainer: {
         display: 'flex',
@@ -191,13 +199,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     shadow: {
-        shadowColor: "#000",
+        shadowColor: colors.loginBlue,
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 0,
         },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
         elevation: 8,
     },
     topTitle: {

@@ -1,25 +1,27 @@
 import { useContext, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Image } from 'react-native'
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
-import {getAuth} from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
-
+import { colors } from '../../colors'
+import { isLoading } from 'expo-font';
+import { PencilSimple } from 'phosphor-react-native';
 
 
 
 // this defines the fields for us so that we can reuse our modal component
 const fields = [
-    { label: 'Email', key: 'email', keyboardType: 'email-address' },
-    { label: 'Name', key: 'name', keyboardType: 'default' },
-    // { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true },
-    { label: 'Major', key: 'major', keyboardType: 'default' },
-    { label: 'Concentration', key: 'concentration', keyboardType: 'default' },
-    { label: 'Grad Year', key: 'gradYear', keyboardType: 'numeric' },
-    { label: 'Instagram', key: 'instagram', keyboardType: 'default' },
-    { label: 'LinkedIn', key: 'linkedin', keyboardType: 'url' },
-    { label: 'Twitter/X', key: 'twitter', keyboardType: 'default' },
+    { label: 'Email', key: 'email', keyboardType: 'email-address', },
+    { label: 'name', key: 'name', keyboardType: 'default', },
+    { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true, description: 'What makes you unique?' },
+    { label: 'Major', key: 'major', keyboardType: 'default', },
+    { label: 'Concentration', key: 'concentration', keyboardType: 'default', },
+    { label: 'Grad Year', key: 'gradYear', keyboardType: 'numeric', description: 'Enter a four digit year (2026)' },
+    { label: 'Instagram', key: 'instagram', keyboardType: 'default', description: 'Enter username' },
+    { label: 'LinkedIn', key: 'linkedin', keyboardType: 'url', description: 'Enter profile link' },
+    { label: 'Twitter/X', key: 'twitter', keyboardType: 'default', description: 'Enter username' },
 ];
 
 const PersonalInformation = () => {
@@ -29,6 +31,9 @@ const PersonalInformation = () => {
     const [input, setInput] = useState('')
     const [pfp, setPfp] = useState(undefined)
     const [errorMessage, setErrorMessage] = useState('')
+    const [continueAvailable, setContinueAvailable] = useState('')
+    const [isLoadingSave, setIsLoadingSave] = useState(false)
+    const [isLoadingImagePicker, setIsLoadingImagePicker] = useState(false)
 
     // FOR TESTING PURPOSES
     // const [fakeUser, setFakeUser] = useState({
@@ -48,22 +53,47 @@ const PersonalInformation = () => {
         setCurrentField(field)
         // set the initial input to the current value
         setInput(userData?.[field.key] || '')
+        setErrorMessage('')
         setModalVisible(true);
+        setContinueAvailable(false)
     }
+
+    const validateInput = (field, value) => {
+        switch (field.key) {
+            case 'instagram':
+            case 'twitter':
+                // Ensure the value is a valid username (alphanumeric and underscores, starting with @)
+                return /^@[a-zA-Z0-9_]+$/.test(value) || 'Must be a username starting with @';
+            case 'gradYear':
+                // Validate the graduation year
+                if (!/^\d{4}$/.test(value)) return 'Enter a valid four-digit year';
+                const yearNum = parseInt(value, 10);
+                const currentYear = new Date().getFullYear();
+                if (yearNum < currentYear || yearNum > currentYear + 6) {
+                    return `Year must be between ${currentYear} and ${currentYear + 6}`;
+                }
+                return true;
+            default:
+                return true; // Default to valid if no validation rules
+        }
+    };
+
 
     const handleSave = async () => {
         if (!currentField) {
             return;
         }
 
-        // example of how to validate inputs
-        if (currentField.key === 'gradYear' && !validateGradYear(input)) {
-            Alert.alert('Invalid Graduation Year', 'Please enter a valid graduation year.');
+        setIsLoadingSave(true)
+
+        const validationResponse = validateInput(currentField, input);
+        if (validationResponse !== true) {
+            setErrorMessage(validationResponse);
+            setIsLoadingSave(false)
             return;
         }
 
         try {
-            console.log(input)
             const updatedInfo = {
                 [currentField.key]: input,
             }
@@ -73,25 +103,21 @@ const PersonalInformation = () => {
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, updatedInfo);
             const userDoc = await getDoc(userRef);
+
+            // frontend change
             setUserData(userDoc.data());
         } catch (e) {
             console.log(e)
         } finally {
             setModalVisible(false)
+            setIsLoadingSave(false)
         }
-        // update the selected state to the user input
     }
 
 
-    // example function of validating the grad year, keep it relevant
-    const validateGradYear = (year) => {
-        const currentYear = new Date().getFullYear();
-        const yearNum = parseInt(year, 10);
-        return yearNum >= currentYear && yearNum <= currentYear + 10;
-    };
-
     const handleChangePfp = async () => {
         try {
+            setIsLoadingImagePicker(true)
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
                 alert('We need camera roll permissions to add photos!');
@@ -116,42 +142,59 @@ const PersonalInformation = () => {
 
                 // CHANGE PFP HERE
                 // TODO update DB and userContext
+
+                // local change
+                setPfp(selectedImages[0])
             } else {
                 // user cancelled, do nothing
+                setIsLoadingImagePicker(false)
             }
         } catch (e) {
             console.log(e);
+        } finally {
+            setIsLoadingImagePicker(false)
         }
-
     }
 
     return (
         <View style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '90%', height: '100%', alignSelf: 'center' }}>
-            // display error message
-            <View style={{ height: 30, }}>
-                {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
-            </View>
 
-
-            <TouchableOpacity onPress={() => handleChangePfp()}
-                style={{ width: 50, height: 50, alignSelf: 'center' }}
+            <TouchableOpacity
+                disabled={isLoadingImagePicker}
+                onPress={() => handleChangePfp()}
+                style={{ width: 87, height: 87, alignSelf: 'center', borderColor: colors.accentGray, borderWidth: 1, borderRadius: 100 }}
             >
-                {pfp ?
+                {pfp?.uri ?
                     <Image
-                        source={{ pfp }}
-                        style={{ width: 50, height: 50, borderRadius: 50 }}
+                        source={{ uri: pfp.uri }}
+                        style={{ width: 85, height: 85, borderRadius: 50 }}
 
                     /> :
-                    <View style={{ width: 50, height: 50, backgroundColor: 'gray', borderRadius: 50 }} />
+                    <View style={{ width: 85, height: 85, backgroundColor: colors.accentGray, borderRadius: 50 }} />
                 }
+
+                <View style={{ position: 'absolute', top: 32, right: 32 }}>
+                    {isLoadingImagePicker ? <ActivityIndicator color={'white'} /> :
+                        <View style={{ marginTop: -8, marginRight: -10 }}>
+                            <PencilSimple color={'white'} size={40} />
+                        </View>
+
+                        // <Ionicons name='pencil-outline' color={colors.accentGray} size={35} />
+
+                    }
+                </View>
+
+
+
             </TouchableOpacity>
+
 
             {fields.map((field, index) => (
                 <View
                     key={field.key}
                     style={[
                         styles.cardContainer,
-                        index === fields.length - 1 && { borderBottomWidth: 0 },
+                        index === fields.length - 1 && { borderBottomWidth: 0 }, // prevent border on the last one
                     ]}
                 >
                     <View style={styles.textContainer}>
@@ -165,12 +208,12 @@ const PersonalInformation = () => {
                         </Text>
                     </View>
                     {field.label !== 'Email' && <TouchableOpacity onPress={() => handleNext(field)}>
-                        <Ionicons name={'chevron-forward'} size={24} color={'black'} style={styles.icon} />
+                        <Ionicons name={'chevron-forward'} size={24} color={'black'} />
                     </TouchableOpacity>}
                 </View>
             ))}
 
-
+            {/* modal popup */}
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -182,12 +225,22 @@ const PersonalInformation = () => {
                     <View style={styles.modalContent}>
                         <View style={styles.innerModalContainer}>
 
-                            <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 30 }}>
+                            <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 26, alignSelf: 'center', }}>
                                 Edit {currentField.label}
+                            </Text>
+                            {currentField.description && <Text
+                                style={{ fontFamily: 'Inter', fontSize: 14, color: colors.accentGray, marginVertical: 6 }}>
+                                {currentField.description}
+                            </Text>}
+                            <Text style={{ fontFamily: 'Inter', fontSize: 14, color: colors.errorMessage }}>
+                                {errorMessage}
                             </Text>
                         </View>
                         <TextInput
-                            onChangeText={setInput}
+                            onChangeText={(input) => {
+                                setInput(input)
+                                setContinueAvailable(true)
+                            }}
                             value={input}
                             style={styles.input}
                         />
@@ -195,20 +248,21 @@ const PersonalInformation = () => {
                         <View style={styles.modalButtonContainer}>
 
                             <TouchableOpacity
-                                style={[styles.modalCloseButton, { backgroundColor: '#f0f0f0' }]}
+                                style={[styles.modalCloseButton, { backgroundColor: colors.loginGray }]}
                                 onPress={() => setModalVisible(false)}
                             >
                                 <Text style={[styles.modalCloseButtonText, { color: 'black' }]}>Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={styles.modalCloseButton}
+                                disabled={input.length === 0 || !continueAvailable}
+                                style={[styles.modalCloseButton, { backgroundColor: input.length === 0 || !continueAvailable ? colors.loginGray : 'black' }]}
                                 onPress={() => handleSave()}
                             >
-                                <Text style={styles.modalCloseButtonText}>Save</Text>
+                                {isLoadingSave ? (<ActivityIndicator size={'small'} color={'white'} />) : (
+                                    <Text style={[styles.modalCloseButtonText, { color: input.length === 0 || !continueAvailable ? "black" : 'white' }]}>Save</Text>
+                                )}
                             </TouchableOpacity>
                         </View>
-
-
                     </View>
                 </View>
             </Modal>
@@ -217,7 +271,6 @@ const PersonalInformation = () => {
 }
 
 export default PersonalInformation;
-
 
 const styles = StyleSheet.create({
     cardContainer: {
@@ -229,8 +282,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderBottomColor: 'gray',
         borderBottomWidth: 1,
-        paddingVertical: 14,
-        marginTop: 12,
+        paddingVertical: 0,
+        // marginVertical: 6,
+        // marginVertical: 6
+        marginVertical: 5,
     },
     textContainer: {
         display: 'flex',
@@ -239,7 +294,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 0,
         maxWidth: '85%'
-
     },
     upperText: {
         fontSize: 12,
@@ -247,7 +301,8 @@ const styles = StyleSheet.create({
         color: 'gray'
     },
     lowerText: {
-        fontFamily: 'inter', fontSize: 16,
+        fontFamily: 'inter',
+        fontSize: 16,
         color: 'black'
     },
 
@@ -277,8 +332,12 @@ const styles = StyleSheet.create({
     },
     modalCloseButton: {
         backgroundColor: 'black',
-        paddingHorizontal: 30, paddingVertical: 15,
+        width: 75,
+        height: 50,
         borderRadius: 5,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     modalCloseButtonText: {
         color: 'white',
@@ -286,8 +345,20 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textAlign: 'center',
     },
-    innerModalContainer: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '80%', alignSelf: 'center' },
-    modalButtonContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '95%', marginTop: 20 },
+    innerModalContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+        width: '90%',
+        alignSelf: 'center'
+    },
+    modalButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '95%',
+        marginTop: 20
+    },
     manualCheckButton: {
         backgroundColor: '#f0f0f0',
         paddingVertical: 10,

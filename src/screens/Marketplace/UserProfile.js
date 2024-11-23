@@ -1,52 +1,30 @@
-import {useEffect, useState} from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Linking, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator } from "react-native";
 import ForYou from "./MarketplaceLists/ForYou";
 import { Ionicons } from "@expo/vector-icons";
-import {collection, doc, getDoc, getFirestore} from "firebase/firestore";
+import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
+import ListingsList from '../../components/ListingsList'
+import { Check, EnvelopeSimple, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
+import { colors } from "../../colors";
 
+const testUserPosts = [
+    { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
+    { listingID: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
+    { listingID: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
+    { listingID: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: true },
+    { listingID: 5, img: undefined, title: 'Catan Set', price: 10, sold: true },
+]
 const UserProfile = ({ navigation, route }) => {
     const { userID } = route.params
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
-    const [user, setUser] = useState(null)
+    const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
+    const [userListings, setUserListings] = useState(testUserPosts)
 
-    // grab the profile from the backend by the userID.
-    // use on component mount so useEffect? or use userContext?
-    useEffect(() => {
-        const getProfile= async () => {
-            try {
-                const db = getFirestore();
-                const userRef = doc(db, "users", userID);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    setUser(userDoc.data())
-                }
-                else {
-                    console.error("No such user")
-                }
-            } catch (error) {
-                console.error("Error fetching listings:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        getProfile();
-    }, []);
-
-    if (isLoading) {
-        return <FullLoadingScreen />
-    }
-
-    const handleFollow = () => {
-        setFollowingUser(!followingUser)
-        // BACKEND CHANGES HERE
-    }
-
-    const handleMessage = () => {
-        console.log('gonna implement soon')
-    }
+    const [loadingIG, setLoadingIG] = useState(false)
+    const [loadingX, setLoadingX] = useState(false)
+    const [loadingLI, setLoadingLI] = useState(false)
 
     // Below is for testing
     const [testUser, setTestUser] = useState({
@@ -62,70 +40,158 @@ const UserProfile = ({ navigation, route }) => {
         posts: testUserPosts
     })
     //
-    const testUserPosts = [
-        { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        { listingID: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
-        { listingID: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
-        { listingID: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: true },
-        { listingID: 5, img: undefined, title: 'Catan Set', price: 10, sold: true },
-    ]
 
+
+    // grab the profile from the backend by the userID.
+    // use on component mount so useEffect? or use userContext?
+    useEffect(() => {
+        const getProfile = async () => {
+            try {
+                const db = getFirestore();
+                const userRef = doc(db, "users", userID);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    setUserProfile(userDoc.data())
+                }
+                else {
+                    console.error("No such user")
+                }
+            } catch (error) {
+                console.error("Error fetching listings:", error);
+            } finally {
+                setIsLoading(false);
+            }
+            // setting the socials for testing
+            setUserProfile(prevProfile => ({
+                ...prevProfile,
+                instagram: 'williamhuntt',
+                twitter: 'nfl',
+                linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
+            }));
+        };
+        getProfile();
+    }, []);
+
+
+
+    if (isLoading) {
+        return <FullLoadingScreen />
+    }
+
+    if (!userProfile) {
+        return (
+            <View>
+                <Text>
+                    User not found!
+                </Text>
+            </View>
+        )
+    }
+
+    const handleFollow = () => {
+        setFollowingUser(!followingUser)
+        // BACKEND CHANGES HERE
+    }
+
+    const handleMessage = () => {
+        console.log('gonna implement soon')
+    }
+
+    // todo maybe handle as error messages instead of alerts
+    const openSocial = async (social) => {
+
+        let url = ''
+        switch (social) {
+            case ('instagram'):
+                if (!userProfile.instagram) {
+                    setLoadingIG(true)
+                    Alert.alert('Error', 'No Instagram user found')
+                    console.log(userProfile.instagram)
+                    return;
+                }
+                url = `https://www.instagram.com/${userProfile.instagram}`;
+                break; // this prevents fallthrough
+            case ('twitter'):
+                setLoadingX(true)
+                if (!userProfile.twitter) {
+                    Alert.alert('Error', 'No X user found')
+                    return;
+                }
+                url = `https://x.com/${userProfile.twitter}`;
+                break;
+            case ('linkedin'):
+                setLoadingLI(true)
+                const isUrl = /^https?:\/\/.+$/.test(userProfile.linkedin);
+                if (!isUrl) {
+                    Alert.alert('Error', 'Invalid URL')
+                    return;
+                }
+                if (!userProfile.linkedin) {
+                    Alert.alert('Error', 'No LinkedIn user found')
+                    return;
+                }
+                url = userProfile.linkedin
+                break;
+            default:
+                Alert.alert('Error', 'Unsupported platform');
+                return;
+        }
+        try {
+            const supported = await Linking.canOpenURL(url)
+            if (supported) {
+                await Linking.openURL(url)
+            } else {
+                Alert.alert('Error', "Can't open Instagram profile")
+            }
+        } catch (e) {
+            console.error("An error occurred while trying to open Instagram:", error);
+            Alert.alert("Error", "An unexpected error occurred.");
+        } finally {
+            setLoadingIG(false)
+            setLoadingX(false)
+            setLoadingLI(false)
+        }
+    }
 
     return (
         <View style={styles.container}>
             <View style={styles.topContainer}>
-                {testUser.pfp ? (<Image
-                // pfp would go here
+                {userProfile.pfp ? (<Image
+                    // pfp would go here
+                    style={{ idth: 45, height: 45, borderRadius: 75, }}
+                    source={{ uri: userProfile?.pfp }}
 
                 />) :
-                    (<View style={{ backgroundColor: 'gray', width: 75, height: 75, borderRadius: 75 }} />)
+                    (<View style={{ backgroundColor: colors.loginGray, width: 45, height: 45, borderRadius: 75, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                        <User size={24} />
+                    </View>)
                 }
                 <View style={styles.headerTextContainer}>
                     <Text style={styles.nameText}>
-                        {user?.name || "no name provided"}
+                        {userProfile?.name || "Nameless"}
                     </Text>
+                    <Text style={{ fontFamily: 'inter', fontSize: 18, color: colors.accentGray }}>
+                        {userProfile?.email || "Nameless"}
+                    </Text>
+
                 </View>
             </View>
 
-
-
-            <View style={styles.bioContainer}>
-                {/*TODO: why is user.major weirdly italicized*/}
-                <Text style={{ fontSize: 16, color: 'black', fontFamily: 'inter', fontWeight: '500', marginTop: 10, }}>
-                    {user.gradYear} | {user.major} | {user?.concentration || ""}
-                </Text>
-                <View style={styles.socials}>
-                    <TouchableOpacity style={styles.socialBubblePlaceholder}
-                        onPress={() => console.log('open instagram')}
-                    />
-                    <TouchableOpacity style={styles.socialBubblePlaceholder}
-                        onPress={() => console.log('open linkedin')}
-                    />
-                    <TouchableOpacity style={styles.socialBubblePlaceholder}
-                        onPress={() => console.log('open x')}
-                    />
-                </View>
-                <Text style={{ fontSize: 14, color: 'black', fontFamily: 'inter', fontWeight: '400', marginTop: 10, }}>
-                    {testUser.bio}
-                </Text>
-            </View>
-
-            <View style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
+            <View style={[{ width: '100%', display: 'flex', backgroundColor: 'white', flexDirection: 'row', borderRadius: 12, marginVertical: 16, height: 35, alignItems: 'center' }, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}>
                 <TouchableOpacity style={styles.followButton}
                     onPress={() => handleFollow()}
                 >
 
-                    {followingUser ? <Ionicons name='checkmark' size={18} /> : <Ionicons name='add' size={18} />}
-
-
-                    <Text style={styles.followText}>
+                    {followingUser ? <Check size={18} color={followingUser ? colors.neonBlue : colors.accentGray} /> : <Plus size={18} color={colors.accentGray} />}
+                    <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
                         Follow{followingUser && 'ing'}
                     </Text>
                 </TouchableOpacity>
+                <View style={{ width: 1, backgroundColor: colors.accentGray, height: '100%' }} />
                 <TouchableOpacity style={styles.followButton}
                     onPress={() => handleMessage()}
                 >
-                    <Ionicons name='mail-outline' size={18} />
+                    <EnvelopeSimple size={18} colors={colors.accentGray} />
                     <Text style={styles.followText}>
                         Message
                     </Text>
@@ -135,13 +201,77 @@ const UserProfile = ({ navigation, route }) => {
 
 
 
+            <View style={styles.bioContainer}>
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
+                    <View >
+                        <Text style={styles.majorText}>
+                            {userProfile.major}
+                        </Text>
+                        <Text style={{ fontFamily: 'inter', fontSize: 16, color: colors.accentGray, fontWeight: '500' }}>
+                            {userProfile.concentration}
+                        </Text>
+                    </View>
+                    <Text style={styles.majorText}>
+                        {userProfile.gradYear}
+                    </Text>
+                </View>
 
-            <ForYou listings={testUserPosts} navigation={navigation} />
+                <View style={{ marginTop: 12, width: '100%', maxHeight: 128, marginBottom: 0 }}>
+                    <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
+                        Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+                    </Text>
+                </View>
+
+
+                {(userProfile.instagram || userProfile.linkedin || userProfile.twitter) && (<View style={styles.socials}>
+
+                    {userProfile.instagram && <TouchableOpacity
+                        onPress={() => openSocial('instagram')}
+                    >
+                        {loadingIG ? <ActivityIndicator color={'black'} /> : <InstagramLogo size={30} color={'black'} />}
+                    </TouchableOpacity>}
+
+                    {userProfile.linkedin && <TouchableOpacity
+                        onPress={() => openSocial('linkedin')}
+                    >
+                        {loadingLI ? <ActivityIndicator color={'black'} /> : <LinkedinLogo size={30} color={'black'} />}
+                    </TouchableOpacity>}
+
+                    {userProfile.twitter && <TouchableOpacity
+                        onPress={() => openSocial('twitter')}
+                    >
+                        {loadingX ? <ActivityIndicator color={'black'} /> : <XLogo size={30} color={'black'} />}
+                    </TouchableOpacity>}
+                </View>)}
+
+
+                <Text ellipsizeMode="tail" numberOfLines={6}
+                    style={{ fontSize: 14, color: 'black', fontFamily: 'inter', fontWeight: '400', marginTop: 10, }}>
+                    {userProfile.bio}
+                </Text>
+
+                <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', marginLeft: 6 }}>
+                    Listings
+                </Text>
+            </View>
 
 
 
 
-        </View>
+            {
+                userListings ? <ListingsList listings={userListings} navigation={navigation} /> : (
+                    <View style={{ marginTop: 30 }}>
+                        <Text style={{ fontFamily: 'inter', fontSize: 16 }}>
+                            User has no listings!
+                        </Text>
+                    </View>
+                )
+            }
+
+
+
+
+        </View >
     )
 
 }
@@ -152,16 +282,18 @@ const styles = StyleSheet.create({
     container: {
         display: 'flex',
         height: '100%',
-        width: '100%',
+        width: '92%',
         alignItems: 'center',
         justifyContent: 'flex-start',
         flexDirection: 'column',
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
     topContainer: {
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+        width: '100%'
     },
 
     headerTextContainer: {
@@ -182,22 +314,30 @@ const styles = StyleSheet.create({
         fontFmaily: 'inter'
     },
     bioContainer: {
-        width: '90%',
         display: 'flex',
         alignItems: 'flex-start',
-        marginBottom: 12
+        marginBottom: 12,
+        width: '100%',
+        marginTop: 20
     },
     socials: {
         flexDirection: 'row',
-        marginTop: 10
+        marginTop: 10,
+        width: 120,
+        justifyContent: 'space-between',
     },
-    socialBubblePlaceholder: {
-        width: 50,
-        height: 50,
-        borderRadius: 50,
-        backgroundColor: 'red',
-        marginRight: 10,
+
+    followText: { marginLeft: 4, fontSize: 15, fontFamily: 'inter', color: colors.accentGray },
+    followButton: { width: '50%', height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' },
+    shadow: {
+        shadowColor: colors.accentGray,
+        shadowOpacity: 0.4,
+        shadowRadius: 6,
     },
-    followText: { marginLeft: 4, fontSize: 15, fontFamily: 'inter' },
-    followButton: { width: '50%', height: 30, borderWidth: 1, borderColor: 'black', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }
+    majorText: {
+        fontFamily: 'inter',
+        fontSize: 18,
+        fontWeight: '600',
+        color: colors.uwPurple
+    }
 })
