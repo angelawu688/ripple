@@ -13,6 +13,26 @@ const SavedItems = ({ navigation }) => {
     //     { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
     // ]
     const { savedPosts } = useContext(userContext)
+    const [savedListings, setSavedListings] = useState([])
+
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        setIsLoading(true)
+        try {
+            // grab the users saved listings on component mount
+            // for now is test listings
+            setSavedListings(savedPosts)
+        } catch (e) {
+            setErrorMessage(e.message)
+        } finally {
+            setIsLoading(false)
+        }
+    }, [])
+
+    if (isLoading) {
+        return <FullLoadingScreen />
+    }
 
     console.log("savedPosts is", savedPosts)
 
@@ -31,10 +51,7 @@ const SavedItems = ({ navigation }) => {
                     console.log("Found an undefined listing in savedPosts.");
                     return null;
                 }
-                // TODO: make sure this matches id of document in listings collection
-                const listingID = listing.id
-                // our console.log here worked
-                // console.log("listingID is:", listingID)
+                const listingID = listing.listing_id
                 return (
                     <TouchableOpacity
                         onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}

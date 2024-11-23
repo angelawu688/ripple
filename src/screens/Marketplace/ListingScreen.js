@@ -20,14 +20,14 @@ const ListingScreen = ({ navigation, route }) => {
     // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(false);
     const { listingID } = route.params;
-    const { user, userData } = useContext(userContext);
+    const { user, userData, savedPosts, setSavedPosts } = useContext(userContext);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     // edit, delete, markSold | used for toggling buttons
     const [selectedBottomButton, setSelectedBottomButton] = useState('markSold')
-
-
     const [postSold, setPostSold] = useState(false) // grab this on init
-    const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
+
+
+    const isOwnPost = false // TEST, GRAB ON COMPONENT MOUNT
     const otherUserID = 'TcxxqAtEwuPxzYLSoQdv12vWqp83';
     const testPhotos = [
         { id: '1', color: 'yellow' },
@@ -46,30 +46,24 @@ const ListingScreen = ({ navigation, route }) => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     setListing({ id: docSnap.id, ...docSnap.data() });
+
                     // check if listing is saved already
-                    const savedPostsRef = collection(db, "savedPosts");
-                    const queryPosts = query(savedPostsRef,
-                        where("user_id", "==", user.uid),
-                        // this throws an error every time. Listing is undefined, thats why this runs
-                        // this will never get the initial state
-                        where("listing_id", "==", listing.listing_id)
-                    );
-                    try {
-                        // since undefined up there, we get an empty snapshot down here every time
-                        const savedSnapshot = await getDocs(queryPosts)
-                        if (!savedSnapshot.empty) {
-                            console.log("Listing is not saved by the user.");
-                            setIsSaved(false);
-                        } else {
-                            console.log("Listing is  saved.");
+                    if (savedPosts && savedPosts.length !== 0) {
+                        const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.user_id === user.uid);
+                        if (saveStatus) {
                             setIsSaved(true);
+                            console.log(`Listing with ID ${listingID} is saved.`);
+                        } else {
+                            setIsSaved(false)
+                            console.log(`Listing with ID ${listingID} is not saved.`);
                         }
-                    } catch (error) {
-                        console.error("Error checking if listing is saved:", error);
+                    }
+                    else {
+                        setIsSaved(false);
                     }
 
                 } else {
-                    console.log("No such document!");
+                    console.log("No such listing!");
                 }
             } catch (error) {
                 console.error("Error fetching listing:", error);
@@ -149,38 +143,74 @@ const ListingScreen = ({ navigation, route }) => {
 
 
 
-
-
     const handleSavePost = async () => {
         // frontend change
-        setIsSaved(!isSaved)
+
         setIsLoadingSave(true)
 
         if (!listing) {
             return;
         }
 
+        // TODO :
         // we probably should throttle this
         try {
-            if (isSaved) {
+            if (!isSaved) {
                 // add it
-                await setDoc(doc(db, "savedPosts", user.uid + listing.listing_id), {
+                await setDoc(doc(db, "savedPosts", user.uid + listingID), {
                     user_id: user.uid,
                     listing_id: listingID,
                     price: listing.price,
                     title: listing.title
                     // listing images requires firebase storage
-            } else {
-                // delete it
-                // what about the case where it isnt there???
-                const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
-
-                // if (!listingRef) {
-                //     // we dont
-                //     return;
-                // }
-                await deleteDoc(listingRef)
+                });
+                const newSaved = {
+                    user_id: user.uid,
+                    listing_id: listingID,
+                    price: listing.price,
+                    title: listing.title,
+                };
+                setSavedPosts((prevSavedPosts) => [...prevSavedPosts, newSaved]);
             }
+            else {
+                // if in saved Posts --> exists in savedPosts collection
+                // can also directly check savedPosts collection
+                const listingRef = doc(db, "savedPosts", user.uid + listingID);
+                if (savedPosts && savedPosts.length !== 0) {
+                    const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.user_id === user.uid);
+                    if (saveStatus) {
+                        await deleteDoc(listingRef);
+                    } else {
+                        console.error("no document to delete");
+                    }
+                }
+                else {
+                    console.error("no document to delete");
+                }
+
+                setSavedPosts((prevSavedPosts) =>
+                    prevSavedPosts.filter((post) => post.listing_id !== listingID || user.uid !== post.user_id)
+                );
+                // delete it
+                // const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
+                // const savedPostsRef = collection(db, "savedPosts");
+                // const queryPosts = query(savedPostsRef,
+                //     where("user_id", "==", user.uid),
+                //     where("listing_id", "==", listingID)
+                // );
+                // try {
+                //     const savedSnapshot = await getDocs(queryPosts)
+                //     if (savedSnapshot.exists()) {
+                //         console.log("Listing is in savedPosts, listing.listing_id is: ");
+                //         await deleteDoc(listingRef);
+                //     } else {
+                //         console.log("Listing is not saved.");
+                //     }
+                // } catch (error) {
+                //     console.error("Error checking if listing is saved:", error);
+                // }
+            }
+            setIsSaved(!isSaved);
         } catch (e) {
             console.log(e)
         } finally {

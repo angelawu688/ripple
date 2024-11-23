@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="updating saved posts (has errors and bugs), ignore" />
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="updating saved posts (has errors and bugs), ignore">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/UserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/context/UserContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/SavedItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/SavedItems.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,7 +66,7 @@
       <option name="presentableId" value="Default" />
       <updated>1731611708204</updated>
       <workItem from="1731611710568" duration="25335000" />
-      <workItem from="1732039685359" duration="24980000" />
+      <workItem from="1732039685359" duration="31714000" />
     </task>
     <task id="LOCAL-00001" summary="adding collections setup">
       <option name="closed" value="true" />
