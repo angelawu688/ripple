@@ -23,7 +23,7 @@ const fields = [
 ];
 
 const PersonalInformation = () => {
-    const { userData, setUserData } = useContext(userContext)
+    const { user, userData, setUserData } = useContext(userContext)
     const [modalVisible, setModalVisible] = useState(false)
     const [currentField, setCurrentField] = useState('')
     const [input, setInput] = useState('')
@@ -67,9 +67,9 @@ const PersonalInformation = () => {
             const updatedInfo = {
                 [currentField.key]: input,
             }
-            const auth = getAuth();
+            // const auth = getAuth();
             const db = getFirestore();
-            const user = auth.currentUser;
+            // const user = auth.currentUser;
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, updatedInfo);
             const userDoc = await getDoc(userRef);

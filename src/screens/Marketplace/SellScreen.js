@@ -1,3 +1,4 @@
+// unused?
 import { Text, View } from "react-native"
 import {doc, getFirestore, setDoc} from "firebase/firestore";
 

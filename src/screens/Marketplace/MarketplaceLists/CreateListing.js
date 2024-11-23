@@ -169,7 +169,7 @@ const CreateListing = ({ navigation }) => {
 
         setIsLoading(true)
         try {
-            // TODO submission to DB! 
+            // TODO submission to DB! pass in user from userContext
             const db = getFirestore();
             const auth = getAuth();
             const user = auth.currentUser;

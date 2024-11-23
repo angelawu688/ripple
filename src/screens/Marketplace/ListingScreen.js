@@ -14,9 +14,9 @@ const ListingScreen = ({ route }) => {
     const [listing, setListing] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     // when you onboard, need to know if listing is saved or not by the user
-    const [isSaved, setIsSaved] = useState(true);
+    const [isSaved, setIsSaved] = useState(false);
     const { listingID } = route.params;
-    const { user } = useContext(userContext);
+    const { user, savedPosts, setSavedPosts } = useContext(userContext);
 
     const db = getFirestore();
     useEffect(() => {
@@ -27,24 +27,14 @@ const ListingScreen = ({ route }) => {
             if (docSnap.exists()) {
                 setListing({ id: docSnap.id, ...docSnap.data() });
                 // check if listing is saved already
-                const savedPostsRef = collection(db, "savedPosts");
-                const queryPosts = query(savedPostsRef,
-                    where("user_id", "==", user.uid),
-                    where("listing_id", "==", listing.listing_id)
-                );
-                try {
-                    const savedSnapshot = await getDocs(queryPosts);
-                    if (!savedSnapshot.empty) {
-                        console.log("Listing is saved by the user.");
-                        setIsSaved(true);
-                    } else {
-                        console.log("Listing is not saved.");
-                        setIsSaved(false);
-                    }
-                } catch (error) {
-                    console.error("Error checking if listing is saved:", error);
+                if (savedPosts !== undefined && savedPosts.length !== 0 && savedPosts.some((post) => post.listing_id === listingID)) {
+                    console.log("Listing is saved by the user.");
+                    setIsSaved(true);
                 }
-
+                else {
+                    console.log("Listing is not saved.");
+                    setIsSaved(false);
+                }
             } else {
               console.log("No such document!");
             }
@@ -67,26 +57,40 @@ const ListingScreen = ({ route }) => {
 
 
     const handleSavePost = async () => {
-        setIsSaved(!isSaved) // toggle
+        console.log("isSaved before is ", isSaved)
+          if (isSaved) {
+              setIsSaved(false);
+          }
+          else {
+              setIsSaved(true);
+          }
+        // TODO: fix this toggle
+        // setIsSaved(!isSaved) // toggle
+        console.log("isSaved is now", isSaved)
+        console.log("savedPosts is ", savedPosts)
         // BACKEND LOGIC HERE
         if (isSaved && listing) {
             // post should be in saved
             console.log('SAVE POST!')
             try {
-                await setDoc(doc(db, "savedPosts", user.uid + listing.listing_id), {
+                const newSaved = await setDoc(doc(db, "savedPosts", user.uid + listingID), {
                     user_id: user.uid,
-                    listing_id: listing.listing_id,
+                    listing_id: listingID,
                     price: listing.price,
                     title: listing.title
                     // listing images requires firebase storage
                 });
+                // do i need to update context here
+                setSavedPosts((prevSavedPosts) => [...prevSavedPosts, newSaved]);
+                console.log("savedPosts is ", savedPosts)
             } catch (error) {
                 console.log(error.message);
             }
-        } else if (listing) {
+        } else if (!isSaved && listing) {
             // remove post from saved
-            const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
+            const listingRef = doc(db, "savedPosts", user.uid + listingID);
             await deleteDoc(listingRef);
+            setSavedPosts((prevSavedPosts) => prevSavedPosts.filter((post) => post.listing_id !== listingID));
             console.log("deleted");
         }
         else {

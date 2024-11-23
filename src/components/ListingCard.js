@@ -1,8 +1,7 @@
 import { View, Text, Image } from 'react-native'
 import { useState } from 'react'
 
-
-// TODO we will want to pass in an entire listing eventually
+// TODO: deconstruct entire listing with all fields
 const ListingCard = ({ listing }) => {
     if (!listing) {
         console.log("undefined listing")

@@ -6,7 +6,6 @@ import { userContext } from '../../context/UserContext'
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const EmailConfirmation = ({ navigation, route }) => {
-    // TODO ADD EMAIL CHECKING LOGIC
     const [code, setCode] = useState('')
     const { email, password } = route.params
     const [errorMessage, setErrorMessage] = useState('')
