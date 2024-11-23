@@ -14,21 +14,19 @@ const SavedItems = ({ navigation }) => {
     // ]
     const { savedPosts } = useContext(userContext)
     const [savedListings, setSavedListings] = useState([])
-
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         setIsLoading(true)
         try {
             // grab the users saved listings on component mount
-            // for now is test listings
             setSavedListings(savedPosts)
-        } catch (e) {
-            setErrorMessage(e.message)
+        } catch (error) {
+            console.error("Error fetching saved posts", error)
         } finally {
             setIsLoading(false)
         }
-    }, [])
+    }, [savedPosts])
 
     if (isLoading) {
         return <FullLoadingScreen />
@@ -45,7 +43,7 @@ const SavedItems = ({ navigation }) => {
             }}
             ListHeaderComponent={null} // blank for now, this is where a header would go.
             numColumns={2} // this is how we put them side by side
-            data={savedPosts}
+            data={savedListings}
             renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
                 if (!listing) {
                     console.log("Found an undefined listing in savedPosts.");
