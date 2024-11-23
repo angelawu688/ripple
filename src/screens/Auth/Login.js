@@ -23,6 +23,14 @@ const Login = ({ navigation }) => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    try {
+
+    } catch (error) {
+
+    }
+  };
+
   const toggle = () => {
     setSecureTextEntry(!secureTextEntry)
   }

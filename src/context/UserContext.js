@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import {getFirestore, doc, getDoc, query, collection, where, getDocs} from "firebase/firestore";
 
 export const userContext = createContext();
 
@@ -15,12 +15,20 @@ export const UserProvider = ({ children }) => {
     const db = getFirestore();
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
+      // firebaseUser
       if (firebaseUser) {
         try {
           const userRef = doc(db, "users", firebaseUser.uid);
           const userDoc = await getDoc(userRef);
+          const querySaved = query(collection(db, "savedPosts"), where("user_id", "==", firebaseUser.uid));
+          const querySnapshot = await getDocs(querySaved);
           if (userDoc.exists()) {
+            const savedListings = querySnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
             setUserData(userDoc.data());
+            setSavedPosts(savedListings || []);
             // grab user posts here
           } else {
             console.warn("No such document!");
@@ -32,6 +40,7 @@ export const UserProvider = ({ children }) => {
         }
       } else {
         setUserData(null); // Clear user data if no user is logged in
+        setSavedPosts(null);
       }
       setIsLoading(false);
     });
@@ -40,7 +49,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <userContext.Provider value={{ user, setUser, savedPosts, setSavedPosts, userData, setUserData, isLoading }}>
+      <userContext.Provider value={{ user, setUser, savedPosts, setSavedPosts, userData, setUserData, isLoading }}>
       {children}
     </userContext.Provider>
   );

@@ -2,8 +2,7 @@ import { View, Text, Image } from 'react-native'
 import { useState } from 'react'
 import { colors } from '../colors';
 
-
-// TODO we will want to pass in an entire listing eventually
+// TODO: deconstruct entire listing with all fields
 const ListingCard = ({ listing }) => {
     if (!listing) {
         return null;
