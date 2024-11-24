@@ -21,7 +21,7 @@ export const UserProvider = ({ children }) => {
         try {
           const userRef = doc(db, "users", firebaseUser.uid);
           const userDoc = await getDoc(userRef);
-          const querySaved = query(collection(db, "savedPosts"), where("user_id", "==", firebaseUser.uid));
+          const querySaved = query(collection(db, "savedPosts"), where("userID", "==", firebaseUser.uid));
           const querySavedSnapshot = await getDocs(querySaved);
           const queryPosts = query(collection(db, "listings"), where("userId", "==", firebaseUser.uid));
           const queryPostsSnapshot = await getDocs(queryPosts);

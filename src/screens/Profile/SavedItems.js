@@ -32,8 +32,6 @@ const SavedItems = ({ navigation }) => {
         return <FullLoadingScreen />
     }
 
-    console.log("savedPosts is", savedPosts)
-
     return (
         <FlatList
             style={{ width: '99%', alignSelf: 'center' }}
