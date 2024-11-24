@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Linking, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator } from "react-native";
 import ForYou from "./MarketplaceLists/ForYou";
 import { Ionicons } from "@expo/vector-icons";
-import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import {collection, doc, getDoc, getDocs, getFirestore, query, where} from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
 import ListingsList from '../../components/ListingsList'
 import { Check, EnvelopeSimple, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
@@ -20,44 +20,51 @@ const UserProfile = ({ navigation, route }) => {
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
-    const [userListings, setUserListings] = useState(testUserPosts)
+    const [userListings, setUserListings] = useState([])
 
     const [loadingIG, setLoadingIG] = useState(false)
     const [loadingX, setLoadingX] = useState(false)
     const [loadingLI, setLoadingLI] = useState(false)
 
     // Below is for testing
-    const [testUser, setTestUser] = useState({
-        pfp: undefined,
-        name: 'Alex Smith',
-        netID: 'asmith@uw.edu',
-        major: 'info',
-        concentration: 'hci',
-        gradYear: '2025',
-        instagram: 'alex.smith',
-        linkedin: 'SOME URL HERE',
-        bio: "Jonah Coleman's favorite arist is EBK Yeebo. You should check him out",
-        posts: testUserPosts
-    })
+    // const [testUser, setTestUser] = useState({
+    //     pfp: undefined,
+    //     name: 'Alex Smith',
+    //     netID: 'asmith@uw.edu',
+    //     major: 'info',
+    //     concentration: 'hci',
+    //     gradYear: '2025',
+    //     instagram: 'alex.smith',
+    //     linkedin: 'SOME URL HERE',
+    //     bio: "Jonah Coleman's favorite arist is EBK Yeebo. You should check him out",
+    //     posts: testUserPosts
+    // })
     //
 
-
-    // grab the profile from the backend by the userID.
-    // use on component mount so useEffect? or use userContext?
+    // grab the profile from the backend by the userID
     useEffect(() => {
         const getProfile = async () => {
             try {
                 const db = getFirestore();
                 const userRef = doc(db, "users", userID);
                 const userDoc = await getDoc(userRef);
+                const queryListings = query(collection(db, "listings"),
+                    where("userId", "==", userID)
+                );
+                const listingsDoc = await getDocs(queryListings)
                 if (userDoc.exists()) {
                     setUserProfile(userDoc.data())
+                    const listingsData = listingsDoc.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    setUserListings(listingsData);
                 }
                 else {
                     console.error("No such user")
                 }
             } catch (error) {
-                console.error("Error fetching user:", error);
+                console.error("Error fetching user and their listings:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -218,7 +225,7 @@ const UserProfile = ({ navigation, route }) => {
 
                 <View style={{ marginTop: 12, width: '100%', maxHeight: 128, marginBottom: 0 }}>
                     <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
-                        Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+                        {userProfile.bio}
                     </Text>
                 </View>
 
@@ -244,11 +251,11 @@ const UserProfile = ({ navigation, route }) => {
                     </TouchableOpacity>}
                 </View>)}
 
-
-                <Text ellipsizeMode="tail" numberOfLines={6}
-                    style={{ fontSize: 14, color: 'black', fontFamily: 'inter', fontWeight: '400', marginTop: 10, }}>
-                    {userProfile.bio}
-                </Text>
+                {/*TODO: not sure what this was for*/}
+                {/*<Text ellipsizeMode="tail" numberOfLines={6}*/}
+                {/*    style={{ fontSize: 14, color: 'black', fontFamily: 'inter', fontWeight: '400', marginTop: 10, }}>*/}
+                {/*    {userProfile.bio}*/}
+                {/*</Text>*/}
 
                 <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', marginLeft: 6 }}>
                     Listings
