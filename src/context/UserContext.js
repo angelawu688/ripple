@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [savedPosts, setSavedPosts] = useState([]);
+  const [userListings, setUserListings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -21,14 +22,21 @@ export const UserProvider = ({ children }) => {
           const userRef = doc(db, "users", firebaseUser.uid);
           const userDoc = await getDoc(userRef);
           const querySaved = query(collection(db, "savedPosts"), where("user_id", "==", firebaseUser.uid));
-          const querySnapshot = await getDocs(querySaved);
+          const querySavedSnapshot = await getDocs(querySaved);
+          const queryPosts = query(collection(db, "listings"), where("userId", "==", firebaseUser.uid));
+          const queryPostsSnapshot = await getDocs(queryPosts);
           if (userDoc.exists()) {
-            const savedListings = querySnapshot.docs.map(doc => ({
+            const savedListings = querySavedSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            const listings = queryPostsSnapshot.docs.map(doc => ({
               id: doc.id,
               ...doc.data()
             }));
             setUserData(userDoc.data());
             setSavedPosts(savedListings || []);
+            setUserListings(listings || []);
             // grab user posts here
           } else {
             console.warn("No such document!");
@@ -49,7 +57,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-      <userContext.Provider value={{ user, setUser, savedPosts, setSavedPosts, userData, setUserData, isLoading }}>
+      <userContext.Provider value={{ user, setUser, savedPosts, setSavedPosts, userData, setUserData, userListings, setUserListings, isLoading }}>
       {children}
     </userContext.Provider>
   );
