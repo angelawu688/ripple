@@ -182,7 +182,6 @@ const EditPost = ({ navigation, route }) => {
 
         setIsLoading(true)
         try {
-            // TODO submission to DB! 
             const db = getFirestore();
             const listingData = {
                 title,
@@ -190,7 +189,7 @@ const EditPost = ({ navigation, route }) => {
                 description,
                 tags,
                 photos,
-                userId: user.uid,
+                // do we want a new createdAt date?
                 createdAt: new Date()
             }
             const editDoc = await updateDoc(doc(db, "listings", listingID), listingData);

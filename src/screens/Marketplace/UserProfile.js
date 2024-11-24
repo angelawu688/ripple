@@ -251,12 +251,6 @@ const UserProfile = ({ navigation, route }) => {
                     </TouchableOpacity>}
                 </View>)}
 
-                {/*TODO: not sure what this was for*/}
-                {/*<Text ellipsizeMode="tail" numberOfLines={6}*/}
-                {/*    style={{ fontSize: 14, color: 'black', fontFamily: 'inter', fontWeight: '400', marginTop: 10, }}>*/}
-                {/*    {userProfile.bio}*/}
-                {/*</Text>*/}
-
                 <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', marginLeft: 6 }}>
                     Listings
                 </Text>

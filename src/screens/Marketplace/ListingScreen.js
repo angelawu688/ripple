@@ -197,7 +197,6 @@ const ListingScreen = ({ navigation, route }) => {
                 setSavedPosts((prevSavedPosts) => [...prevSavedPosts, newSaved]);
             }
             else {
-                // if in saved Posts --> exists in savedPosts collection
                 // TODO:
                 // can also directly query the savedPosts collection to check
                 const listingRef = doc(db, "savedPosts", user.uid + listingID);

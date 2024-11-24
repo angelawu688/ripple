@@ -181,7 +181,6 @@ const CreateListing = ({ navigation }) => {
 
         setIsLoading(true)
         try {
-            // TODO submission to DB! pass in user from userContext
             const db = getFirestore();
             const listingData = {
                 title,
