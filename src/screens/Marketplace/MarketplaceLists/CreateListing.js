@@ -63,7 +63,7 @@ const CreateListing = ({ navigation }) => {
     const [photos, setPhotos] = useState([]) // array of photos
     const [tags, setTags] = useState([]) // array of tags
     const [title, setTitle] = useState('')
-    const [price, setPrice] = useState(0)
+    const [price, setPrice] = useState('0')
     const [description, setDescription] = useState('')
     const [tagInput, setTagInput] = useState('')
 
@@ -183,8 +183,6 @@ const CreateListing = ({ navigation }) => {
         try {
             // TODO submission to DB! pass in user from userContext
             const db = getFirestore();
-            // const auth = getAuth();
-            // const user = auth.currentUser;
             const listingData = {
                 title,
                 price,
