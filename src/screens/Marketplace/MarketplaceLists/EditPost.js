@@ -188,9 +188,7 @@ const EditPost = ({ navigation, route }) => {
                 price,
                 description,
                 tags,
-                photos,
-                // do we want a new createdAt date?
-                createdAt: new Date()
+                photos
             }
             const editDoc = await updateDoc(doc(db, "listings", listingID), listingData);
 
