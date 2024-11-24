@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useContext, useState} from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { collection, addDoc, getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { colors } from "../../../colors";
+import {userContext} from "../../../context/UserContext";
 
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
@@ -70,6 +71,7 @@ const CreateListing = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [isLoadingPhotoPicker, setIsLoadingPhotoPicker] = useState(false)
     const [imageErrorMessage, setImageErrorMessage] = useState('')
+    const { user, userData } = useContext(userContext)
 
     const handleAddTag = async (newTag) => {
         if (newTag.length <= 15) {
@@ -181,8 +183,8 @@ const CreateListing = ({ navigation }) => {
         try {
             // TODO submission to DB! pass in user from userContext
             const db = getFirestore();
-            const auth = getAuth();
-            const user = auth.currentUser;
+            // const auth = getAuth();
+            // const user = auth.currentUser;
             const listingData = {
                 title,
                 price,
@@ -190,6 +192,9 @@ const CreateListing = ({ navigation }) => {
                 tags,
                 photos,
                 userId: user.uid,
+                userName: userData.name,
+                userEmail: userData.email,
+                // pass in user pfp too
                 createdAt: new Date()
             }
             const docRef = await addDoc(collection(db, "listings"), listingData);

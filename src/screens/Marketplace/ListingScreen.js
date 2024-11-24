@@ -20,7 +20,7 @@ const ListingScreen = ({ navigation, route }) => {
     // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(false);
     const { listingID } = route.params;
-    const { user, userData, savedPosts, setSavedPosts } = useContext(userContext);
+    const { user, savedPosts, setSavedPosts } = useContext(userContext);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     // edit, delete, markSold | used for toggling buttons
     const [selectedBottomButton, setSelectedBottomButton] = useState('markSold')
@@ -294,9 +294,9 @@ const ListingScreen = ({ navigation, route }) => {
 
                     style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
 
-                    {user?.pfp?.uri ? (
+                    {listing?.pfp?.uri ? (
                         <Image
-                            source={{ uri: user.pfp.uri }}
+                            source={{ uri: listing.pfp.uri }}
                             style={{ width: 60, height: 60, borderRadius: 60 }}
                         />
                     ) : (
@@ -309,10 +309,10 @@ const ListingScreen = ({ navigation, route }) => {
 
                     <View>
                         <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: 'black', fontWeight: '500' }} >
-                            {userData.name || 'oops'}
+                            {listing.userName || 'no name available'}
                         </Text>
                         <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: colors.accentGray }} >
-                            {user.email}
+                            {listing.userEmail || 'no email available'}
                         </Text>
                     </View>
 
