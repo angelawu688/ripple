@@ -7,11 +7,11 @@ import ListingCard from '../../components/ListingCard'
 import ListingsList from '../../components/ListingsList'
 
 const YourListings = ({ navigation }) => {
-    const testListings = [
-        { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
-    ]
-    const { user } = useContext(userContext)
+    // const testListings = [
+    //     { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
+    //     { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
+    // ]
+    const { userListings } = useContext(userContext)
     const [yourListings, setYourListings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
@@ -19,20 +19,19 @@ const YourListings = ({ navigation }) => {
         setIsLoading(true)
         try {
             // grab the users saved listings on component mount
-            // for now is test listings
-            setYourListings(testListings)
-        } catch (e) {
-            setErrorMessage(e.message)
+            setYourListings(userListings)
+        } catch (error) {
+            console.error(error.message)
         } finally {
             setIsLoading(false)
         }
-    }, [])
+    }, [userListings])
 
     if (isLoading) {
         return <FullLoadingScreen />
     }
 
-    if (!yourListings) {
+    if (!yourListings || yourListings.length === 0) {
         return (
             <View>
                 <Text>

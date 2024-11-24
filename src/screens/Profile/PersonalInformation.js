@@ -97,9 +97,7 @@ const PersonalInformation = () => {
             const updatedInfo = {
                 [currentField.key]: input,
             }
-            // const auth = getAuth();
             const db = getFirestore();
-            // const user = auth.currentUser;
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, updatedInfo);
             const userDoc = await getDoc(userRef);

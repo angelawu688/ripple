@@ -76,7 +76,7 @@ const Profile = ({ navigation }) => {
 
                     <Ionicons name={'chevron-forward'} size={24} color={'black'} />
                 </TouchableOpacity>
-
+                 {/*todo: consolidate sold items and your listings*/}
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={() => navigation.navigate('SoldItems')}
@@ -84,7 +84,7 @@ const Profile = ({ navigation }) => {
                     <View style={styles.profileCardLeft}>
                         <ShoppingCart size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
-                            Sold tems
+                            Sold Items
                         </Text>
                     </View>
                     <Ionicons name={'chevron-forward'} size={24} color={'black'} />

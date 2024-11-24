@@ -306,12 +306,11 @@ const styles = StyleSheet.create({
     previewImage: {
         width: 150,
         height: 150,
-        borderRadius: 5,
+        // borderRadius: 5,
         marginRight: 10,
         borderWidth: 1,
         borderColor: colors.loginGray,
         borderRadius: 8
-
     },
     previewPost: {
         flexDirection: 'row',

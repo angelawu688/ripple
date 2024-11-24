@@ -20,15 +20,17 @@ const ListingScreen = ({ navigation, route }) => {
     // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(false);
     const { listingID } = route.params;
-    const { user, userData, savedPosts, setSavedPosts } = useContext(userContext);
+    const { user, savedPosts, setSavedPosts, setUserListings } = useContext(userContext);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     // edit, delete, markSold | used for toggling buttons
     const [selectedBottomButton, setSelectedBottomButton] = useState('markSold')
     const [postSold, setPostSold] = useState(false) // grab this on init
+    const [isOwnPost, setIsOwnPost] = useState(false) // grab this on init
+    const [sellerID, setSellerID] = useState(null) // grab this on init
 
 
-    const isOwnPost = false // TEST, GRAB ON COMPONENT MOUNT
-    const otherUserID = 'TcxxqAtEwuPxzYLSoQdv12vWqp83';
+    // const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
+    // const otherUserID = 'TcxxqAtEwuPxzYLSoQdv12vWqp83';
     const testPhotos = [
         { id: '1', color: 'yellow' },
         { id: '2', color: 'green' },
@@ -46,10 +48,19 @@ const ListingScreen = ({ navigation, route }) => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     setListing({ id: docSnap.id, ...docSnap.data() });
+                    // check if it's their own post, can save their own posts
+                    if (docSnap.data().userId === user.uid) {
+                        setIsOwnPost(true);
+                        setSellerID(user.uid);
+                    }
+                    else {
+                        setIsOwnPost(false);
+                        setSellerID(docSnap.data().userId);
+                    }
 
                     // check if listing is saved already
                     if (savedPosts && savedPosts.length !== 0) {
-                        const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.user_id === user.uid);
+                        const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
                         if (saveStatus) {
                             setIsSaved(true);
                             console.log(`Listing with ID ${listingID} is saved.`);
@@ -89,7 +100,7 @@ const ListingScreen = ({ navigation, route }) => {
     }
 
     const handleEditListing = () => {
-        navigation.navigate('EditPost', { listing: listing })
+        navigation.navigate('EditPost', { listing: listing, listingID: listingID })
     }
 
     const handleDeleteListing = () => {
@@ -112,9 +123,25 @@ const ListingScreen = ({ navigation, route }) => {
         );
     }
 
-    const deletePost = () => {
+    // should only be available if it's their own listing
+    const deletePost = async () => {
         console.log('DELETE POST')
-        // handle backlend states, navigation, etc.
+        // handle backend states, navigation, etc.
+        // TODO:
+        // delete from listings, delete from savedPosts
+        // display "post is no longer available"? if someone's viewing post at same time
+        const docRef = doc(db, "listings", listingID);
+        try {
+            await deleteDoc(docRef);
+            // frontend update
+            setUserListings((prevUserListings) =>
+                prevUserListings.filter((post) => post.id !== listingID)
+            );
+        } catch (error) {
+            console.error("Error deleting listing:", error);
+        } finally {
+            console.log("listing is deleted")
+        }
     }
 
     const handleMarkAsSold = () => {
@@ -145,7 +172,6 @@ const ListingScreen = ({ navigation, route }) => {
 
     const handleSavePost = async () => {
         // frontend change
-
         setIsLoadingSave(true)
 
         if (!listing) {
@@ -158,26 +184,28 @@ const ListingScreen = ({ navigation, route }) => {
             if (!isSaved) {
                 // add it
                 await setDoc(doc(db, "savedPosts", user.uid + listingID), {
-                    user_id: user.uid,
+                    userID: user.uid,
                     listing_id: listingID,
                     price: listing.price,
                     title: listing.title
                     // listing images requires firebase storage
                 });
                 const newSaved = {
-                    user_id: user.uid,
+                    userID: user.uid,
                     listing_id: listingID,
                     price: listing.price,
                     title: listing.title,
                 };
+                // TODO:
+                // frontend update, can discuss this
                 setSavedPosts((prevSavedPosts) => [...prevSavedPosts, newSaved]);
             }
             else {
-                // if in saved Posts --> exists in savedPosts collection
-                // can also directly check savedPosts collection
+                // TODO:
+                // can also directly query the savedPosts collection to check
                 const listingRef = doc(db, "savedPosts", user.uid + listingID);
                 if (savedPosts && savedPosts.length !== 0) {
-                    const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.user_id === user.uid);
+                    const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
                     if (saveStatus) {
                         await deleteDoc(listingRef);
                     } else {
@@ -187,9 +215,10 @@ const ListingScreen = ({ navigation, route }) => {
                 else {
                     console.error("no document to delete");
                 }
-
+                // TODO:
+                // frontend update, can discuss this
                 setSavedPosts((prevSavedPosts) =>
-                    prevSavedPosts.filter((post) => post.listing_id !== listingID || user.uid !== post.user_id)
+                    prevSavedPosts.filter((post) => post.listing_id !== listingID || user.uid !== post.userID)
                 );
                 // delete it
                 // const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
@@ -263,14 +292,14 @@ const ListingScreen = ({ navigation, route }) => {
             {/* profile card */}
             <View style={styles.sectionContainer}>
                 <TouchableOpacity onPress={() => {
-                    navigation.navigate('UserProfile', { userID: otherUserID })
+                    navigation.navigate('UserProfile', { userID: sellerID })
                 }}
 
                     style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
 
-                    {user?.pfp?.uri ? (
+                    {listing?.pfp?.uri ? (
                         <Image
-                            source={{ uri: user.pfp.uri }}
+                            source={{ uri: listing.pfp.uri }}
                             style={{ width: 60, height: 60, borderRadius: 60 }}
                         />
                     ) : (
@@ -283,10 +312,10 @@ const ListingScreen = ({ navigation, route }) => {
 
                     <View>
                         <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: 'black', fontWeight: '500' }} >
-                            {userData.name || 'oops'}
+                            {listing.userName || 'no name available'}
                         </Text>
                         <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: colors.accentGray }} >
-                            {user.email}
+                            {listing.userEmail || 'no email available'}
                         </Text>
                     </View>
 

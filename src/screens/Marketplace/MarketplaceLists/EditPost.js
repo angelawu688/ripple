@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
-import { collection, addDoc, getFirestore } from 'firebase/firestore';
+import {collection, addDoc, getFirestore, updateDoc, doc} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { colors } from "../../../colors";
+import {userContext} from "../../../context/UserContext";
 
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
@@ -52,7 +53,8 @@ const TagPreview = ({ tag, removeTag }) => {
 }
 
 const EditPost = ({ navigation, route }) => {
-    const { listing } = route.params
+    const { listing, listingID } = route.params
+    const { setUserListings } = useContext(userContext);
 
     const [photos, setPhotos] = useState(listing.photos || []) // array of photos
     const [tags, setTags] = useState(listing.tags || []) // array of tags
@@ -180,23 +182,20 @@ const EditPost = ({ navigation, route }) => {
 
         setIsLoading(true)
         try {
-            // TODO submission to DB! 
             const db = getFirestore();
-            const auth = getAuth();
-            const user = auth.currentUser;
             const listingData = {
                 title,
                 price,
                 description,
                 tags,
-                photos,
-                userId: user.uid,
-                createdAt: new Date()
+                photos
             }
-            // this is gonna need to change to updateDoc instead of addDoc I think? Not sure about overwrite behavior
-            // as of rn it will just create another doc because the listingData is (slightly) different. This sucks and gives us duplicate key issues
-            const docRef = await addDoc(collection(db, "listings"), listingData);
-
+            const editDoc = await updateDoc(doc(db, "listings", listingID), listingData);
+            setUserListings(prevUserListings =>
+                prevUserListings.map(listing =>
+                    listing.id === listingID ? { ...listing, ...listingData } : listing
+                )
+            );
 
             setTimeout(() => {
                 // just chill for a sec, simulating loading
@@ -223,9 +222,6 @@ const EditPost = ({ navigation, route }) => {
             <View
                 style={styles.container}
             >
-
-
-
                 <View style={styles.inputContainer}>
                     <Text style={styles.footerText}>
                         Title
@@ -343,7 +339,7 @@ const EditPost = ({ navigation, route }) => {
 
 
 
-                    {/* capping the legnth of tags at 15 characters */}
+                    {/* capping the length of tags at 15 characters */}
                     <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, tagInput.length > 15 && { color: 'red' }]}>
                         {tagInput.length}/15 characters
                     </Text>
