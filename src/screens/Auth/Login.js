@@ -1,12 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Touchable, TouchableOpacity } from 'react-native';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../colors';
 
 const Login = ({ navigation }) => {
-  // TODO IMPLEMENT FORGOT PASSWORD
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,11 +22,13 @@ const Login = ({ navigation }) => {
     }
   };
 
+  // TODO: update with frontend changes
   const handleForgotPassword = async () => {
     try {
-
+      const auth = getAuth();
+      await sendPasswordResetEmail(auth, email);
     } catch (error) {
-
+      setErrorMessage(error.message);
     }
   };
 
@@ -104,7 +105,7 @@ const Login = ({ navigation }) => {
       </TouchableOpacity> */}
 
       <TouchableOpacity
-        onPress={() => { console.log('FORGOT PASSWORD') }}>
+        onPress={handleForgotPassword}>
         <Text style={styles.link}>
           Forgot password?
         </Text>
