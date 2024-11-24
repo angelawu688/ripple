@@ -31,7 +31,7 @@ const YourListings = ({ navigation }) => {
         return <FullLoadingScreen />
     }
 
-    if (!yourListings) {
+    if (!yourListings || yourListings.length === 0) {
         return (
             <View>
                 <Text>

@@ -20,7 +20,7 @@ const ListingScreen = ({ navigation, route }) => {
     // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(false);
     const { listingID } = route.params;
-    const { user, savedPosts, setSavedPosts } = useContext(userContext);
+    const { user, savedPosts, setSavedPosts, setUserListings } = useContext(userContext);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     // edit, delete, markSold | used for toggling buttons
     const [selectedBottomButton, setSelectedBottomButton] = useState('markSold')
@@ -133,6 +133,10 @@ const ListingScreen = ({ navigation, route }) => {
         const docRef = doc(db, "listings", listingID);
         try {
             await deleteDoc(docRef);
+            // frontend update
+            setUserListings((prevUserListings) =>
+                prevUserListings.filter((post) => post.id !== listingID)
+            );
         } catch (error) {
             console.error("Error deleting listing:", error);
         } finally {

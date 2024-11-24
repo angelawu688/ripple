@@ -54,7 +54,7 @@ const TagPreview = ({ tag, removeTag }) => {
 
 const EditPost = ({ navigation, route }) => {
     const { listing, listingID } = route.params
-    const { user } = useContext(userContext);
+    const { setUserListings } = useContext(userContext);
 
     const [photos, setPhotos] = useState(listing.photos || []) // array of photos
     const [tags, setTags] = useState(listing.tags || []) // array of tags
@@ -191,6 +191,11 @@ const EditPost = ({ navigation, route }) => {
                 photos
             }
             const editDoc = await updateDoc(doc(db, "listings", listingID), listingData);
+            setUserListings(prevUserListings =>
+                prevUserListings.map(listing =>
+                    listing.id === listingID ? { ...listing, ...listingData } : listing
+                )
+            );
 
             setTimeout(() => {
                 // just chill for a sec, simulating loading

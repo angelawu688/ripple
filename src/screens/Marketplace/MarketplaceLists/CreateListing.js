@@ -71,7 +71,7 @@ const CreateListing = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [isLoadingPhotoPicker, setIsLoadingPhotoPicker] = useState(false)
     const [imageErrorMessage, setImageErrorMessage] = useState('')
-    const { user, userData } = useContext(userContext)
+    const { user, userData, setUserListings } = useContext(userContext)
 
     const handleAddTag = async (newTag) => {
         if (newTag.length <= 15) {
@@ -195,6 +195,12 @@ const CreateListing = ({ navigation }) => {
                 createdAt: new Date()
             }
             const docRef = await addDoc(collection(db, "listings"), listingData);
+            const updatedListingData = {
+                ...listingData,
+                id: docRef.id, // Add the generated document id
+            };
+            // frontend update
+            setUserListings((prevUserListings) => [...prevUserListings, updatedListingData]);
             setTimeout(() => {
                 // just chill for a sec, simulating loading
                 // using navigation reset so that we dont get a back buttons
