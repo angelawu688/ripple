@@ -19,7 +19,6 @@ const YourListings = ({ navigation }) => {
         setIsLoading(true)
         try {
             // grab the users saved listings on component mount
-            // for now is test listings
             setYourListings(userListings)
         } catch (error) {
             console.error(error.message)
