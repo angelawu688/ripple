@@ -21,7 +21,6 @@ const fields = [
     { label: 'Grad Year', key: 'gradYear', keyboardType: 'numeric', description: 'Enter a four digit year (2026)' },
     { label: 'Instagram', key: 'instagram', keyboardType: 'default', description: 'Enter username' },
     { label: 'LinkedIn', key: 'linkedin', keyboardType: 'url', description: 'Enter profile link' },
-    { label: 'Twitter/X', key: 'twitter', keyboardType: 'default', description: 'Enter username' },
 ];
 
 const PersonalInformation = () => {

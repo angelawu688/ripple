@@ -9,6 +9,7 @@ import SavedItems from "../../screens/Profile/SavedItems";
 import Analytics from "../../screens/Profile/Analytics";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import ListingScreen from "../../screens/Marketplace/ListingScreen";
+import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
 
 
 const ProfileStack = createNativeStackNavigator();
@@ -22,7 +23,6 @@ const ProfileStackNavigator = () => {
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false,
             }}
-
         >
             <ProfileStack.Screen
                 name="Profile"
@@ -112,6 +112,21 @@ const ProfileStackNavigator = () => {
             <ProfileStack.Screen
                 name="ListingScreen"
                 component={ListingScreen}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
+
+            <ProfileStack.Screen
+                name="EditPost"
+                component={EditPost}
                 options={({ navigation }) => ({
                     headerTitle: () => (
                         <Logo />

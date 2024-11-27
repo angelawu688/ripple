@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="no fix here">
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="mark posts as sold">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/Messages/Conversation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Messages/Conversation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/YourListings.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/YourListings.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,21 +33,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "angela",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/Users/angelawu/CSE_all/uw-marketplace/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/angelawu/CSE_all/uw-marketplace/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
@@ -304,23 +304,7 @@
       <option name="project" value="LOCAL" />
       <updated>1732690927899</updated>
     </task>
-    <task id="LOCAL-00029" summary="fix onboarding">
-      <option name="closed" value="true" />
-      <created>1732692002987</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1732692002987</updated>
-    </task>
-    <task id="LOCAL-00030" summary="no fix here">
-      <option name="closed" value="true" />
-      <created>1732692050994</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1732692050994</updated>
-    </task>
-    <option name="localTasksCounter" value="31" />
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -338,6 +322,8 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="check if listing was saved by user" />
+    <MESSAGE value="display saved listings in user profile" />
     <MESSAGE value="get seller info for user profile screen" />
     <MESSAGE value="update user profile screen with backend" />
     <MESSAGE value="updating saved posts (has errors and bugs), ignore" />
@@ -361,8 +347,6 @@
     <MESSAGE value="fixed id issue" />
     <MESSAGE value="not sure what these changes are" />
     <MESSAGE value="mark posts as sold" />
-    <MESSAGE value="fix onboarding" />
-    <MESSAGE value="no fix here" />
-    <option name="LAST_COMMIT_MESSAGE" value="no fix here" />
+    <option name="LAST_COMMIT_MESSAGE" value="mark posts as sold" />
   </component>
 </project>

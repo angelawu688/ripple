@@ -4,7 +4,7 @@ import { MotiView } from 'moti';
 
 
 
-const ListingsList = ({ listings, navigation }) => {
+const ListingsList = ({ listings, navigation, scrollEnabled = true }) => {
     if (!listings || listings.length === 0) {
         return null
     }
@@ -17,6 +17,7 @@ const ListingsList = ({ listings, navigation }) => {
             numColumns={2} // this is how we put them side by side
             data={listings}
             showsVerticalScrollIndicator={false}
+            scrollEnabled={scrollEnabled}
             renderItem={({ item }) => { // note: need to keep as "items", we are just renaming it to be clear
                 return (
                     <TouchableOpacity

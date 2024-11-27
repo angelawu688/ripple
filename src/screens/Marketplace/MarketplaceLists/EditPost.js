@@ -1,12 +1,15 @@
-import {useContext, useEffect, useState} from "react";
+import { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
-import {collection, addDoc, getFirestore, updateDoc, doc} from 'firebase/firestore';
+import { collection, addDoc, getFirestore, updateDoc, doc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { colors } from "../../../colors";
-import {userContext} from "../../../context/UserContext";
+import { userContext } from "../../../context/UserContext";
+import { MinusCircle, PlusCircle, UploadSimple } from "phosphor-react-native";
+import CurrencyInput from 'react-native-currency-input'
+
 
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
@@ -133,14 +136,6 @@ const EditPost = ({ navigation, route }) => {
         // no backend update needed
     };
 
-    const handlePriceChange = (text) => {
-        const formattedPrice = formatPrice(text);
-        setPrice(formattedPrice);
-        setErrorMessage('')
-        setChanges(true)
-        setImageErrorMessage('')
-    }
-
     const formatPrice = (input) => {
         const cleanedPrice = input.replace(/[^0-9]/g, ''); // only allow numbers
         const number = parseInt(cleanedPrice, 10);
@@ -216,61 +211,43 @@ const EditPost = ({ navigation, route }) => {
         }
     }
 
+    const Asterisk = () => {
+        return (
+            <Text style={{ color: colors.errorMessage }}>
+                {' *'}
+            </Text>
+        )
+    }
+
     return (
+        // TODO make the KAV work
+
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 
             <View
                 style={styles.container}
             >
+                {/* photos */}
                 <View style={styles.inputContainer}>
-                    <Text style={styles.footerText}>
-                        Title
+                    <Text style={styles.titleText}>
+                        Upload images
+                        <Asterisk />
                     </Text>
-                    <TextInput
-                        style={[styles.shadow, styles.middleInput]}
-                        placeholder="Title"
-                        placeholderTextColor="#7E7E7E"
-                        value={title}
-                        onChangeText={(text) => {
-                            setTitle(text)
-                            setChanges(true)
-                            setErrorMessage('')
-                            setImageErrorMessage('')
-                        }}
-                    />
-                </View>
-
-                <View style={styles.inputContainer}>
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={styles.footerText}>
-                            Photos | {photos.length}/5
-                        </Text>
-                        <Text style={{ color: colors.errorMessage }}>
-                            {imageErrorMessage}
-                        </Text>
-                    </View>
-
                     {/* empty photos */}
                     {photos.length === 0 && <TouchableOpacity
                         onPress={handleAddPhoto}
                         style={[styles.shadow, styles.addPhotosContainer]}
                     >
                         <View style={{ display: 'flex', flexDirection: 'row', }}>
-                            {isLoadingPhotoPicker ? <ActivityIndicator /> : <Ionicons name="add-circle-outline" size={24} color='#7E7E7E' />}
-
-                            <Text style={[styles.placeholderText, { marginLeft: 4 }]}>
-                                Add photos
-                            </Text>
+                            {isLoadingPhotoPicker ? <ActivityIndicator /> : <UploadSimple size={30} color={colors.accentGray} />}
                         </View>
-
                     </TouchableOpacity>}
 
-
+                    {/* photo preview and + icon */}
                     {photos.length >= 1 && <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                         {photos.map((uri, index) => {
                             return (
                                 <ImagePreview key={index} uri={uri} removePhoto={removePhoto} />
-
                             )
                         })}
 
@@ -279,57 +256,99 @@ const EditPost = ({ navigation, route }) => {
                             style={{ width: imageSize, height: imageSize, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 7, }}
                             hitSlop={16}
                         >
-                            {isLoadingPhotoPicker ? <ActivityIndicator /> : <Ionicons name="add-circle-outline" size={20} color='#7E7E7E' />}
+                            {isLoadingPhotoPicker ? <ActivityIndicator /> : <PlusCircle size={30} color={colors.loginBlue} />}
                         </TouchableOpacity>}
-
                     </View>}
 
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={styles.footerText}>
+                            Photos | {photos.length}/5
+                        </Text>
+                        <Text style={{ color: colors.errorMessage }}>
+                            {imageErrorMessage}
+                        </Text>
+                    </View>
                 </View>
 
-
-
-                <View style={[styles.inputContainer]}>
-                    <Text style={styles.footerText}>
-                        Price
+                {/* title */}
+                <View style={styles.inputContainer}>
+                    <Text style={styles.titleText}>
+                        Title
+                        <Asterisk />
                     </Text>
                     <TextInput
+                        style={[styles.shadow, styles.middleInput]}
+                        placeholder="Title"
+                        placeholderTextColor="#7E7E7E"
+                        value={title}
+                        onChangeText={(text) => {
+                            setTitle(text)
+                            setErrorMessage('')
+                            setChanges(true)
+                            setImageErrorMessage('')
+                        }}
+                    />
+                </View>
+
+                <View style={[styles.inputContainer]}>
+                    <Text style={styles.titleText}>
+                        Price
+                        <Asterisk />
+                    </Text>
+                    <CurrencyInput
+                        style={[styles.shadow, styles.middleInput, { padding: 10 }]}
+                        value={price}
+                        onChangeValue={(text) => {
+                            setPrice(text)
+                            setErrorMessage('')
+                            setChanges(true)
+                            setImageErrorMessage('')
+                        }}
+                        delimiter=","
+                        separator="." // otherwise they use ,
+                        precision={2}
+                        minValue={0}
+                        prefix='$'
+                        placeholder="$1.63"
+                    />
+                    {/* <TextInput
                         style={[styles.shadow, styles.middleInput]}
                         placeholder="0.00"
                         placeholderTextColor="#7E7E7E"
                         value={price}
                         onChangeText={handlePriceChange}
                         keyboardType="numeric"
-                    />
+                    /> */}
                 </View>
 
+
+                {/* Tags input container */}
                 <View style={styles.inputContainer}>
-                    <Text style={styles.footerText}>
+                    <Text style={styles.titleText}>
                         Tags | {tags.length}/3
                     </Text>
-                    {/* TODO change this to be more representative of what we want to do */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-
-
+                    <View style={{ flexDirection: 'row', alignItems: 'center', }}>
                         {tags.length < 3 && <TextInput
                             style={[styles.shadow, styles.tagInput]}
                             placeholder="Clothing"
                             placeholderTextColor="#7E7E7E"
                             value={tagInput}
                             onChangeText={(text) => {
+                                console.log(tagInput)
                                 setTagInput(text)
-                                setErrorMessage('')
-                                setImageErrorMessage('')
                             }}
                         />}
                         {tags.length < 3 && <TouchableOpacity
                             onPress={() => handleAddTag(tagInput)}
                             style={{ marginLeft: 10 }}
+                            disabled={tagInput.length === 0}
                         >
-                            <Ionicons name="add-circle-outline" size={24} color='#7E7E7E' />
+                            <PlusCircle color={tagInput.length > 0 && tagInput.length <= 15 ? colors.loginBlue : colors.accentGray} size={30} />
                         </TouchableOpacity>}
                     </View>
 
-                    <View style={{ display: 'flex', flexDirection: 'row', marginTop: 6 }}>
+                    {/* tag previews */}
+                    <View style={{ display: 'flex', flexDirection: 'row', marginTop: 5 }}>
                         {tags.map((tag, index) => {
                             return (
                                 <TagPreview key={index} tag={tag} removeTag={removeTag} />
@@ -337,17 +356,16 @@ const EditPost = ({ navigation, route }) => {
                         })}
                     </View>
 
-
-
-                    {/* capping the length of tags at 15 characters */}
-                    <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, tagInput.length > 15 && { color: 'red' }]}>
+                    {/* capping the legnth of tags at 15 characters */}
+                    <Text style={[styles.footerText, { marginBottom: 0, color: colors.accentGray }, tagInput.length > 15 && { color: colors.errorMessage }]}>
                         {tagInput.length}/15 characters
                     </Text>
                 </View>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.footerText}>
+                    <Text style={styles.titleText}>
                         Description
+                        <Asterisk />
                     </Text>
                     <TextInput
                         style={[styles.shadow, styles.descriptionInput]}
@@ -356,14 +374,14 @@ const EditPost = ({ navigation, route }) => {
                         value={description}
                         onChangeText={(text) => {
                             setDescription(text)
-                            setChanges(true)
                             setErrorMessage('')
                             setImageErrorMessage('')
+                            setChanges(true)
                         }}
                         multiline={true}
                     />
-                    <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, description.length > 150 && { color: 'red' }]}>
-                        {description.length}/150 characters
+                    <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, description.length > 163 && { color: 'red' }]}>
+                        {description.length}/163 characters
                     </Text>
                 </View>
 
@@ -392,16 +410,25 @@ const styles = StyleSheet.create({
     container: {
         display: 'flex',
         alignSelf: 'center',
-        width: '92%',
+        width: '100%',
         height: '100%',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        marginTop: 0
+        marginTop: 0,
+        paddingHorizontal: 25,
+        paddingVertical: 15
+    },
+    titleText: {
+        fontSize: 18,
+        fontFamily: 'inter',
+        color: colors.loginBlue,
+        marginBottom: 6,
+        marginLeft: 6
     },
     shadow: {
-        shadowColor: "#0C6E86",
+        shadowColor: colors.accentGray,
         shadowOffset: {
-            top: 1,
+            top: 0,
         },
         shadowOpacity: 0.3,
         shadowRadius: 3,
@@ -415,8 +442,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-
-        marginTop: 1
+        marginTop: 1,
+        height: 65,
+        borderStyle: 'dashed',
+        borderWidth: 1,
+        borderColor: colors.accentGray
     },
     placeholderText: {
         color: '#7E7E7E',
@@ -446,12 +476,10 @@ const styles = StyleSheet.create({
     },
     footerText: {
         fontSize: 14,
-        color: '#1f1f1f',
+        color: colors.accentGray,
         fontFamily: 'inter',
         alignSelf: 'flex-start',
-        marginLeft: 12,
-        marginBottom: 6,
-        marginTop: 4
+        marginTop: 6
     },
     publishButton: {
         width: '100%',
@@ -484,7 +512,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     inputContainer: {
-        marginBottom: 12,
+        marginBottom: 20,
         width: '100%'
     },
     tagInput: {
@@ -494,5 +522,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 15,
     },
-
+    publishShadow: {
+        shadowColor: colors.loginBlue,
+        shadowOffset: {
+            top: 0,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 8,
+    }
 })

@@ -50,7 +50,9 @@ const TabNavigator = () => {
                 tabBarShowLabel: false,
                 tabBarStyle: {
                     backgroundColor: colors.darkblue,
-                    paddingTop: 12
+                    paddingTop: 12,
+                    borderTopLeftRadius: 10,
+                    borderTopRightRadius: 10
                 },
 
             })}

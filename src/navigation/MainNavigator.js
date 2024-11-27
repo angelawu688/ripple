@@ -7,6 +7,8 @@ import { userContext } from '../context/UserContext';
 
 const RootStack = createNativeStackNavigator()
 
+
+
 const MainNavigator = () => {
   const { user, isLoading } = useContext(userContext);
 
