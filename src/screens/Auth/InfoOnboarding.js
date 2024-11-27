@@ -7,7 +7,7 @@ import {
 } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -20,7 +20,7 @@ const InfoOnboarding = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [name, setName] = useState('')
     const [pfp, setPfp] = useState(undefined)
-    const { setUser } = useContext(userContext);
+    const { setUser, setUserData, setSavedPosts, setUserListings } = useContext(userContext);
 
     // focus the top text field on component mount
     const inputRef = useRef(null);
@@ -48,6 +48,10 @@ const InfoOnboarding = ({ navigation, route }) => {
                 name: name,
                 // profile photo requires firebase storage
             });
+            const userDoc = await getDoc(doc(db, "users", user.uid))
+            setUserData(userDoc.data());
+            setSavedPosts([]);
+            setUserListings([]);
             setUser(user); // this will navigate to the home page
         } catch (error) {
             console.log(error.message);

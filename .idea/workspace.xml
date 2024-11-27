@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="fixed id issue">
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="mark posts as sold">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Auth/InfoOnboarding.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Auth/InfoOnboarding.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -295,7 +297,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732413042053</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="mark posts as sold">
+      <option name="closed" value="true" />
+      <created>1732690927896</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1732690927899</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -313,8 +323,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="User email verification (need to fix EduOnboarding)" />
-    <MESSAGE value="saving post, trying to display saved items (not fixed)" />
     <MESSAGE value="check if listing was saved by user" />
     <MESSAGE value="display saved listings in user profile" />
     <MESSAGE value="get seller info for user profile screen" />
@@ -338,6 +346,8 @@
     <MESSAGE value="edit listing, no new createdAt" />
     <MESSAGE value="context for your published listings" />
     <MESSAGE value="fixed id issue" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed id issue" />
+    <MESSAGE value="not sure what these changes are" />
+    <MESSAGE value="mark posts as sold" />
+    <option name="LAST_COMMIT_MESSAGE" value="mark posts as sold" />
   </component>
 </project>

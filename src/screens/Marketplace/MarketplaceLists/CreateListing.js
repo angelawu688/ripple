@@ -191,6 +191,7 @@ const CreateListing = ({ navigation }) => {
                 userId: user.uid,
                 userName: userData.name,
                 userEmail: userData.email,
+                sold: false,
                 // pass in user pfp too
                 createdAt: new Date()
             }
