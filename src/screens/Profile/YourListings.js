@@ -33,6 +33,8 @@ const YourListings = ({ navigation }) => {
         try {
             // grab the users saved listings on component mount
             setYourListings(userListings)
+            console.log("userListings is", userListings)
+
         } catch (error) {
             console.error(error.message)
         } finally {
@@ -42,12 +44,12 @@ const YourListings = ({ navigation }) => {
 
     useEffect(() => {
         setIsLoading(false)
-        const active = yourListings.filter(listing => !listing.sold)
-        const past = yourListings.filter(listing => listing.sold)
+        const active = yourListings.filter(listing => listing.sold === false)
+        const past = yourListings.filter(listing => listing.sold === true)
         setActiveListings(active)
         setPastListings(past)
         // cleanup function
-    }, [])
+    }, [yourListings])
 
     if (isLoading) {
         return <FullLoadingScreen />
