@@ -1,4 +1,4 @@
-import { FlatList, View, Text, TouchableOpacity } from "react-native"
+import { FlatList, View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import ListingCard from "../../../components/ListingCard"
 
 
@@ -8,14 +8,13 @@ const ForYou = ({ listings, navigation }) => {
 
     if (!listings) {
         return (
-            <View style={{ display: 'flex', height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                {/* <Text>
-                    Posts from your friends will show up here!
-                </Text> */}
+            <View style={styles.emptyContainer}>
+                <Text style={styles.title}>
+                    No posts found!
+                </Text>
             </View>
         )
     }
-
 
     return (
         <FlatList
@@ -51,3 +50,19 @@ const ForYou = ({ listings, navigation }) => {
 }
 
 export default ForYou;
+
+const styles = StyleSheet.create({
+    title: {
+        fontSize: 18,
+        fontFamily: 'inter',
+        fontWeight: '600',
+        textAlign: 'center'
+    },
+    emptyContainer: {
+        display: 'flex',
+        height: '70%',
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
+})

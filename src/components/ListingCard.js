@@ -34,7 +34,11 @@ const ListingCard = ({ listing }) => {
                 }
 
                 {sold && (
-                    <Text style={{ color: 'black', fontSize: 70, opacity: 0.4, fontWeight: '900', position: 'absolute' }}>SOLD</Text>
+                    <Text style={{
+                        color: 'white', fontSize: 28, fontWeight: '900', position: 'absolute',
+                        // TODO REMOVE
+                        borderWidth: 1, borderColor: 'black' // just so that we can see it
+                    }}>SOLD</Text>
                 )}
 
             </View>

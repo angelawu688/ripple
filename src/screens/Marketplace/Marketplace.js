@@ -11,6 +11,7 @@ import Friends from './MarketplaceLists/Friends'
 import Sell from './MarketplaceLists/Sell'
 import Search from './MarketplaceLists/Search'
 import { MapPin, Plus } from "phosphor-react-native";
+import ListingsListSkeletonLoaderFull from "../../components/ListingsListSkeletonLoaderFull";
 
 
 const testPosts = [
@@ -150,14 +151,12 @@ const Marketplace = ({ navigation }) => {
             </View>
             }
 
-
-
-            {isLoading ? <ActivityIndicator size="large" /> : renderSelectedOption()}
+            {isLoading ? (<ListingsListSkeletonLoaderFull />) : renderSelectedOption()}
 
             <TouchableOpacity onPress={() => navigation.navigate('CreateListing')}
 
-                style={{ backgroundColor: 'white', borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, borderWidth: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.4, shadowRadius: 3, position: 'absolute', bottom: 15, right: 15 }}>
-                <Plus color={colors.darkblue} size={30} />
+                style={{ backgroundColor: 'white', borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.35, shadowRadius: 5, position: 'absolute', bottom: 15, right: 15, shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 } }}>
+                <Plus color={colors.darkblue} size={30} weight="bold" />
             </TouchableOpacity>
         </View>
     )
@@ -210,11 +209,13 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.4,
         shadowRadius: 8,
         elevation: 8,
+        paddingHorizontal: 16, // this is an expirement
+
     },
     topTitle: {
         backgroundColor: 'white',
         height: 36,
-        paddingHorizontal: 10,
+        // paddingHorizontal: 10,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',

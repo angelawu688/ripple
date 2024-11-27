@@ -76,8 +76,8 @@ const Profile = ({ navigation }) => {
 
                     <Ionicons name={'chevron-forward'} size={24} color={'black'} />
                 </TouchableOpacity>
-                 {/*todo: consolidate sold items and your listings*/}
-                <TouchableOpacity
+                {/*todo: consolidate sold items and your listings*/}
+                {/* <TouchableOpacity
                     style={styles.profileCard}
                     onPress={() => navigation.navigate('SoldItems')}
                 >
@@ -88,7 +88,7 @@ const Profile = ({ navigation }) => {
                         </Text>
                     </View>
                     <Ionicons name={'chevron-forward'} size={24} color={'black'} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View >
 
             {/* About */}
@@ -183,7 +183,8 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        paddingTop: 30
     },
     profileCardContainer: {
         display: 'flex',

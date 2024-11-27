@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Linking, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator } from "react-native";
+import { Linking, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator, ScrollView } from "react-native";
 import ForYou from "./MarketplaceLists/ForYou";
 import { Ionicons } from "@expo/vector-icons";
-import {collection, doc, getDoc, getDocs, getFirestore, query, where} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
 import ListingsList from '../../components/ListingsList'
 import { Check, EnvelopeSimple, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
@@ -72,7 +72,6 @@ const UserProfile = ({ navigation, route }) => {
             setUserProfile(prevProfile => ({
                 ...prevProfile,
                 instagram: 'williamhuntt',
-                twitter: 'nfl',
                 linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
             }));
         };
@@ -118,14 +117,6 @@ const UserProfile = ({ navigation, route }) => {
                 }
                 url = `https://www.instagram.com/${userProfile.instagram}`;
                 break; // this prevents fallthrough
-            case ('twitter'):
-                setLoadingX(true)
-                if (!userProfile.twitter) {
-                    Alert.alert('Error', 'No X user found')
-                    return;
-                }
-                url = `https://x.com/${userProfile.twitter}`;
-                break;
             case ('linkedin'):
                 setLoadingLI(true)
                 const isUrl = /^https?:\/\/.+$/.test(userProfile.linkedin);
@@ -161,7 +152,8 @@ const UserProfile = ({ navigation, route }) => {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={{ flex: 1 }}>
+            {/* I WANT THIS TO BE A HEADER COMPONENT */}
             <View style={styles.topContainer}>
                 {userProfile.pfp ? (<Image
                     // pfp would go here
@@ -184,92 +176,96 @@ const UserProfile = ({ navigation, route }) => {
                 </View>
             </View>
 
-            <View style={[{ width: '100%', display: 'flex', backgroundColor: 'white', flexDirection: 'row', borderRadius: 12, marginVertical: 16, height: 35, alignItems: 'center' }, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}>
-                <TouchableOpacity style={styles.followButton}
-                    onPress={() => handleFollow()}
-                >
+            <ScrollView
+                contentContainerStyle={{
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                }}
+                style={styles.scrollContainer}
+            >
 
-                    {followingUser ? <Check size={18} color={followingUser ? colors.neonBlue : colors.accentGray} /> : <Plus size={18} color={colors.accentGray} />}
-                    <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
-                        Follow{followingUser && 'ing'}
-                    </Text>
-                </TouchableOpacity>
-                <View style={{ width: 1, backgroundColor: colors.accentGray, height: '100%' }} />
-                <TouchableOpacity style={styles.followButton}
-                    onPress={() => handleMessage()}
-                >
-                    <EnvelopeSimple size={18} colors={colors.accentGray} />
-                    <Text style={styles.followText}>
-                        Message
-                    </Text>
-                </TouchableOpacity>
-            </View>
+                <View style={[{ width: '100%', display: 'flex', backgroundColor: 'white', flexDirection: 'row', borderRadius: 15, marginVertical: 16, height: 35, alignItems: 'center' }, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}>
+                    <TouchableOpacity style={styles.followButton}
+                        onPress={() => handleFollow()}
+                    >
 
-
-
-
-            <View style={styles.bioContainer}>
-                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
-                    <View >
-                        <Text style={styles.majorText}>
-                            {userProfile.major}
+                        {followingUser ? <Check size={18} color={followingUser ? colors.neonBlue : colors.accentGray} /> : <Plus size={18} color={colors.accentGray} />}
+                        <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
+                            Follow{followingUser && 'ing'}
                         </Text>
-                        <Text style={{ fontFamily: 'inter', fontSize: 16, color: colors.accentGray, fontWeight: '500' }}>
-                            {userProfile.concentration}
+                    </TouchableOpacity>
+                    <View style={{ width: 1, backgroundColor: colors.accentGray, height: '100%' }} />
+                    <TouchableOpacity style={styles.followButton}
+                        onPress={() => handleMessage()}
+                    >
+                        <EnvelopeSimple size={18} color={colors.accentGray} />
+                        <Text style={styles.followText}>
+                            Message
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
+
+
+                <View style={styles.bioContainer}>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
+                        <View >
+                            <Text style={styles.majorText}>
+                                {userProfile.major}
+                            </Text>
+                            {userProfile?.concentration && (
+                                <Text style={{ fontFamily: 'inter', fontSize: 16, color: colors.accentGray, fontWeight: '500' }}>
+                                    {userProfile.concentration}
+                                </Text>
+                            )}
+                        </View>
+                        <Text style={styles.majorText}>
+                            {userProfile.gradYear}
                         </Text>
                     </View>
-                    <Text style={styles.majorText}>
-                        {userProfile.gradYear}
+
+                    {userProfile?.bio && (<View style={{ marginTop: 12, width: '100%', maxHeight: 128, marginBottom: 0 }}>
+                        <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
+                            {userProfile.bio}
+                        </Text>
+                    </View>)}
+
+
+                    {(userProfile.instagram || userProfile.linkedin || userProfile.twitter) && (<View style={styles.socials}>
+
+                        {userProfile.instagram && <TouchableOpacity
+                            onPress={() => openSocial('instagram')}
+                        >
+                            {loadingIG ? <ActivityIndicator color={'black'} /> : <InstagramLogo size={30} color={'black'} />}
+                        </TouchableOpacity>}
+
+                        {userProfile.linkedin && <TouchableOpacity
+                            onPress={() => openSocial('linkedin')}
+                        >
+                            {loadingLI ? <ActivityIndicator color={'black'} /> : <LinkedinLogo size={30} color={'black'} />}
+                        </TouchableOpacity>}
+
+                    </View>)}
+
+                    <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', marginLeft: 6 }}>
+                        Listings
                     </Text>
                 </View>
 
-                <View style={{ marginTop: 12, width: '100%', maxHeight: 128, marginBottom: 0 }}>
-                    <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
-                        {userProfile.bio}
-                    </Text>
-                </View>
-
-
-                {(userProfile.instagram || userProfile.linkedin || userProfile.twitter) && (<View style={styles.socials}>
-
-                    {userProfile.instagram && <TouchableOpacity
-                        onPress={() => openSocial('instagram')}
-                    >
-                        {loadingIG ? <ActivityIndicator color={'black'} /> : <InstagramLogo size={30} color={'black'} />}
-                    </TouchableOpacity>}
-
-                    {userProfile.linkedin && <TouchableOpacity
-                        onPress={() => openSocial('linkedin')}
-                    >
-                        {loadingLI ? <ActivityIndicator color={'black'} /> : <LinkedinLogo size={30} color={'black'} />}
-                    </TouchableOpacity>}
-
-                    {userProfile.twitter && <TouchableOpacity
-                        onPress={() => openSocial('twitter')}
-                    >
-                        {loadingX ? <ActivityIndicator color={'black'} /> : <XLogo size={30} color={'black'} />}
-                    </TouchableOpacity>}
-                </View>)}
-
-                <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', marginLeft: 6 }}>
-                    Listings
-                </Text>
-            </View>
 
 
 
-
-            {
-                userListings ? <ListingsList listings={userListings} navigation={navigation} /> : (
+                {userListings ? <ListingsList listings={userListings} navigation={navigation} scrollEnabled={false} /> : (
                     <View style={{ marginTop: 30 }}>
                         <Text style={{ fontFamily: 'inter', fontSize: 16 }}>
                             User has no listings!
                         </Text>
                     </View>
-                )
-            }
+                )}
 
-        </View >
+            </ScrollView >
+        </View>
+
     )
 
 }
@@ -277,27 +273,27 @@ const UserProfile = ({ navigation, route }) => {
 export default UserProfile;
 
 const styles = StyleSheet.create({
-    container: {
+    scrollContainer: {
         display: 'flex',
         height: '100%',
-        width: '92%',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
+        width: '100%',
         flexDirection: 'column',
         alignSelf: 'center',
+        paddingHorizontal: 15
     },
     topContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        width: '100%'
+        width: '100%',
+        paddingHorizontal: 15
     },
-
     headerTextContainer: {
         display: 'flex',
         flexDirection: 'column',
-        marginLeft: 12
+        marginLeft: 12,
+        marginBottom: 6
 
     },
     nameText: {
@@ -321,16 +317,29 @@ const styles = StyleSheet.create({
     socials: {
         flexDirection: 'row',
         marginTop: 10,
-        width: 120,
+        width: 75,
         justifyContent: 'space-between',
+        marginBottom: 25
     },
-
-    followText: { marginLeft: 4, fontSize: 15, fontFamily: 'inter', color: colors.accentGray },
-    followButton: { width: '50%', height: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' },
+    followText: {
+        marginLeft: 4,
+        fontSize: 15,
+        fontFamily: 'inter',
+        color: colors.accentGray
+    },
+    followButton: {
+        width: '50%',
+        height: 30,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
     shadow: {
         shadowColor: colors.accentGray,
         shadowOpacity: 0.4,
         shadowRadius: 6,
+        shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 }
     },
     majorText: {
         fontFamily: 'inter',

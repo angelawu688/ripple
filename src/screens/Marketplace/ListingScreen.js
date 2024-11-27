@@ -15,9 +15,10 @@ import {
 import { useState, useEffect, useContext, useRef } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
-import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package } from 'phosphor-react-native';
+import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, Tag } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
+import * as Linking from 'expo-linking'
 
 
 const ListingScreen = ({ navigation, route }) => {
@@ -36,7 +37,7 @@ const ListingScreen = ({ navigation, route }) => {
     // edit, delete, markSold | used for toggling buttons
     const [selectedBottomButton, setSelectedBottomButton] = useState('markSold')
     const [postSold, setPostSold] = useState(false) // grab this on init
-    const [isOwnPost, setIsOwnPost] = useState(false) // grab this on init
+    const [isOwnPost, setIsOwnPost] = useState(true) // grab this on init. Literally something like uid === userData.uid should be chill
     const [sellerID, setSellerID] = useState(null) // grab this on init
 
 
@@ -105,7 +106,12 @@ const ListingScreen = ({ navigation, route }) => {
         };
 
         fetchListing();
+
     }, [listingID]);
+
+    useEffect(() => {
+        console.log(listing?.createdAt?.seconds)
+    }, [listing])
 
 
     if (isLoading) {
@@ -142,6 +148,38 @@ const ListingScreen = ({ navigation, route }) => {
             ],
             { cancelable: true } // Allows dismissal by tapping outside the alert
         );
+    }
+
+    // TODO move this to utils
+    // test this too
+    const formatDate = (dateInSeconds) => {
+        // date.now is in ms, we are passing in as seconds
+        const seconds = (Date.now() / 1000) - dateInSeconds
+        console.log(Date.now())
+        const minute = 60;
+        const hour = 60 * minute;
+        const day = 24 * hour;
+        const month = 30 * day;
+        const year = 365 * day;
+
+        if (seconds < minute) {
+            return "Just now";
+        } else if (seconds < hour) {
+            const minutes = Math.floor(seconds / minute);
+            return `${minutes} min ago`;
+        } else if (seconds < day) {
+            const hours = Math.floor(seconds / hour);
+            return `${hours} hours ago`;
+        } else if (seconds < month) {
+            const days = Math.floor(seconds / day);
+            return `${days} days ago`;
+        } else if (seconds < year) {
+            const months = Math.floor(seconds / month);
+            return `${months} months ago`;
+        } else {
+            const years = Math.floor(seconds / year);
+            return `${years} years ago`;
+        }
     }
 
     // should only be available if it's their own listing
@@ -314,15 +352,25 @@ const ListingScreen = ({ navigation, route }) => {
 
     const sharePost = () => {
         // will have to flesh out what this looks like, thinking like a pop up to send as a text?
+        const deepLink = Linking.createURL(`listing/${listingID}`)
+        const messageBody = `Check out this listing on Ripple!\n${deepLink}`
+        const smsURL = `sms:&body=${encodeURIComponent(messageBody)}`
+
+        try {
+            Linking.openURL(smsURL)
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     return (
         <ScrollView
             contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
-            style={{ width: '100%' }}
+            style={{ width: '100%', paddingBottom: 50 }}
 
         >
-            <PhotoCarousel photos={testPhotos} />
+            <PhotoCarousel photos={testPhotos} sold={postSold} />
+
 
             {/* name, price, date */}
             <View style={styles.sectionContainer}>
@@ -335,14 +383,15 @@ const ListingScreen = ({ navigation, route }) => {
                         ${listing.price}
                     </Text>
                 </View>
-                {/* todofix */}
-                <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', color: colors.accentGray }}>
-                    {new Date(listing.createdAt.toDate()).toLocaleDateString()}
-                </Text>
+                {/* now showing date in own post per figma */}
+                {!isOwnPost && (<Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', color: colors.accentGray }}>
+                    {/* {listing.createdAt.toDate().toLocaleDateString()} */}
+                    {formatDate(listing.createdAt.seconds)}
+                </Text>)}
             </View>
 
             {/* profile card */}
-            <View style={styles.sectionContainer}>
+            {!isOwnPost && (<View style={styles.sectionContainer}>
                 <TouchableOpacity onPress={() => {
                     navigation.navigate('UserProfile', { userID: sellerID })
                 }}
@@ -372,7 +421,7 @@ const ListingScreen = ({ navigation, route }) => {
                     </View>
 
                 </TouchableOpacity>
-            </View>
+            </View>)}
 
 
             {/* IF THIS IS NOT OUR POST */}
@@ -397,7 +446,7 @@ const ListingScreen = ({ navigation, route }) => {
 
                 <View style={styles.bottomButtonContainer}>
 
-                    <TouchableOpacity style={styles.bottomButton} onPress={() => console.log('share')}>
+                    <TouchableOpacity style={styles.bottomButton} onPress={() => sharePost()}>
                         <PaperPlaneTilt size={26} color="black" s />
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Share
@@ -419,45 +468,30 @@ const ListingScreen = ({ navigation, route }) => {
                 </View>
             </View>}
 
+
+            {/* buttons if its your own */}
             {isOwnPost &&
-                <View style={styles.sectionContainer}>
-                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', alignSelf: 'center', height: 40, marginTop: 12 }}>
+                <View style={styles.isOwnPostContainer}>
+                    <TouchableOpacity
+                        onPress={() => handleEditListing()}
+                        style={[{ width: '32%' }, styles.ownPostBottomButton]}
+                    >
+                        <PencilSimple color={colors.black} />
+                        <Text style={styles.ownPostBottomButtonText}>
+                            Edit
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => handleMarkAsSold()}
+                        style={[{ width: '64%' }, styles.ownPostBottomButton]}
 
-                        <TouchableOpacity onPress={() => {
-                            if (selectedBottomButton === 'markSold') {
-                                handleMarkAsSold()
-                            } else {
-                                setSelectedBottomButton('markSold')
-                            }
-                        }}
-                            style={[{ width: selectedBottomButton === 'markSold' ? '50%' : '20%' }, styles.ownPostBottomButton]}>
-                            {selectedBottomButton !== 'markSold' ? (<Package color={colors.black} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.black }]}> Mark as {postSold ? 'Active' : 'Sold'}</Text>)}
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => {
-                            if (selectedBottomButton === 'edit') {
-                                handleEditListing()
-                            } else {
-                                setSelectedBottomButton('edit')
-                            }
-                        }}
-                            style={[{ width: selectedBottomButton === 'edit' ? '50%' : '20%' }, styles.ownPostBottomButton]}>
-                            {selectedBottomButton !== 'edit' ? (<PencilSimple color={colors.accentGray} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.accentGray }]}>Edit Listing</Text>)}
-
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={() => {
-                            if (selectedBottomButton !== 'delete') {
-                                setSelectedBottomButton('delete')
-                            } else {
-                                handleDeleteListing()
-                            }
-                        }}
-                            style={[styles.ownPostBottomButton, { width: selectedBottomButton === 'delete' ? '50%' : '20%', borderColor: selectedBottomButton !== 'delete' ? (colors.accentGray) : (colors.errorMessage) },]}>
-                            {selectedBottomButton !== 'delete' ? (<TrashSimple color={colors.errorMessage} />) : (<Text style={[styles.ownPostBottomButtonText, { color: colors.errorMessage }]}>Delete Listing</Text>)}
-                        </TouchableOpacity>
-                    </View>
+                    >
+                        <Tag color={colors.black} />
+                        <Text style={styles.ownPostBottomButtonText}>
+                            Mark item as {postSold ? 'Active' : 'Sold'}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
-
             }
 
             {/* description section */}
@@ -469,6 +503,8 @@ const ListingScreen = ({ navigation, route }) => {
                     {listing.description}
                 </Text>
             </View>
+
+            <View style={{ width: 1, height: 20 }} />
 
         </ScrollView >
     )
@@ -497,7 +533,8 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start'
     },
     sectionContainer: {
-        width: '92%',
+        width: '100%',
+        paddingHorizontal: 15,
         alignSelf: 'center',
         flexDirection: 'column',
         marginTop: 16
@@ -529,15 +566,28 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: colors.accentGray,
+        borderColor: colors.loginGray,
         height: 40,
-        borderRadius: 8
+        borderRadius: 13,
+        flexDirection: 'row'
     },
-    ownPostBottomButtonText: { fontSize: 18, fontFamily: 'inter', fontWeight: '600' }
+    ownPostBottomButtonText: {
+        fontSize: 18,
+        fontFamily: 'inter',
+        fontWeight: '400',
+        marginLeft: 21
+    },
+    isOwnPostContainer: {
+        width: '100%',
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 25
+    }
 })
 
 
-const PhotoCarousel = ({ photos }) => {
+const PhotoCarousel = ({ photos, sold }) => {
     const { width } = Dimensions.get("window");
     const [currentIndex, setCurrentIndex] = useState(0);
     const flatListRef = useRef(null);
@@ -561,15 +611,15 @@ const PhotoCarousel = ({ photos }) => {
             alignSelf: "center",
         },
         indicatorButton: {
-            width: 10,
-            height: 10,
+            width: 8,
+            height: 8,
             borderRadius: 5,
             backgroundColor: colors.loginGray,
-            marginHorizontal: 8,
+            marginHorizontal: 2,
         },
         activeIndicator: {
             backgroundColor: colors.neonBlue,
-            width: 10 // can make this bigger if you want
+            width: 8 // can make this bigger if you want
         },
 
     })
@@ -599,15 +649,36 @@ const PhotoCarousel = ({ photos }) => {
                 renderItem={(item) => {
                     return (
                         // TODO change this to be an image
-                        <View style={{ height: width, width: width, backgroundColor: item.item.color, alignSelf: 'center' }} />
+                        <View
+                            style={{ height: width, width: width, backgroundColor: item.item.color, alignSelf: 'center', justifyContent: 'center' }}
+                        >
+                            {sold && (
+                                <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: '100%' }}>
+                                    <Text
+                                        style={{
+                                            color: 'white',
+                                            fontSize: 100,
+                                            fontWeight: '900',
+                                            zIndex: 10,
+                                            // top: '50%',
+                                            // left: '50%',
+                                            // transform: [{ translateX: -50 }, { translateY: -50 }],
+                                        }}
+                                    >
+                                        SOLD
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
                     )
-                }}
+                }
+                }
                 keyExtractor={(item, index) => index.toString()}
                 showsHorizontalScrollIndicator={false}
                 onScroll={handleScroll} // manage state variable
                 scrollEventThrottle={16} // slows down the rate of the event handler
             />
-            <View style={carouselStyles.indicatorContainer}>
+            {photos?.length > 0 && <View style={carouselStyles.indicatorContainer}>
                 {photos.map((_, index) => (
                     <TouchableOpacity
                         key={index}
@@ -619,7 +690,8 @@ const PhotoCarousel = ({ photos }) => {
 
                     />
                 ))}
-            </View>
+            </View>}
+
         </View >
     )
 }

@@ -22,7 +22,6 @@ const ProfileStackNavigator = () => {
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false,
             }}
-
         >
             <ProfileStack.Screen
                 name="Profile"

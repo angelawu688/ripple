@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
-import { TouchableOpacity } from "react-native";
+import { Image, TouchableOpacity } from "react-native";
 
 const MessagesStack = createNativeStackNavigator();
 
@@ -17,6 +17,13 @@ const MessagesStackNavigator = () => {
             screenOptions={{
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false,
+                headerRight: () => (
+                    <Image
+                        source={require('../../../assets/images/Ripple_UW_Icon.png')}
+                        style={{ height: 25, width: 25, marginBottom: -5 }}
+
+                    />
+                )
             }}
 
         >

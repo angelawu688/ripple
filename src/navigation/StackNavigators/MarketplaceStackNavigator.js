@@ -6,7 +6,7 @@ import ListingScreen from '../../screens/Marketplace/ListingScreen'
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
 import { Ionicons } from '@expo/vector-icons';
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, Image, View } from "react-native";
 import CreateListing from "../../screens/Marketplace/MarketplaceLists/CreateListing";
 import UserProfile from "../../screens/Marketplace/UserProfile";
 import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
@@ -21,6 +21,13 @@ const MarketplaceStackNavigator = () => {
             screenOptions={{
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false, // applied here
+                headerRight: () => (
+                    <Image
+                        source={require('../../../assets/images/Ripple_UW_Icon.png')}
+                        style={{ height: 25, width: 25, marginBottom: -5 }}
+
+                    />
+                )
             }}
         >
             <MarketplaceStack.Screen
