@@ -1,6 +1,17 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, FlatList, Dimensions, Alert } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import { getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, query, where } from "firebase/firestore";
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    getDocs,
+    deleteDoc,
+    setDoc,
+    collection,
+    query,
+    where,
+    updateDoc
+} from "firebase/firestore";
 import { useState, useEffect, useContext, useRef } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
@@ -56,6 +67,16 @@ const ListingScreen = ({ navigation, route }) => {
                     else {
                         setIsOwnPost(false);
                         setSellerID(docSnap.data().userId);
+                    }
+
+                    // check if it's sold or not
+                    if (docSnap.data().sold === true) {
+                        console.log(`Listing is sold`);
+                        setPostSold(true);
+                    }
+                    else {
+                        console.log(`Listing is not sold`);
+                        setPostSold(false);
                     }
 
                     // check if listing is saved already
@@ -157,14 +178,53 @@ const ListingScreen = ({ navigation, route }) => {
                     },
                     {
                         text: "Mark as Active",
-                        onPress: () => setPostSold(!postSold),
+                        onPress: () => markAsActive(),
                         style: "destructive",
                     },
                 ],
                 { cancelable: true } // Allows dismissal by tapping outside the alert
             );
         } else {
+            markAsSold();
             setPostSold(!postSold)
+        }
+    }
+
+    const markAsSold = async () => {
+        console.log('marking post as sold')
+        const docRef = doc(db, "listings", listingID);
+        const updatedData = {sold: true};
+        try {
+            await updateDoc(docRef, updatedData);
+        } catch (error) {
+            console.error("Error marking listing as sold:", error);
+        } finally {
+            setPostSold(!postSold)
+            console.log("listing is now marked as sold")
+            setUserListings(prevUserListings =>
+                prevUserListings.map(listing =>
+                    listing.id === listingID ? { ...listing, ...updatedData } : listing
+                )
+            );
+        }
+    }
+
+    const markAsActive = async () => {
+        console.log('marking post as active')
+        const docRef = doc(db, "listings", listingID);
+        const updatedData = { sold: false }
+        try {
+            await updateDoc(docRef, updatedData);
+        } catch (error) {
+            console.error("Error marking listing as active:", error);
+        } finally {
+            setPostSold(!postSold)
+            console.log("listing is now marked as active")
+            setUserListings(prevUserListings =>
+                prevUserListings.map(listing =>
+                    listing.id === listingID ? { ...listing, ...updatedData } : listing
+                )
+            );
         }
     }
 

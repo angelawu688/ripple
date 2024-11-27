@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { getFirestore, doc, setDoc, collection, query, orderBy, getDocs, limit } from "firebase/firestore";
+import { getFirestore, where, setDoc, collection, query, orderBy, getDocs, limit } from "firebase/firestore";
 
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../colors'
@@ -43,7 +43,7 @@ const Marketplace = ({ navigation }) => {
     // TODO refactor for clarity
     const totalUsers = '2.3k' // grab the total rows from the users DB and cache it
 
-    const [listings, setListings] = useState(testPosts)
+    const [listings, setListings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
     // possible options are foryou, friends, sell, search
@@ -53,7 +53,11 @@ const Marketplace = ({ navigation }) => {
     useEffect(() => {
         const fetchListings = async () => {
             try {
-                const q = query(collection(db, "listings"), orderBy("createdAt", "desc"), limit(32));
+                const q = query(
+                    collection(db, "listings"),
+                    where("sold", "==", false),
+                    orderBy("createdAt", "desc"),
+                    limit(32));
                 const querySnapshot = await getDocs(q);
                 const listingsData = querySnapshot.docs.map(doc => ({
                     id: doc.id,
