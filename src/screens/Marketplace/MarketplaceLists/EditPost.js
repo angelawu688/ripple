@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     },
     addPhotosContainer: {
         backgroundColor: 'white',
-        height: imageSize,
+        // height: imageSize,
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
