@@ -147,10 +147,6 @@ const ListingScreen = ({ navigation, route }) => {
     // should only be available if it's their own listing
     const deletePost = async () => {
         console.log('DELETE POST')
-        // handle backend states, navigation, etc.
-        // TODO:
-        // delete from listings, delete from savedPosts
-        // display "post is no longer available"? if someone's viewing post at same time
         const docRef = doc(db, "listings", listingID);
         try {
             await deleteDoc(docRef);
@@ -256,8 +252,6 @@ const ListingScreen = ({ navigation, route }) => {
                     price: listing.price,
                     title: listing.title,
                 };
-                // TODO:
-                // frontend update, can discuss this
                 setSavedPosts((prevSavedPosts) => [...prevSavedPosts, newSaved]);
             }
             else {
@@ -275,8 +269,6 @@ const ListingScreen = ({ navigation, route }) => {
                 else {
                     console.error("no document to delete");
                 }
-                // TODO:
-                // frontend update, can discuss this
                 setSavedPosts((prevSavedPosts) =>
                     prevSavedPosts.filter((post) => post.listing_id !== listingID || user.uid !== post.userID)
                 );
