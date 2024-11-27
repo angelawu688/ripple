@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useEffect, useRef, useState } from 'react'
+import {useContext, useEffect, useRef, useState} from 'react'
 import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
 import ListingCard from '../../components/ListingCard';
 import { XCircle } from 'phosphor-react-native';
 import { colors } from '../../colors';
+import {userContext} from "../../context/UserContext";
 
 
 
@@ -73,14 +74,18 @@ const Conversation = ({ route }) => {
     // pass in the listing from the route
     const { listing } = route.params
     const [inputListing, setInputListing] = useState(listing || null)
+    const { user } = useContext(userContext)
 
 
-    // FOR TESTING AND DISPLAY
+
     // grab the userID from the logged in user
+    // const currentUserID = user.uid;
     // grab the messages from the db
+    // const [messages, setMessages] = useState([])
+    // FOR TESTING AND DISPLAY
     const [messages, setMessages] = useState(testMessages)
     const currentUserID = '1';
-
+    const sellerID = listing.userId;
     const [input, setInput] = useState(listing ? ('Hi, is this still available?') : '')
     const [img, setImg] = useState(undefined)
     const [openingImagePicker, setOpeningImagePicker] = useState(false)
@@ -105,7 +110,9 @@ const Conversation = ({ route }) => {
             textContent: text,
             imageContent: image,
             postContent: post,
-            sentBy: currentUserID
+            sender: currentUserID,
+            receiver: sellerID,
+            timestamp: new Date()
         };
         // frontend update
         setMessages((prevMessages) => [...prevMessages, newMessage]);
