@@ -51,8 +51,8 @@ const TabNavigator = () => {
                 tabBarStyle: {
                     backgroundColor: colors.darkblue,
                     paddingTop: 12,
-                    borderTopLeftRadius: 10,
-                    borderTopRightRadius: 10
+                    // borderTopLeftRadius: 10,
+                    // borderTopRightRadius: 10
                 },
 
             })}

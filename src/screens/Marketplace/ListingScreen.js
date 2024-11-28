@@ -227,7 +227,7 @@ const ListingScreen = ({ navigation, route }) => {
     const markAsSold = async () => {
         console.log('marking post as sold')
         const docRef = doc(db, "listings", listingID);
-        const updatedData = {sold: true};
+        const updatedData = { sold: true };
         try {
             await updateDoc(docRef, updatedData);
         } catch (error) {
@@ -367,7 +367,6 @@ const ListingScreen = ({ navigation, route }) => {
         <ScrollView
             contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
             style={{ width: '100%', paddingBottom: 50 }}
-
         >
             <PhotoCarousel photos={testPhotos} sold={postSold} />
 
@@ -384,7 +383,7 @@ const ListingScreen = ({ navigation, route }) => {
                     </Text>
                 </View>
                 {/* now showing date in own post per figma */}
-                {!isOwnPost && (<Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', color: colors.accentGray }}>
+                {(<Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', color: colors.accentGray }}>
                     {/* {listing.createdAt.toDate().toLocaleDateString()} */}
                     {formatDate(listing.createdAt.seconds)}
                 </Text>)}

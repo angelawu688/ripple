@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native"
 import Logo from "../../components/Logo";
 import { colors } from "../../colors";
 
@@ -26,6 +26,26 @@ const LandingPage = ({ navigation }) => {
                         Login
                     </Text>
                 </TouchableOpacity>
+
+                {/* STRICTLY FOR TESTING */}
+                {/* <TouchableOpacity
+                    onPress={() => {
+                        //  password, major, concentration, gradYear, name } = route.params
+                        navigation.navigate('InfoOnboarding', {
+                            email: 'phunt22@useWindowDimensions.edu',
+                            password: 'password',
+                            major: 'CS',
+                            concentration: 'cs',
+                            gradYear: 2040,
+                            name: 'Will'
+                        })
+                    }}
+
+                >
+                    <Text>
+                        info ob
+                    </Text>
+                </TouchableOpacity> */}
             </View>
         </View>
     )

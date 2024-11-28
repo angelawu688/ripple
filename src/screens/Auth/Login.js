@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Touchable, TouchableOpacity } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, Touchable, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,24 +11,52 @@ const Login = ({ navigation }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const { setUser } = useContext(userContext);
   const [secureTextEntry, setSecureTextEntry] = useState(true)
+  const [forgotPasswordSent, setForgotPasswordSent] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleLogin = async () => {
     try {
+      setIsLoading(true)
+      setForgotPasswordSent(false)
       const auth = getAuth();
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       setUser(userCredential.user);
     } catch (error) {
-      setErrorMessage(error.message);
+      if (email.indexOf('uw.edu') < 0) {
+        setErrorMessage('Log in with your @uw.edu email!')
+      } else {
+        setErrorMessage('Incorrect email or password!')
+      }
+      // setErrorMessage('Incorrect email or password!')
+      // setErrorMessage(error.message);
+    } finally {
+      setIsLoading(false)
     }
   };
 
-  // TODO: update with frontend changes
   const handleForgotPassword = async () => {
     try {
+      setIsLoading(true)
+      if (email.indexOf('@uw.edu') < 0) {
+        throw new Error('Use your @uw.edu email!')
+      }
       const auth = getAuth();
       await sendPasswordResetEmail(auth, email);
+      console.log('sent')
+      setForgotPasswordSent(true)
     } catch (error) {
-      setErrorMessage(error.message);
+      if (error.message.indexOf('missing-email') > 0) {
+        setErrorMessage('Enter your email!')
+      } else if (email.indexOf('@uw.edu') < 0) {
+        setErrorMessage('Use your @uw.edu email!')
+      } else if (error.message.indexOf('invalid-email') > 0) {
+        setErrorMessage('Invalid email!')
+      } else {
+        setErrorMessage('Oops! Unexpected error, please try again later')
+      }
+      // setErrorMessage(error.message);
+    } finally {
+      setIsLoading(false)
     }
   };
 
@@ -86,12 +114,13 @@ const Login = ({ navigation }) => {
 
       <TouchableOpacity
         onPress={handleLogin}
+        disabled={!email || !(password.length >= 6)}
         hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-        style={[styles.button, { backgroundColor: email && password ? colors.loginBlue : colors.loginGray }]}
+        style={[styles.button, { backgroundColor: !email || !(password.length >= 6) ? colors.loginGray : colors.loginBlue }]}
       >
-        <Text style={styles.buttonText}>
+        {isLoading ? (<ActivityIndicator />) : (<Text style={styles.buttonText}>
           Log in
-        </Text>
+        </Text>)}
       </TouchableOpacity>
 
       {/* <TouchableOpacity
@@ -105,10 +134,27 @@ const Login = ({ navigation }) => {
       </TouchableOpacity> */}
 
       <TouchableOpacity
-        onPress={handleForgotPassword}>
-        <Text style={styles.link}>
+      >
+        {forgotPasswordSent ? (
+          <View style={{ alignItems: 'flex-start' }}>
+            <Text style={[styles.link, { color: 'black' }]}>
+              Reset password link sent. Check your email!
+            </Text>
+            <Text style={[styles.link, { color: 'black' }]}>
+              Didn't get it?
+              <Text style={styles.link}
+                onPress={handleForgotPassword}
+
+              >
+                {' Send again'}
+              </Text>
+            </Text>
+
+          </View>
+        ) : (<Text style={styles.link}
+          onPress={handleForgotPassword}>
           Forgot password?
-        </Text>
+        </Text>)}
       </TouchableOpacity>
 
     </View >
@@ -151,7 +197,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '600',
     fontFamily: 'Syne_700Bold',
-    color: colors.loginBlue
+    color: colors.black
   },
   lowerContainer: {
     width: '100%',
@@ -164,7 +210,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 5,
     marginBottom: 6,
-    fontFamily: 'inter'
+    fontFamily: 'inter',
+    color: colors.loginBlue
   },
   button: {
     alignSelf: 'center',
@@ -173,7 +220,8 @@ const styles = StyleSheet.create({
     height: 40, display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 50, marginTop: 20
+    borderRadius: 50,
+    marginTop: 20
   },
   buttonText: {
     fontSize: 16,

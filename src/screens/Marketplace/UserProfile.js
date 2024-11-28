@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
-import { Linking, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator, ScrollView } from "react-native";
+import { useContext, useEffect, useState } from "react";
+import { Linking, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator, ScrollView, Image } from "react-native";
 import ForYou from "./MarketplaceLists/ForYou";
 import { Ionicons } from "@expo/vector-icons";
 import { collection, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
 import ListingsList from '../../components/ListingsList'
-import { Check, EnvelopeSimple, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
+import { Check, EnvelopeSimple, Gear, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
 import { colors } from "../../colors";
+import { userContext } from "../../context/UserContext";
 
 const testUserPosts = [
     { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
@@ -17,14 +18,39 @@ const testUserPosts = [
 ]
 const UserProfile = ({ navigation, route }) => {
     const { userID } = route.params
+    const { user } = useContext(userContext)
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
+    const [isOwnProfile, setIsOwnProfile] = useState(false)
     const [userListings, setUserListings] = useState([])
 
     const [loadingIG, setLoadingIG] = useState(false)
-    const [loadingX, setLoadingX] = useState(false)
     const [loadingLI, setLoadingLI] = useState(false)
+
+    // OCM grab if its the users own post
+    // imo a little more bulletproof than having 2 diff accounts
+    useEffect(() => {
+        if (user.uid === userID) {
+            setIsOwnProfile(true)
+        }
+    }, [user])
+
+    useEffect(() => {
+        if (isOwnProfile) {
+            navigation.setOptions(
+                {
+                    headerRight: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('Profile')}
+                        >
+                            <Gear />
+                        </TouchableOpacity>
+                    )
+                }
+            )
+        }
+    }, [isOwnProfile])
 
     // Below is for testing
     // const [testUser, setTestUser] = useState({
@@ -44,6 +70,7 @@ const UserProfile = ({ navigation, route }) => {
     // grab the profile from the backend by the userID
     useEffect(() => {
         const getProfile = async () => {
+            console.log('userID', userID)
             try {
                 const db = getFirestore();
                 const userRef = doc(db, "users", userID);
@@ -69,10 +96,11 @@ const UserProfile = ({ navigation, route }) => {
                 setIsLoading(false);
             }
             // setting the socials for testing
+            // TODO CHANGE TESTING
             setUserProfile(prevProfile => ({
                 ...prevProfile,
-                instagram: 'williamhuntt',
-                linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
+                // instagram: 'williamhuntt',
+                // linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
             }));
         };
         getProfile();
@@ -101,6 +129,8 @@ const UserProfile = ({ navigation, route }) => {
 
     const handleMessage = () => {
         console.log('gonna implement soon')
+        // TODO 
+        navigation.navigate('Conversation', { conversationID: 4 })
     }
 
     // todo maybe handle as error messages instead of alerts
@@ -146,14 +176,12 @@ const UserProfile = ({ navigation, route }) => {
             Alert.alert("Error", "An unexpected error occurred.");
         } finally {
             setLoadingIG(false)
-            setLoadingX(false)
             setLoadingLI(false)
         }
     }
 
     return (
         <View style={{ flex: 1 }}>
-            {/* I WANT THIS TO BE A HEADER COMPONENT */}
             <View style={styles.topContainer}>
                 {userProfile.pfp ? (<Image
                     // pfp would go here
@@ -184,8 +212,9 @@ const UserProfile = ({ navigation, route }) => {
                 style={styles.scrollContainer}
             >
 
-                <View style={[{ width: '100%', display: 'flex', backgroundColor: 'white', flexDirection: 'row', borderRadius: 15, marginVertical: 16, height: 35, alignItems: 'center' }, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}>
-                    <TouchableOpacity style={styles.followButton}
+                <View style={[{ width: '100%', display: 'flex', backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 },]}>
+
+                    <TouchableOpacity style={[styles.followButton, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}
                         onPress={() => handleFollow()}
                     >
 
@@ -194,12 +223,12 @@ const UserProfile = ({ navigation, route }) => {
                             Follow{followingUser && 'ing'}
                         </Text>
                     </TouchableOpacity>
-                    <View style={{ width: 1, backgroundColor: colors.accentGray, height: '100%' }} />
-                    <TouchableOpacity style={styles.followButton}
+
+                    <TouchableOpacity style={[styles.followButton, styles.shadow]}
                         onPress={() => handleMessage()}
                     >
                         <EnvelopeSimple size={18} color={colors.accentGray} />
-                        <Text style={styles.followText}>
+                        <Text style={[styles.followText, { backgroundColor: 'white' }]}>
                             Message
                         </Text>
                     </TouchableOpacity>
@@ -234,16 +263,32 @@ const UserProfile = ({ navigation, route }) => {
                     {(userProfile.instagram || userProfile.linkedin || userProfile.twitter) && (<View style={styles.socials}>
 
                         {userProfile.instagram && <TouchableOpacity
+                            style={styles.socialContainer}
                             onPress={() => openSocial('instagram')}
                         >
-                            {loadingIG ? <ActivityIndicator color={'black'} /> : <InstagramLogo size={30} color={'black'} />}
+                            {loadingIG ? (<ActivityIndicator />) : (<Image
+                                source={require('../../../assets/images/IG_logo.png')}
+                                style={{ width: 30, height: 30, borderRadius: 5 }}
+                            />)}
+                            <Text style={styles.socialText}>
+                                {'@' + userProfile.instagram}
+                            </Text>
                         </TouchableOpacity>}
 
                         {userProfile.linkedin && <TouchableOpacity
+                            style={styles.socialContainer}
                             onPress={() => openSocial('linkedin')}
                         >
-                            {loadingLI ? <ActivityIndicator color={'black'} /> : <LinkedinLogo size={30} color={'black'} />}
+                            <Image
+                                source={require('../../../assets/images/LI_logo.png')}
+                                style={{ width: 30, height: 30, borderRadius: 5 }}
+                            />
+                            <Text numberOfLines={1}
+                                style={styles.socialText}>
+                                {'@' + userProfile.linkedin}
+                            </Text>
                         </TouchableOpacity>}
+
 
                     </View>)}
 
@@ -312,14 +357,15 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         marginBottom: 12,
         width: '100%',
-        marginTop: 20
+        marginTop: 4
     },
     socials: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         marginTop: 10,
-        width: 75,
+        width: '100%',
         justifyContent: 'space-between',
-        marginBottom: 25
+        marginBottom: 25,
+        height: 70
     },
     followText: {
         marginLeft: 4,
@@ -328,12 +374,14 @@ const styles = StyleSheet.create({
         color: colors.accentGray
     },
     followButton: {
-        width: '50%',
-        height: 30,
+        width: '45%',
+        height: 35,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
+        borderRadius: 15,
+        backgroundColor: 'white',
     },
     shadow: {
         shadowColor: colors.accentGray,
@@ -346,5 +394,17 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
         color: colors.uwPurple
+    },
+    socialContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    socialText: {
+        marginLeft: 8,
+        fontSize: 18,
+        fontFamily: 'inter',
+        color: colors.loginBlue,
+        maxWidth: '80%',
     }
 })

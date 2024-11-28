@@ -4,6 +4,7 @@ import { userContext } from '../../context/UserContext'
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../colors';
+import Asterisk from '../shared/Asterisk';
 
 
 const EducationOnboarding = ({ navigation, route }) => {
@@ -12,6 +13,7 @@ const EducationOnboarding = ({ navigation, route }) => {
     const [concentration, setConcentration] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
     const [gradYear, setGradYear] = useState('')
+    const [name, setName] = useState('')
 
     // focus the top text field on component mount
     const inputRef = useRef(null);
@@ -34,7 +36,22 @@ const EducationOnboarding = ({ navigation, route }) => {
             <View style={styles.lowerContainer}>
                 <View style={{ width: '100%', }}>
                     <Text style={styles.inputHeader}>
+                        Full name
+                        <Asterisk />
+                    </Text>
+                    <TextInput
+                        ref={inputRef}
+                        style={styles.input}
+                        placeholder='Michael Penix Jr.'
+                        value={name}
+                        onChangeText={setName}
+                    />
+                </View>
+
+                <View style={{ width: '100%', }}>
+                    <Text style={styles.inputHeader}>
                         Major
+                        <Asterisk />
                     </Text>
                     <TextInput
                         ref={inputRef}
@@ -42,24 +59,6 @@ const EducationOnboarding = ({ navigation, route }) => {
                         placeholder='CS'
                         value={major}
                         onChangeText={setMajor}
-                    />
-                </View>
-
-                <View style={{ width: '100%', }}>
-                    <Text style={styles.inputHeader}>
-                        Graduation year
-                    </Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='2024'
-                        value={gradYear}
-                        onChangeText={(text) => {
-                            // only allow 4 numbers for this!
-                            const sanitizedText = text.replace(/[^0-9]/g, '');
-                            if (sanitizedText.length <= 4) {
-                                setGradYear(sanitizedText);
-                            }
-                        }}
                     />
                 </View>
 
@@ -75,12 +74,34 @@ const EducationOnboarding = ({ navigation, route }) => {
                     />
                 </View>
 
+                <View style={{ width: '100%', }}>
+                    <Text style={styles.inputHeader}>
+                        Graduation year
+                        <Asterisk />
+                    </Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder='2024'
+                        value={gradYear}
+                        onChangeText={(text) => {
+                            // only allow 4 numbers for this!
+                            const sanitizedText = text.replace(/[^0-9]/g, '');
+                            if (sanitizedText.length <= 4) {
+                                setGradYear(sanitizedText);
+                            }
+                        }}
+                    />
+                </View>
+
+
+
 
             </View>
 
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={[styles.button, { backgroundColor: major && gradYear.length === 4 ? colors.loginBlue : colors.loginGray }]}
+                style={[styles.button, { backgroundColor: !name || !major || gradYear.length !== 4 ? colors.loginGray : colors.loginBlue }]}
+                disabled={!name || !major || gradYear.length !== 4}
                 onPress={() => {
                     if (!major) {
                         // concentration not required
@@ -91,7 +112,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                         setErrorMessage('Enter a 4 digit year!')
                     } else {
                         setErrorMessage('')
-                        navigation.navigate('InfoOnboarding', { email: email, password: password, major: major, concentration: concentration, gradYear: gradYear })
+                        navigation.navigate('InfoOnboarding', { email: email, password: password, major: major, concentration: concentration, gradYear: gradYear, name: name })
                     }
                 }}
             >
@@ -118,7 +139,7 @@ const styles = StyleSheet.create({
         fontSize: 26,
         fontWeight: '600',
         fontFamily: 'Syne_700Bold',
-        color: colors.loginBlue
+        color: colors.black
     },
     input: {
         backgroundColor: 'white',
@@ -142,13 +163,14 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        height: 210,
+        height: 270,
     },
     inputHeader: {
         fontSize: 16,
         marginLeft: 5,
         marginBottom: 6,
-        fontFamily: 'inter'
+        fontFamily: 'inter',
+        color: colors.loginBlue
     },
     button: {
         display: 'flex',

@@ -9,6 +9,7 @@ import { colors } from "../../../colors";
 import { userContext } from "../../../context/UserContext";
 import { MinusCircle, PlusCircle, Scroll, UploadSimple } from "phosphor-react-native";
 import CurrencyInput from 'react-native-currency-input'
+import Asterisk from "../../shared/Asterisk";
 
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
@@ -200,14 +201,6 @@ const CreateListing = ({ navigation }) => {
             setIsLoading(false)
             navigation.goBack(); // navigate back to the previous screen. This isnt ideal but should play for now
         }
-    }
-
-    const Asterisk = () => {
-        return (
-            <Text style={{ color: colors.errorMessage }}>
-                {' *'}
-            </Text>
-        )
     }
 
     return (
