@@ -46,7 +46,8 @@ const MessagesOverview = ({ navigation }) => {
                                 <MessagePreviewCard
                                     pfp={conversation.pfp}
                                     name={conversation.otherUserName}
-                                    lastMessage={conversation.lastMessage}
+                                    lastMessage={conversation.lastMessage.content}
+                                    lastSentAt={conversation.lastMessage.sentAt}
                                     conversationID={conversation.id}
                                 />
                             </TouchableOpacity>
@@ -63,9 +64,9 @@ export default MessagesOverview
 
 
 const testMessageObjects = [
-    { id: 1, pfp: '', otherUserName: 'Jane Doe', lastMessage: 'Is your bike still for sale?', userID: 15 },
-    { id: 2, pfp: '', otherUserName: 'Megan Chan', lastMessage: 'Hi, is the Sony camera still available?', userID: 900 },
-    { id: 3, pfp: '', otherUserName: 'Will Hunt', lastMessage: 'Hi, is this still available??', userID: 1234 },
+    { id: 1, pfp: '', otherUserName: 'Jane Doe', lastMessage: { content: 'Is your bike still for sale?', sentAt: Date.now() - 5000000 }, userID: 15 },
+    { id: 2, pfp: '', otherUserName: 'Megan Chan', lastMessage: { content: 'Hi, is the Sony camera still available?', sentAt: Date.now() - 1000000 }, userID: 900 },
+    { id: 3, pfp: '', otherUserName: 'Will Hunt', lastMessage: { content: 'Hi, is this still available??', sentAt: Date.now() - 100000 }, userID: 1234 },
 ]
 
 
@@ -78,5 +79,4 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%'
     },
-
 })

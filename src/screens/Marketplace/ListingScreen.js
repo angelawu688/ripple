@@ -19,6 +19,7 @@ import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, T
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 import * as Linking from 'expo-linking'
+import { formatDate } from '../utils/formatDate';
 
 
 const ListingScreen = ({ navigation, route }) => {
@@ -148,38 +149,6 @@ const ListingScreen = ({ navigation, route }) => {
             ],
             { cancelable: true } // Allows dismissal by tapping outside the alert
         );
-    }
-
-    // TODO move this to utils
-    // test this too
-    const formatDate = (dateInSeconds) => {
-        // date.now is in ms, we are passing in as seconds
-        const seconds = (Date.now() / 1000) - dateInSeconds
-        console.log(Date.now())
-        const minute = 60;
-        const hour = 60 * minute;
-        const day = 24 * hour;
-        const month = 30 * day;
-        const year = 365 * day;
-
-        if (seconds < minute) {
-            return "Just now";
-        } else if (seconds < hour) {
-            const minutes = Math.floor(seconds / minute);
-            return `${minutes} min ago`;
-        } else if (seconds < day) {
-            const hours = Math.floor(seconds / hour);
-            return `${hours} hours ago`;
-        } else if (seconds < month) {
-            const days = Math.floor(seconds / day);
-            return `${days} days ago`;
-        } else if (seconds < year) {
-            const months = Math.floor(seconds / month);
-            return `${months} months ago`;
-        } else {
-            const years = Math.floor(seconds / year);
-            return `${years} years ago`;
-        }
     }
 
     // should only be available if it's their own listing
