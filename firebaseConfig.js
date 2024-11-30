@@ -17,12 +17,18 @@ const firebaseConfig = {
 };
 
 // this avoids a weird error of initiliazing multiple apps
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+// Initialize Firebase app
+let app;
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApp();
+}
+// const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // this allows us to have persistence over sessions
-// the || is for avoiding that weird error again
-export const auth = getAuth(app) || initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage)
 });
 // export const auth = getAuth(app);
 export const db = getFirestore(app);

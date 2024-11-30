@@ -9,7 +9,7 @@ const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { setUser } = useContext(userContext);
+  const { setUser, handleSignIn, authError } = useContext(userContext);
   const [secureTextEntry, setSecureTextEntry] = useState(true)
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -18,21 +18,33 @@ const Login = ({ navigation }) => {
     try {
       setIsLoading(true)
       setForgotPasswordSent(false)
-      const auth = getAuth();
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      setUser(userCredential.user);
+      await handleSignIn(email, password)
     } catch (error) {
-      if (email.indexOf('uw.edu') < 0) {
-        setErrorMessage('Log in with your @uw.edu email!')
-      } else {
-        setErrorMessage('Incorrect email or password!')
-      }
-      // setErrorMessage('Incorrect email or password!')
-      // setErrorMessage(error.message);
+      setErrorMessage(authError)
     } finally {
       setIsLoading(false)
     }
   };
+
+  // const handleLogin = async () => {
+  //   try {
+  //     setIsLoading(true)
+  //     setForgotPasswordSent(false)
+  //     const auth = getAuth();
+  //     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  //     setUser(userCredential.user);
+  //   } catch (error) {
+  //     if (email.indexOf('uw.edu') < 0) {
+  //       setErrorMessage('Log in with your @uw.edu email!')
+  //     } else {
+  //       setErrorMessage('Incorrect email or password!')
+  //     }
+  //     // setErrorMessage('Incorrect email or password!')
+  //     // setErrorMessage(error.message);
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // };
 
   const handleForgotPassword = async () => {
     try {
