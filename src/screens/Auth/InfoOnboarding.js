@@ -55,7 +55,8 @@ const InfoOnboarding = ({ navigation, route }) => {
             }
             setIG(input);
         } else if (currentField.key === 'li') {
-
+            // validate inputs. How? 
+            // Just the same check if its a viable link?
             setLI(input);
         }
         setShowIGModal(false);
@@ -82,8 +83,8 @@ const InfoOnboarding = ({ navigation, route }) => {
                 gradYear: gradYear,
                 name: name,
                 instagram: ig,
-                linkedin: li
-                // profile photo requires firebase storage
+                linkedin: li,
+                pfp: pfp, // stores a reference to our storage :)
             });
             const userDoc = await getDoc(doc(db, "users", user.uid))
             setUserData(userDoc.data());
@@ -126,11 +127,8 @@ const InfoOnboarding = ({ navigation, route }) => {
             if (!result.canceled) {
                 const selectedImages = result.assets.map(asset => ({
                     uri: asset.uri,
-                    name: asset.fileName || `photo_${Date.now()}.jpg`,
-                    type: asset.type || 'image/jpeg',
                 }));
-                console.log('first image', selectedImages[0])
-                setPfp(selectedImages[0]) // this will give us the image object (uri is most important)
+                setPfp(selectedImages[0].uri)
             } else {
                 // user cancelled, do nothing
             }

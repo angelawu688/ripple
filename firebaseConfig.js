@@ -1,8 +1,9 @@
-import { initializeApp } from 'firebase/app';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { getApp, getApps, initializeApp } from 'firebase/app';
+import { initializeAuth, getReactNativePersistence, getAuth } from 'firebase/auth';
 import { REACT_APP_APIKEY, REACT_APP_AUTHDOMAIN, REACT_APP_PROJECT_ID, REACT_APP_STORAGEBUCKET, REACT_APP_MESSAGINGSENDER_ID, REACT_APP_APP_ID, REACT_APP_MEASUREMENT_ID } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from 'firebase/storage';
 
 
 const firebaseConfig = {
@@ -15,11 +16,14 @@ const firebaseConfig = {
   measurementId: REACT_APP_MEASUREMENT_ID
 };
 
-const app = initializeApp(firebaseConfig);
+// this avoids a weird error of initiliazing multiple apps
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // this allows us to have persistence over sessions
-export const auth = initializeAuth(app, {
+// the || is for avoiding that weird error again
+export const auth = getAuth(app) || initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
-})
+});
 // export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app)

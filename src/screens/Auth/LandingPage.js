@@ -83,9 +83,9 @@ const LandingPage = ({ navigation }) => {
             </View>
 
             {/* wave 2––being weird in the bottom waves view so if we have issues this is why */}
-            <View style={{ position: 'absolute', top: '20%', left: -50 }}>
+            <View style={{ position: 'absolute', top: '20%', left: -40 }}>
                 <Wave2 width={520} color={colors.loginBlue}
-                    style={{ position: 'absolute', top: '-20%' }}
+                    style={{ position: 'absolute', top: 0 }}
                     animatedStyle={{
                         transform: [
                             // 7 is the last one

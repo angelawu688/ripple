@@ -12,14 +12,16 @@ import {
     where,
     updateDoc
 } from "firebase/firestore";
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
 import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, Tag } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 import * as Linking from 'expo-linking'
-import { formatDate } from '../utils/formatDate';
+import { formatDate } from '../../utils/formatDate'
+import { useFocusEffect } from '@react-navigation/native';
+
 
 
 const ListingScreen = ({ navigation, route }) => {
@@ -40,79 +42,81 @@ const ListingScreen = ({ navigation, route }) => {
     const [postSold, setPostSold] = useState(false) // grab this on init
     const [isOwnPost, setIsOwnPost] = useState(true) // grab this on init. Literally something like uid === userData.uid should be chill
     const [sellerID, setSellerID] = useState(null) // grab this on init
-
-
-    // const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
-    // const otherUserID = 'TcxxqAtEwuPxzYLSoQdv12vWqp83';
-    const testPhotos = [
-        { id: '1', color: 'yellow' },
-        { id: '2', color: 'green' },
-        { id: '3', color: 'red' },
-        { id: '4', color: 'purple' },
-        { id: '5', color: 'blue' },
-    ]
-
     const db = getFirestore();
-    useEffect(() => {
-        const fetchListing = async () => {
-            setIsLoading(true)
-            try {
-                const docRef = doc(db, "listings", listingID);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    setListing({ id: docSnap.id, ...docSnap.data() });
-                    // check if it's their own post, can save their own posts
-                    if (docSnap.data().userId === user.uid) {
-                        setIsOwnPost(true);
-                        setSellerID(user.uid);
-                    }
-                    else {
-                        setIsOwnPost(false);
-                        setSellerID(docSnap.data().userId);
-                    }
 
-                    // check if it's sold or not
-                    if (docSnap.data().sold === true) {
-                        console.log(`Listing is sold`);
-                        setPostSold(true);
-                    }
-                    else {
-                        console.log(`Listing is not sold`);
-                        setPostSold(false);
-                    }
+    // useEffect(() => {
 
-                    // check if listing is saved already
-                    if (savedPosts && savedPosts.length !== 0) {
-                        const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
-                        if (saveStatus) {
-                            setIsSaved(true);
-                            console.log(`Listing with ID ${listingID} is saved.`);
-                        } else {
-                            setIsSaved(false)
-                            console.log(`Listing with ID ${listingID} is not saved.`);
-                        }
-                    }
-                    else {
-                        setIsSaved(false);
-                    }
 
-                } else {
-                    console.log("No such listing!");
+    // }, [listingID]);
+
+    // fetches a listing from the DB
+    const fetchListing = async () => {
+        setIsLoading(true)
+        try {
+            const docRef = doc(db, "listings", listingID);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                setListing({ id: docSnap.id, ...docSnap.data() });
+                // check if it's their own post, can save their own posts
+                if (docSnap.data().userId === user.uid) {
+                    setIsOwnPost(true);
+                    setSellerID(user.uid);
                 }
-            } catch (error) {
-                console.error("Error fetching listing:", error);
-            } finally {
-                setIsLoading(false);
+                else {
+                    setIsOwnPost(false);
+                    setSellerID(docSnap.data().userId);
+                }
+
+                // check if it's sold or not
+                if (docSnap.data().sold === true) {
+                    console.log(`Listing is sold`);
+                    setPostSold(true);
+                }
+                else {
+                    console.log(`Listing is not sold`);
+                    setPostSold(false);
+                }
+
+                // check if listing is saved already
+                if (savedPosts && savedPosts.length !== 0) {
+                    const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
+                    if (saveStatus) {
+                        setIsSaved(true);
+                        console.log(`Listing with ID ${listingID} is saved.`);
+                    } else {
+                        setIsSaved(false)
+                        console.log(`Listing with ID ${listingID} is not saved.`);
+                    }
+                }
+                else {
+                    setIsSaved(false);
+                }
+            } else {
+                console.log("No such listing!");
             }
-        };
+        } catch (error) {
+            console.error("Error fetching listing:", error);
+            // could we use toasts here?
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-        fetchListing();
 
-    }, [listingID]);
+    // this is what makes it immediately responsive after we edit and go back
+    // essentially the same as useEffect, but will do it every time we focus, not just the first time
+    // the component mounts
+    useFocusEffect(
+        useCallback(() => {
+            fetchListing();
 
-    useEffect(() => {
-        console.log(listing?.createdAt?.seconds)
-    }, [listing])
+            // might be a good idea for a cleanup function this is a placeholder
+            // i.e. use some sort of ref to tell fetchListing to not grab data if we close the screen
+            // before we get the data from fetch
+            // not doing rn, premature optimization
+            return () => { };
+        }, [listingID, user.uid, savedPosts])
+    );
 
 
     if (isLoading) {
@@ -337,7 +341,7 @@ const ListingScreen = ({ navigation, route }) => {
             contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
             style={{ width: '100%', paddingBottom: 50 }}
         >
-            <PhotoCarousel photos={testPhotos} sold={postSold} />
+            <PhotoCarousel photos={listing.photos} sold={postSold} />
 
 
             {/* name, price, date */}
@@ -568,7 +572,7 @@ const PhotoCarousel = ({ photos, sold }) => {
         imageContainer: {
             width: width,
             height: width,
-            borderRadius: 10,
+            borderRadius: 0,
             alignSelf: "center",
         },
         indicatorContainer: {
@@ -614,12 +618,22 @@ const PhotoCarousel = ({ photos, sold }) => {
                 ref={flatListRef}
                 horizontal={true}
                 data={photos}
-                renderItem={(item) => {
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => {
                     return (
                         // TODO change this to be an image
                         <View
-                            style={{ height: width, width: width, backgroundColor: item.item.color, alignSelf: 'center', justifyContent: 'center' }}
+                            style={{ height: width, width: width, alignSelf: 'center', justifyContent: 'center', }}
                         >
+                            <Image
+                                source={{ uri: item }}
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    borderRadius: 0,
+                                }}
+                                resizeMode="cover"
+                            />
                             {sold && (
                                 <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: '100%' }}>
                                     <Text
@@ -640,13 +654,11 @@ const PhotoCarousel = ({ photos, sold }) => {
                         </View>
                     )
                 }
-                }
-                keyExtractor={(item, index) => index.toString()}
-                showsHorizontalScrollIndicator={false}
+                } showsHorizontalScrollIndicator={false}
                 onScroll={handleScroll} // manage state variable
                 scrollEventThrottle={16} // slows down the rate of the event handler
             />
-            {photos?.length > 0 && <View style={carouselStyles.indicatorContainer}>
+            {photos?.length > 1 && <View style={carouselStyles.indicatorContainer}>
                 {photos.map((_, index) => (
                     <TouchableOpacity
                         key={index}

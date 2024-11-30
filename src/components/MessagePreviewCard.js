@@ -1,6 +1,6 @@
 import { View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
-import { formatDate } from '../screens/utils/formatDate';
+import { formatDate } from '../utils/formatDate'
 import { useEffect } from 'react';
 import { User } from 'phosphor-react-native';
 import { colors } from '../colors';

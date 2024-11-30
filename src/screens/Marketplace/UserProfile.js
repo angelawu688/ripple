@@ -50,7 +50,10 @@ const UserProfile = ({ navigation, route }) => {
                 }
             )
         }
+        console.log(user.pfp)
     }, [isOwnProfile])
+
+
 
     // Below is for testing
     // const [testUser, setTestUser] = useState({
@@ -85,7 +88,15 @@ const UserProfile = ({ navigation, route }) => {
                         id: doc.id,
                         ...doc.data()
                     }));
-                    setUserListings(listingsData);
+                    // sort by 1) sold or not sold, 2) time as tiebreaker
+                    const sortedListings = listingsData.sort((a, b) => {
+                        if (a.sold === b.sold) {
+
+                            return new Date(b.createdAt) - new Date(a.createdAt);
+                        }
+                        return a.sold - b.sold;
+                    });
+                    setUserListings(sortedListings);
                 }
                 else {
                     console.error("No such user")
@@ -131,6 +142,14 @@ const UserProfile = ({ navigation, route }) => {
         console.log('gonna implement soon')
         // TODO 
         navigation.navigate('Conversation', { conversationID: 4 })
+    }
+
+    const handleFollowers = () => {
+
+    }
+
+    const handleFollowing = () => {
+
     }
 
     // todo maybe handle as error messages instead of alerts
@@ -211,105 +230,130 @@ const UserProfile = ({ navigation, route }) => {
                 }}
                 style={styles.scrollContainer}
             >
+                <View style={{ paddingHorizontal: 25, display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={[{ width: '100%', display: 'flex', backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-between', marginVertical: 16, },]}>
 
-                <View style={[{ width: '100%', display: 'flex', backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 },]}>
-
-                    <TouchableOpacity style={[styles.followButton, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}
-                        onPress={() => handleFollow()}
-                    >
-
-                        {followingUser ? <Check size={18} color={followingUser ? colors.neonBlue : colors.accentGray} /> : <Plus size={18} color={colors.accentGray} />}
-                        <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
-                            Follow{followingUser && 'ing'}
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={[styles.followButton, styles.shadow]}
-                        onPress={() => handleMessage()}
-                    >
-                        <EnvelopeSimple size={18} color={colors.accentGray} />
-                        <Text style={[styles.followText, { backgroundColor: 'white' }]}>
-                            Message
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-
-
-                <View style={styles.bioContainer}>
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
-                        <View >
-                            <Text style={styles.majorText}>
-                                {userProfile.major}
-                            </Text>
-                            {userProfile?.concentration && (
-                                <Text style={{ fontFamily: 'inter', fontSize: 16, color: colors.accentGray, fontWeight: '500' }}>
-                                    {userProfile.concentration}
+                        {isOwnProfile ? (
+                            <TouchableOpacity style={[styles.followButton, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}
+                                onPress={() => handleFollowers()}
+                            >
+                                <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
+                                    Followers
                                 </Text>
-                            )}
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity style={[styles.followButton, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}
+                                onPress={() => handleFollow()}
+                            >
+
+                                {followingUser ? <Check size={18} color={followingUser ? colors.neonBlue : colors.accentGray} /> : <Plus size={18} color={colors.accentGray} />}
+                                <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
+                                    Follow{followingUser && 'ing'}
+                                </Text>
+                            </TouchableOpacity>)}
+
+                        {isOwnProfile ? (<TouchableOpacity style={[styles.followButton, styles.shadow]}
+                            onPress={() => handleFollowing()}
+                        >
+                            <Text style={[styles.followText, { backgroundColor: 'white' }]}>
+                                Following
+                            </Text>
+                        </TouchableOpacity>) : (<TouchableOpacity style={[styles.followButton, styles.shadow]}
+                            onPress={() => handleMessage()}
+                        >
+                            <EnvelopeSimple size={18} color={colors.accentGray} />
+                            <Text style={[styles.followText, { backgroundColor: 'white' }]}>
+                                Message
+                            </Text>
+                        </TouchableOpacity>)}
+                    </View>
+
+
+
+
+                    <View style={styles.bioContainer}>
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
+                            <View >
+                                <Text style={styles.majorText}>
+                                    {userProfile.major}
+                                </Text>
+                                {userProfile?.concentration && (
+                                    <Text style={{ fontFamily: 'inter', fontSize: 16, color: colors.accentGray, fontWeight: '500' }}>
+                                        {userProfile.concentration}
+                                    </Text>
+                                )}
+                            </View>
+                            <Text style={styles.majorText}>
+                                {userProfile.gradYear}
+                            </Text>
                         </View>
-                        <Text style={styles.majorText}>
-                            {userProfile.gradYear}
+
+                        {userProfile?.bio && (<View style={{ marginTop: 12, width: '100%', maxHeight: 128, marginBottom: 0 }}>
+                            <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
+                                {userProfile.bio}
+                            </Text>
+                        </View>)}
+
+
+                        {(userProfile.instagram || userProfile.linkedin || userProfile.twitter) && (<View style={styles.socials}>
+
+                            {userProfile.instagram && <TouchableOpacity
+                                style={styles.socialContainer}
+                                onPress={() => openSocial('instagram')}
+                            >
+                                {loadingIG ? (<ActivityIndicator />) : (<Image
+                                    source={require('../../../assets/images/IG_logo.png')}
+                                    style={{ width: 30, height: 30, borderRadius: 5 }}
+                                />)}
+                                <Text style={styles.socialText}>
+                                    {'@' + userProfile.instagram}
+                                </Text>
+                            </TouchableOpacity>}
+
+                            {userProfile.linkedin && <TouchableOpacity
+                                style={styles.socialContainer}
+                                onPress={() => openSocial('linkedin')}
+                            >
+                                <Image
+                                    source={require('../../../assets/images/LI_logo.png')}
+                                    style={{ width: 30, height: 30, borderRadius: 5 }}
+                                />
+                                <Text numberOfLines={1}
+                                    style={styles.socialText}>
+                                    {'@' + userProfile.linkedin}
+                                </Text>
+                            </TouchableOpacity>}
+
+
+                        </View>)}
+                        <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 20, marginTop: 12 }}>
+                            Listings
                         </Text>
                     </View>
 
-                    {userProfile?.bio && (<View style={{ marginTop: 12, width: '100%', maxHeight: 128, marginBottom: 0 }}>
-                        <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
-                            {userProfile.bio}
-                        </Text>
-                    </View>)}
 
-
-                    {(userProfile.instagram || userProfile.linkedin || userProfile.twitter) && (<View style={styles.socials}>
-
-                        {userProfile.instagram && <TouchableOpacity
-                            style={styles.socialContainer}
-                            onPress={() => openSocial('instagram')}
-                        >
-                            {loadingIG ? (<ActivityIndicator />) : (<Image
-                                source={require('../../../assets/images/IG_logo.png')}
-                                style={{ width: 30, height: 30, borderRadius: 5 }}
-                            />)}
-                            <Text style={styles.socialText}>
-                                {'@' + userProfile.instagram}
-                            </Text>
-                        </TouchableOpacity>}
-
-                        {userProfile.linkedin && <TouchableOpacity
-                            style={styles.socialContainer}
-                            onPress={() => openSocial('linkedin')}
-                        >
-                            <Image
-                                source={require('../../../assets/images/LI_logo.png')}
-                                style={{ width: 30, height: 30, borderRadius: 5 }}
-                            />
-                            <Text numberOfLines={1}
-                                style={styles.socialText}>
-                                {'@' + userProfile.linkedin}
-                            </Text>
-                        </TouchableOpacity>}
-
-
-                    </View>)}
-
-                    <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', marginLeft: 6 }}>
-                        Listings
-                    </Text>
                 </View>
 
 
 
 
-                {userListings ? <ListingsList listings={userListings} navigation={navigation} scrollEnabled={false} /> : (
-                    <View style={{ marginTop: 30 }}>
-                        <Text style={{ fontFamily: 'inter', fontSize: 16 }}>
-                            User has no listings!
-                        </Text>
-                    </View>
-                )}
+                {
+                    userListings ? (
+                        <View style={{ flex: 1 }}>
+                            <ListingsList listings={userListings} navigation={navigation} scrollEnabled={false} />
+                        </View>
+
+                    ) : (
+                        <View style={{ marginTop: 30 }}>
+                            <Text style={{ fontFamily: 'inter', fontSize: 16 }}>
+                                User has no listings!
+                            </Text>
+                        </View>
+                    )
+                }
 
             </ScrollView >
-        </View>
+        </View >
 
     )
 
@@ -324,7 +368,7 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'column',
         alignSelf: 'center',
-        paddingHorizontal: 15
+        paddingHorizontal: 1
     },
     topContainer: {
         display: 'flex',
@@ -332,7 +376,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
         width: '100%',
-        paddingHorizontal: 15
+        paddingHorizontal: 25
     },
     headerTextContainer: {
         display: 'flex',
@@ -361,11 +405,11 @@ const styles = StyleSheet.create({
     },
     socials: {
         flexDirection: 'column',
-        marginTop: 10,
+        marginTop: 16,
         width: '100%',
         justifyContent: 'space-between',
         marginBottom: 25,
-        height: 70
+        height: 80
     },
     followText: {
         marginLeft: 4,

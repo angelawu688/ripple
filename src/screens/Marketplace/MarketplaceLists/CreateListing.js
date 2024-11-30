@@ -3,13 +3,15 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingVi
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
-import { collection, addDoc, getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { colors } from "../../../colors";
 import { userContext } from "../../../context/UserContext";
 import { MinusCircle, PlusCircle, Scroll, UploadSimple } from "phosphor-react-native";
 import CurrencyInput from 'react-native-currency-input'
 import Asterisk from "../../shared/Asterisk";
+import { uploadListingImage } from "../../../utils/firebaseUtils";
+import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
+
 
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
@@ -39,7 +41,6 @@ const ImagePreview = ({ uri, removePhoto }) => {
 
 // renders the little card for the tag
 const TagPreview = ({ tag, removeTag }) => {
-    console.log('tag', tag)
     return (
         <View style={[{
             display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', padding: 6, paddingHorizontal: 8, borderRadius: 12, marginRight: 8,
@@ -57,7 +58,7 @@ const TagPreview = ({ tag, removeTag }) => {
 
 
 const CreateListing = ({ navigation }) => {
-    const [photos, setPhotos] = useState([]) // array of photos
+    const [photos, setPhotos] = useState([]) // array of photo uris
     const [tags, setTags] = useState([]) // array of tags
     const [title, setTitle] = useState('')
     const [price, setPrice] = useState(undefined)
@@ -107,8 +108,6 @@ const CreateListing = ({ navigation }) => {
             if (!result.canceled) {
                 const selectedImages = result.assets.map(asset => ({
                     uri: asset.uri,
-                    name: asset.fileName || `photo_${Date.now()}.jpg`,
-                    type: asset.type || 'image/jpeg',
                 }));
                 setPhotos([...photos, ...selectedImages.map(img => img.uri)]);
                 setIsLoadingPhotoPicker(false)
@@ -133,8 +132,6 @@ const CreateListing = ({ navigation }) => {
 
     const handlePublish = async () => {
         // TODO add some confetti or some fun animation or something
-        console.log(photos, title, price, description, tags)
-
         if (!title) {
             setErrorMessage('Enter a title!')
             return
@@ -161,45 +158,67 @@ const CreateListing = ({ navigation }) => {
             return;
         }
         // allow empty description
-        // allow empty photos?
+        if (photos.length === 0) {
+            setErrorMessage('Enter photo(s)!')
+            return;
+        }
 
         setIsLoading(true)
         try {
             const db = getFirestore();
+
+            // 1. make a doc ref w id (w/o setting data)
+            const listingsCollectionRef = collection(db, "listings");
+            const newListingRef = doc(listingsCollectionRef); // this makes an ID
+            const listingID = newListingRef.id;
+
+
+            // 2. upload all the images
+            // making sure to await
+            const uniquePhotos = [...new Set(photos)];
+            const uploadPromises = uniquePhotos.map(async (uri, index) => {
+                // this -index is what allows for no duplicates within an upload
+                // we use date as an identifier in our path as well
+                return uploadListingImage(uri, user.uid, listingID, index)
+            });
+            const downloadURLs = await Promise.all(uploadPromises);
+
+            // 3. prepare data listing
             const listingData = {
                 title,
                 price,
                 description,
                 tags,
-                photos,
+                photos: downloadURLs,
                 userId: user.uid,
                 userName: userData.name,
                 userEmail: userData.email,
+                userPfp: userData.pfp,
                 sold: false,
-                // pass in user pfp too
                 createdAt: new Date()
             }
-            const docRef = await addDoc(collection(db, "listings"), listingData);
+
+            // 4. backend udpate
+            await setDoc(newListingRef, listingData)
+
+            // 5. frontend update
             const updatedListingData = {
                 ...listingData,
-                id: docRef.id, // Add the generated document id
+                id: listingID,
             };
-            // frontend update
             setUserListings((prevUserListings) => [...prevUserListings, updatedListingData]);
-            setTimeout(() => {
-                // just chill for a sec, simulating loading
-                // using navigation reset so that we dont get a back buttons
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'Marketplace' }],
-                });
-            }, [2500])
+
+            // 6. post completed message
+            // can we use something like chakraUI toast?
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Marketplace' }],
+            });
         } catch (e) {
             setErrorMessage(e.message)
             console.log(e);
         } finally {
             setIsLoading(false)
-            navigation.goBack(); // navigate back to the previous screen. This isnt ideal but should play for now
         }
     }
 
@@ -210,10 +229,7 @@ const CreateListing = ({ navigation }) => {
             behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <ScrollView>
-
-
-
+                <ScrollView >
                     <View
                         style={styles.container}
                     >
@@ -322,7 +338,6 @@ const CreateListing = ({ navigation }) => {
                                     placeholderTextColor="#7E7E7E"
                                     value={tagInput}
                                     onChangeText={(text) => {
-                                        console.log(tagInput)
                                         setTagInput(text)
                                         setErrorMessage('')
                                         setImageErrorMessage('')

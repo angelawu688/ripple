@@ -3,10 +3,19 @@ import ListingCard from "../../../components/ListingCard"
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ListingsList from "../../../components/ListingsList";
 import { colors } from "../../../colors";
+import { useContext, useEffect, useState } from "react";
+import { userContext } from "../../../context/UserContext";
 
 
 
-const Sell = ({ activeListings, navigation }) => {
+const Sell = ({ navigation }) => {
+    const { userListings } = useContext(userContext)
+    const [activeListings, setActiveListings] = useState([])
+
+    useEffect(() => {
+        setActiveListings(userListings.filter((listing) => listing.sold !== true))
+    }, [userListings])
+
     return (
         <View style={styles.container}>
 
@@ -17,7 +26,7 @@ const Sell = ({ activeListings, navigation }) => {
                 </Text>
             </TouchableOpacity>
 
-            {activeListings?.length === 0 ? <ListingsList navigation={navigation} listings={activeListings} /> : (
+            {activeListings?.length > 0 ? <ListingsList navigation={navigation} listings={activeListings} /> : (
                 <View style={styles.textContainer}>
                     <Text style={{ fontSize: 16, fontFamily: 'inter', fontWeight: '600', marginBottom: 10 }}>
                         Ready to sell?
