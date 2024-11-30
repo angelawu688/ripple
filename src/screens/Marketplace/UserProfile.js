@@ -8,6 +8,8 @@ import ListingsList from '../../components/ListingsList'
 import { Check, EnvelopeSimple, Gear, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
 import { colors } from "../../colors";
 import { userContext } from "../../context/UserContext";
+import ListingCard from "../../components/ListingCard";
+import { getConversation } from '../../utils/firebaseUtils'
 
 const testUserPosts = [
     { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
@@ -52,23 +54,6 @@ const UserProfile = ({ navigation, route }) => {
         }
         console.log(user.pfp)
     }, [isOwnProfile])
-
-
-
-    // Below is for testing
-    // const [testUser, setTestUser] = useState({
-    //     pfp: undefined,
-    //     name: 'Alex Smith',
-    //     netID: 'asmith@uw.edu',
-    //     major: 'info',
-    //     concentration: 'hci',
-    //     gradYear: '2025',
-    //     instagram: 'alex.smith',
-    //     linkedin: 'SOME URL HERE',
-    //     bio: "Jonah Coleman's favorite arist is EBK Yeebo. You should check him out",
-    //     posts: testUserPosts
-    // })
-    //
 
     // grab the profile from the backend by the userID
     useEffect(() => {
@@ -138,10 +123,14 @@ const UserProfile = ({ navigation, route }) => {
         // BACKEND CHANGES HERE
     }
 
-    const handleMessage = () => {
+    const handleMessage = async () => {
         console.log('gonna implement soon')
-        // TODO 
-        navigation.navigate('Conversation', { conversationID: 4 })
+        // active user ID and the other user's ID
+        const conversationID = await getConversation(user.uid, userID)
+        navigation.navigate('MessagesStack', {
+            screen: 'Conversation',
+            params: { conversationID }
+        });
     }
 
     const handleFollowers = () => {
@@ -154,7 +143,6 @@ const UserProfile = ({ navigation, route }) => {
 
     // todo maybe handle as error messages instead of alerts
     const openSocial = async (social) => {
-
         let url = ''
         switch (social) {
             case ('instagram'):
@@ -326,22 +314,26 @@ const UserProfile = ({ navigation, route }) => {
 
 
                         </View>)}
-                        <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 20, marginTop: 12 }}>
-                            Listings
-                        </Text>
+                        {userListings && userListings.length > 0 && (
+                            // <View>
+                            <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 20, marginTop: 12 }}>
+                                Listings
+                            </Text>
+                            // </View>
+                        )}
                     </View>
-
-
                 </View>
 
 
 
-
+                {/* getting hella conditional w it */}
                 {
-                    userListings ? (
-                        <View style={{ flex: 1 }}>
-                            <ListingsList listings={userListings} navigation={navigation} scrollEnabled={false} />
-                        </View>
+                    userListings && userListings.length > 0 ? (userListings.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
+                        <ListingCard listing={userListings[0]} />
+                    </View>) : (<View style={{ flex: 1 }}>
+                        <ListingsList listings={userListings} navigation={navigation} scrollEnabled={false} />
+                    </View>)
+
 
                     ) : (
                         <View style={{ marginTop: 30 }}>

@@ -2,6 +2,7 @@ import { createNativeStackNavigator, TransitionPresets } from "@react-navigation
 import MessagesOverview from "../../screens/Messages/MessagesOverview";
 import Conversation from "../../screens/Messages/Conversation";
 import { Ionicons } from '@expo/vector-icons';
+import ListingScreen from '../../screens/Marketplace/ListingScreen'
 
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
@@ -21,11 +22,9 @@ const MessagesStackNavigator = () => {
                     <Image
                         source={require('../../../assets/images/Ripple_UW_Icon.png')}
                         style={{ height: 25, width: 25, marginBottom: -5 }}
-
                     />
                 )
             }}
-
         >
             <MessagesStack.Screen
                 name="MessagesOverview"
@@ -47,7 +46,6 @@ const MessagesStackNavigator = () => {
                         <Logo />
                     ),
                     headerLeft: () => (
-
                         <TouchableOpacity onPress={() => navigation.reset({
                             index: 0,
                             routes: [{ name: 'MessagesOverview' }],
@@ -57,6 +55,22 @@ const MessagesStackNavigator = () => {
                     ),
                 })}
             />
+
+            <MessagesStack.Screen
+                name="ListingScreen"
+                component={ListingScreen}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                })}
+            />
+
         </MessagesStack.Navigator>
     )
 }

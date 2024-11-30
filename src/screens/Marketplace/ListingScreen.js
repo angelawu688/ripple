@@ -21,6 +21,7 @@ import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullS
 import * as Linking from 'expo-linking'
 import { formatDate } from '../../utils/formatDate'
 import { useFocusEffect } from '@react-navigation/native';
+import { getConversation } from '../../utils/firebaseUtils';
 
 
 
@@ -34,7 +35,7 @@ const ListingScreen = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true);
     // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(false);
-    const { listingID } = route.params;
+    const { listingID, } = route.params;
     const { user, savedPosts, setSavedPosts, setUserListings } = useContext(userContext);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     // edit, delete, markSold | used for toggling buttons
@@ -310,17 +311,18 @@ const ListingScreen = ({ navigation, route }) => {
         }
     }
 
-    const handleSendHi = () => {
-        // TODO
-        // conditionally create a new conversation on the backend and frontend
-        // loading states, etc. 
+    const handleSendHi = async () => {
+        if (!user.uid || !sellerID) {
+            console.log('ids undefined')
+            return
+        }
+        const conversationID = await getConversation(user.uid, sellerID)
 
         // this will navigate with the 
         navigation.navigate('MessagesStack', {
             screen: 'Conversation',
-            params: { listing },
+            params: { listing, conversationID },
         });
-        console.log('SEND HI')
     }
 
     const sharePost = () => {

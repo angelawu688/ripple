@@ -8,12 +8,18 @@ import { colors } from '../colors';
 
 
 
-const MessagePreviewCard = ({ pfp, name, lastMessage, conversationID, lastSentAt }) => {
+const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt }) => {
     // const otherUserID = conversationIDToOtherUserID(conversationID); // to be implemented. Current placeholder is. 
     // not sure if we need this here
     useEffect(() => {
         console.log('lsa', lastSentAt)
     }, [])
+
+    if (!lastMessage) {
+        // nothing has been sent, we dont want to display that
+        return null;
+    }
+
     return (
         <View
             style={styles.container}
@@ -40,12 +46,12 @@ const MessagePreviewCard = ({ pfp, name, lastMessage, conversationID, lastSentAt
                     </Text>
                     <Text style={styles.lastSentText}>
                         {/*  */}
-                        {formatDate(lastSentAt / 1000)}
+                        {formatDate(parseInt(lastSentAt) / 1000)}
                     </Text>
                 </View>
 
                 <Text style={styles.lowerText}>
-                    {lastMessage + ''}
+                    {lastMessage}
                 </Text>
 
             </View>
