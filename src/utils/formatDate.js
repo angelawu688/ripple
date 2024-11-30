@@ -1,8 +1,16 @@
 // TODO move this to utils
 // test this too
 export const formatDate = (dateInSeconds) => {
+    console.log(dateInSeconds)
+    if (!dateInSeconds || isNaN(dateInSeconds) || dateInSeconds < 0) {
+        return "";
+    }
+    const currentTimeInSeconds = Date.now() / 1000; // Convert current time to seconds
+    const seconds = currentTimeInSeconds - dateInSeconds;
+
+
     // date.now is in ms, we are passing in as seconds
-    const seconds = (Date.now() / 1000) - dateInSeconds
+    // const seconds = (Date.now() / 1000) - dateInSeconds
     console.log(Date.now())
     const minute = 60;
     const hour = 60 * minute;

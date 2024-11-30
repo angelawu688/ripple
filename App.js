@@ -24,7 +24,7 @@ export default function App() {
   // keep the splash up until the fonts are loaded
   useEffect(() => {
     if (fontsLoaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(console.warn);;
     }
   }, [fontsLoaded]);
 

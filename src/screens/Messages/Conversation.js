@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useContext, useEffect, useRef, useState } from 'react'
-import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, FlatList } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
 import ListingCard from '../../components/ListingCard';
 import { XCircle } from 'phosphor-react-native';
@@ -27,7 +27,6 @@ const MessageBubble = ({ navigation, message, activeUserID }) => {
             if (!postID) return;
             const fetchedListing = await getListingFromID(postID)
             if (!fetchedListing) {
-                console.log('NO FETCHED LISTING')
                 return
             }
             setListing(fetchedListing)
@@ -105,10 +104,8 @@ const Conversation = ({ navigation, route }) => {
                 id: doc.id,
                 ...doc.data(),
             }));
-            setMessages(fetchedMessages.sort((a, b) => a.timestamp - b.timestamp));
-            fetchedMessages.map((mess) => {
-                console.log(mess)
-            })
+            // most recent first, since we are using inverted flatlist
+            setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
         });
 
         // unsub on unmount
@@ -133,7 +130,6 @@ const Conversation = ({ navigation, route }) => {
             )
 
         } catch (e) {
-            console.log(img)
             console.log('handlesend', e)
         } finally {
             clearInputs();
@@ -188,7 +184,32 @@ const Conversation = ({ navigation, route }) => {
             keyboardVerticalOffset={90}
         >
             <View style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%', }}>
-                <ScrollView
+                {messages?.length > 0 ? (<FlatList
+                    data={messages}
+                    renderItem={({ item }) => {
+                        return (
+                            <MessageBubble
+                                navigation={navigation}
+                                message={item}
+                                activeUserID={user.uid}
+                            />
+                        )
+                    }
+                    }
+                    keyExtractor={(item) => item.id}
+                    inverted={true}// This inverts the list
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                        paddingHorizontal: 30,
+                        paddingTop: 10,
+                        paddingBottom: 50,
+                    }}
+                />) : (
+                    <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
+                        Start a conversation!
+                    </Text>
+                )}
+                {/* <ScrollView
                     ref={scrollRef}
                     contentContainerStyle={{ flexGrow: 1, wdith: '100%', paddingHorizontal: 30, paddingTop: 10, paddingBottom: 50 }}
                     showsVerticalScrollIndicator={false}
@@ -213,7 +234,7 @@ const Conversation = ({ navigation, route }) => {
                             </Text>
                         </View>
                     }
-                </ScrollView>
+                </ScrollView> */}
 
 
 

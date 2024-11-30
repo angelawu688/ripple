@@ -84,6 +84,7 @@ const MessagesOverview = ({ navigation }) => {
                         const conversationID = item.id
                         const otherUserId = item.users.find(id => id !== user.uid);
                         const otherUserDetails = item.userDetails[otherUserId];
+                        console.log('item', item)
 
 
                         return (
@@ -91,11 +92,10 @@ const MessagesOverview = ({ navigation }) => {
                                 onPress={() => navigation.navigate('Conversation', { conversationID: conversationID })}
                             >
                                 <MessagePreviewCard
-                                    // pfp={item.pfp}
                                     pfp={otherUserDetails?.pfp}
                                     name={otherUserDetails?.name || "User"}
                                     lastMessage={item.lastMessage}
-                                    lastSentAt={item.lastSentAt}
+                                    lastSentAt={item.timestamp}
                                 />
                             </TouchableOpacity>
                         )

@@ -46,7 +46,7 @@ const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt }) => {
                     </Text>
                     <Text style={styles.lastSentText}>
                         {/*  */}
-                        {formatDate(parseInt(lastSentAt) / 1000)}
+                        {formatDate(lastSentAt / 1000)}
                     </Text>
                 </View>
 

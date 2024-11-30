@@ -16,19 +16,7 @@ export const UserProvider = ({ children }) => {
 
 
 
-  const handleSignOut = async () => {
-    const auth = getAuth()
-    try {
-      // sign out
-      await signOut(auth);
-      // clear async
-      await clearAllData();
-    } catch (e) {
-      console.log('Sign out error: ', e)
-      throw e
-    }
-  }
-
+  // grabs the user data from firebase
   const fetchUserData = async (firebaseUser) => {
     const db = getFirestore();
     try {
@@ -66,6 +54,20 @@ export const UserProvider = ({ children }) => {
       }
     } catch (e) {
       setAuthError(e.message)
+    }
+  }
+
+  // signs out the user and clears all of our async storage
+  const handleSignOut = async () => {
+    const auth = getAuth()
+    try {
+      // sign out
+      await signOut(auth);
+      // clear async
+      await clearAllData();
+    } catch (e) {
+      console.log('Sign out error: ', e)
+      throw e
     }
   }
 
