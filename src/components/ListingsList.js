@@ -1,10 +1,13 @@
 import { FlatList, View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import ListingCard from "./ListingCard"
 import { MotiView } from 'moti';
+import { useContext } from "react";
+import { userContext } from "../context/UserContext";
 
 
 
 const ListingsList = ({ listings, navigation, scrollEnabled = true }) => {
+    const { user } = useContext(userContext)
     if (!listings || listings.length === 0) {
         return null
     }
@@ -21,6 +24,7 @@ const ListingsList = ({ listings, navigation, scrollEnabled = true }) => {
             renderItem={({ item }) => { // note: need to keep as "items", we are just renaming it to be clear
                 return (
                     <TouchableOpacity
+                        disabled={item.sold && user.uid !== item.userId}
                         onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
                         style={{ width: '49.75%' }}
                     >

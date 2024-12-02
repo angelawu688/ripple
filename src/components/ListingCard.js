@@ -1,32 +1,39 @@
 import { View, Text, Image } from 'react-native'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { colors } from '../colors';
 
-// TODO: deconstruct entire listing with all fields
 const ListingCard = ({ listing }) => {
     if (!listing) {
         return null;
     }
-    // no photos or sold fields yet
-    // const { price, title, photos, sold } = listing;
-    // const img = photos && photos.length > 0 ? photos[0] : undefined;
-    const img = undefined;
+
     const sold = listing.sold;
     const { price, title } = listing;
+    const [img, setImg] = useState(undefined)
     // this code will grab the width of the component. We set the height to make it a square + the title
     const [width, setWidth] = useState(0);
+
     const handleLayout = (event) => {
         const { width } = event.nativeEvent.layout;
         setWidth(width);
     };
+
+    // ensuring that we dont try to render images that are undefined
+    // ie if photos is undefined, we cant get photos[0]
+    useEffect(() => {
+        if (listing?.photos?.length > 0) {
+            setImg(listing.photos[0])
+        }
+    }, [listing])
+
     return (
         <View onLayout={handleLayout}
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', marginBottom: 15 }}>
             <View style={{ borderRadius: 12, width: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#F2F0F0' }}>
                 {img ? (
                     <Image
-                        source={{ uri: img.uri }}
-                        style={{ width: '100%', aspectRatio: 1, }}
+                        source={{ uri: img }}
+                        style={{ width: '100%', aspectRatio: 1, borderRadius: 10 }}
 
                     />) : (<View
                         style={{ width: '100%', aspectRatio: 1, }}
@@ -36,8 +43,6 @@ const ListingCard = ({ listing }) => {
                 {sold && (
                     <Text style={{
                         color: 'white', fontSize: 28, fontWeight: '900', position: 'absolute',
-                        // TODO REMOVE
-                        borderWidth: 1, borderColor: 'black' // just so that we can see it
                     }}>SOLD</Text>
                 )}
 

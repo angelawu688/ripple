@@ -1,53 +1,101 @@
-import { useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 
 import MessagePreviewCard from '../../components/MessagePreviewCard'
+import { useFocusEffect } from "@react-navigation/native"
+import { userContext } from "../../context/UserContext"
+import { collection, onSnapshot, query, where } from "firebase/firestore"
+import { db } from "../../../firebaseConfig"
 
 
-// TODO CONNECT USER MESSAGES TO FIREBASE
 const MessagesOverview = ({ navigation }) => {
+    const { user, userData } = useContext(userContext)
 
-    // TODO change this to actually grab the messages
-    // currently is imitating something
-    useEffect(() => {
-        if (conversations) {
-            // make a call to setConversations
-            setIsLoading(false)
-        } else {
-            // do nothing
-        }
-    }, [conversations])
+    // on component focus, grab all of the conversations for that user
+    useFocusEffect(
+        useCallback(() => {
+            // make sure we have uid
+            if (!user?.uid) return;
+
+            setIsLoading(true);
+            const q = query(
+                collection(db, "conversations"),
+                where("users", "array-contains", user.uid)
+            );
+
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const fetchedConversations = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                setConversations(fetchedConversations);
+                console.log(fetchedConversations)
+                setIsLoading(false);
+            }, (error) => {
+                console.error("Error fetching conversations:", error);
+                setIsLoading(false);
+            });
+
+
+
+            // cleanup
+            return () => unsubscribe();
+        }, [user?.uid])
+    )
+
 
     // grab messages on component mount or as prop
     // for now they are implemented as test message props below
     // note: structure will likely have to change
-    const [conversations, setConversations] = useState(testMessageObjects)
+    const [conversations, setConversations] = useState([])
     const [isLoading, setIsLoading] = useState(true)
+
+
+    // todo fetch and cache the other users pfp!
+    const [otherUserPfp, setOtherUserPfp] = useState(undefined)
+
+    if (isLoading) {
+        // todo skeleton loading
+        return (
+            <ActivityIndicator />
+        )
+    }
 
 
     return (
         <View style={styles.container}>
             {/* checking for conversations is a redundant check */}
-            {isLoading && conversations ? (
-                <ActivityIndicator size={'large'} />
+            {!conversations || conversations.length === 0 ? (
+                <View style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '90%' }}>
+                    <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
+                        Start a conversation!
+                    </Text>
+                </View>
             ) : (
                 <FlatList
                     style={{ width: '100%' }}
                     ListHeaderComponent={null} // blank for now, this is where a header would go 
 
                     data={conversations}
-                    renderItem={({ item: conversation }) => { // note: need to keep items, we are just renaming it to be clear
-                        const conversationID = conversation.id
+                    renderItem={({ item }) => { // note: need to keep items, we are just renaming it to be clear
+                        if (!item || !item.id || !item.users || !item.userDetails) {
+                            return null
+                        }
+                        const conversationID = item.id
+                        const otherUserId = item.users.find(id => id !== user.uid);
+                        const otherUserDetails = item.userDetails[otherUserId];
+                        console.log('item', item)
+
 
                         return (
                             <TouchableOpacity
                                 onPress={() => navigation.navigate('Conversation', { conversationID: conversationID })}
                             >
                                 <MessagePreviewCard
-                                    pfp={conversation.pfp}
-                                    name={conversation.otherUserName}
-                                    lastMessage={conversation.lastMessage}
-                                    conversationID={conversation.id}
+                                    pfp={otherUserDetails?.pfp}
+                                    name={otherUserDetails?.name || "User"}
+                                    lastMessage={item.lastMessage}
+                                    lastSentAt={item.timestamp}
                                 />
                             </TouchableOpacity>
                         )
@@ -61,15 +109,6 @@ const MessagesOverview = ({ navigation }) => {
 
 export default MessagesOverview
 
-
-const testMessageObjects = [
-    { id: 1, pfp: '', otherUserName: 'Jane Doe', lastMessage: 'Is your bike still for sale?', userID: 15 },
-    { id: 2, pfp: '', otherUserName: 'Megan Chan', lastMessage: 'Hi, is the Sony camera still available?', userID: 900 },
-    { id: 3, pfp: '', otherUserName: 'Will Hunt', lastMessage: 'Hi, is this still available??', userID: 1234 },
-]
-
-
-
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
@@ -78,5 +117,4 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%'
     },
-
 })

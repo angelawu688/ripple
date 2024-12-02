@@ -1,91 +1,87 @@
 import { Ionicons } from '@expo/vector-icons'
-import {useContext, useEffect, useRef, useState} from 'react'
-import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native'
+import { useContext, useEffect, useRef, useState } from 'react'
+import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, FlatList } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
 import ListingCard from '../../components/ListingCard';
 import { XCircle } from 'phosphor-react-native';
 import { colors } from '../../colors';
-import {userContext} from "../../context/UserContext";
+import { collection, onSnapshot } from 'firebase/firestore';
+import { getListingFromID, sendMessage } from '../../utils/firebaseUtils';
+import { db } from '../../../firebaseConfig';
+import { userContext } from '../../context/UserContext';
 
 
+// TODO in cleanup move this to another file
+// TODO add support for text and listings, posts and text, etc. 
+const MessageBubble = ({ navigation, message, activeUserID }) => {
+    if (!message) {
+        return null
+    }
+    const { textContent, imageUri, postID, sentBy } = message
+    const [listing, setListing] = useState(undefined)
 
-// not to represent the structure––we need time as well
-// I am assuming that they will be sorted by time in the DB
-const testMessages = [
-    { textContent: 'Hi!', imageContent: undefined, postContent: undefined, sentBy: '2', },
-    { textContent: 'Hello', imageContent: undefined, postContent: undefined, sentBy: '1', },
-    { textContent: 'Im tryna buy your fridge', imageContent: undefined, postContent: undefined, sentBy: '2', },
-    { textContent: 'Bet how much', imageContent: undefined, postContent: undefined, sentBy: '1', },
-    { textContent: '10 bands', imageContent: undefined, postContent: undefined, sentBy: '1', },
-    { textContent: 'No thanks', imageContent: undefined, postContent: undefined, sentBy: '2', },
-    { textContent: 'Ill do 4', imageContent: undefined, postContent: undefined, sentBy: '2', },
-    { textContent: undefined, imageContent: undefined, postContent: undefined, sentBy: '1', }
-]
+    const isCurrentUser = sentBy === activeUserID
 
+    useEffect(() => {
+        const fetchListing = async () => {
+            if (!postID) return;
+            const fetchedListing = await getListingFromID(postID)
+            if (!fetchedListing) {
+                return
+            }
+            setListing(fetchedListing)
+        }
+        fetchListing()
+    }, [postID])
 
-const MessageBubble = ({ message, activeUserID }) => {
-    const { textContent, imageContent, postContent, sentBy } = message
-
-    // TODO pull images from here and display within a message bubble
-    if (!textContent && !imageContent && !postContent) {
+    if (!textContent && !imageUri && !postID) {
         return;
     }
-    const isCurrentUser = sentBy === activeUserID
 
     // add suport for images and posts
 
     // TODO make look cleaner
     return (
-        <View style={{ flexDirection: 'column', alignItems: isCurrentUser ? 'flex-end' : 'flex-start' }}>
-            {postContent && (
-                <View style={{
-                    width: 150,
-                    aspectRatio: 1,
-                    marginBottom: 10
-                }}>
-                    <ListingCard listing={postContent} containerWidth={170} />
-                </View>
+        <View style={{ flexDirection: 'column', alignItems: isCurrentUser ? 'flex-end' : 'flex-start', marginVertical: 2 }}>
+            {listing && (
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('ListingScreen', { listingID: listing.id })}
+
+                    style={{
+                        width: 150,
+                        height: 170,
+                        marginVertical: 8,
+                    }}>
+                    <ListingCard listing={listing} containerWidth={170} />
+                </TouchableOpacity>
             )}
 
-            {imageContent && (
+            {imageUri && (
                 <Image
                     style={{ width: 170, height: 170, borderWidth: 1, borderColor: colors.loginGray, borderRadius: 8 }}
-                    source={{ uri: imageContent.uri }}
+                    source={{ uri: imageUri }}
                 />
             )}
+
             {textContent && textContent.length !== 0 && (
                 <View style={[styles.messageBubble, isCurrentUser ? styles.sent : styles.received]}>
 
                     <Text style={[styles.messageText, { color: isCurrentUser ? 'white' : 'black' }]}>
                         {textContent}
                     </Text>
-
                 </View>
             )}
-
         </View>
-
-
     )
 }
 
 
-const Conversation = ({ route }) => {
+const Conversation = ({ navigation, route }) => {
     // pass in the listing from the route
-    const { listing } = route.params
+    const { listing, conversationID } = route.params
     const [inputListing, setInputListing] = useState(listing || null)
     const { user } = useContext(userContext)
-
-
-
-    // grab the userID from the logged in user
-    // const currentUserID = user.uid;
-    // grab the messages from the db
-    // const [messages, setMessages] = useState([])
-    // FOR TESTING AND DISPLAY
-    const [messages, setMessages] = useState(testMessages)
-    const currentUserID = '1';
-    const sellerID = listing.userId;
+    const [messages, setMessages] = useState([])
     const [input, setInput] = useState(listing ? ('Hi, is this still available?') : '')
     const [img, setImg] = useState(undefined)
     const [openingImagePicker, setOpeningImagePicker] = useState(false)
@@ -98,32 +94,52 @@ const Conversation = ({ route }) => {
         }
     }, [messages]);
 
-    const handleSendMessage = (text, image, post, clearInputs) => {
+    // load messages from firebase
+    useEffect(() => {
+        const messagesRef = collection(db, 'conversations', conversationID, 'messages')
+
+        // same as convs, we grab the snapshot and unsubscribe when we are done with it
+        const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
+            const fetchedMessages = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            // most recent first, since we are using inverted flatlist
+            setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
+        });
+
+        // unsub on unmount
+        return () => unsubscribe();
+    }, [])
+
+    const handleSendMessage = async (text, image, post, clearInputs) => {
         // if we arent sending anything, return
         if (!text.trim() && !image && !post) {
             return
         }
 
-        // again, this is a test––update to reflect the actual schema
-        // right now we have the option to send text, images, or posts
-        const newMessage = {
-            textContent: text,
-            imageContent: image,
-            postContent: post,
-            sender: currentUserID,
-            receiver: sellerID,
-            timestamp: new Date()
-        };
-        // frontend update
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        // send it away to our lovely database
+        try {
+            // convID, senderID, textContent = undefined, postID = undefined, imageUri = undefined
+            await sendMessage(
+                conversationID,
+                user.uid,
+                text?.trim(),
+                post?.id,
+                img,
+            )
 
-        // UPDATE THE BACKEND HERE
-        clearInputs()
+        } catch (e) {
+            console.log('handlesend', e)
+        } finally {
+            clearInputs();
+        }
     }
 
     const clearInputs = () => {
         setInput('')
         setImg(null)
+        setInputListing(null)
     }
 
 
@@ -149,15 +165,13 @@ const Conversation = ({ route }) => {
             if (!result.canceled) {
                 const selectedImages = result.assets.map(asset => ({
                     uri: asset.uri,
-                    name: asset.fileName || `photo_${Date.now()}.jpg`,
-                    type: asset.type || 'image/jpeg',
                 }));
-                setImg(selectedImages[0])
+                setImg(selectedImages[0].uri) // we are just storing images as URIs
             } else {
                 // user cancelled, do nothing
             }
         } catch (e) {
-            console.log(e);
+            console.log('addimage', e);
             setOpeningImagePicker(false)
         }
     }
@@ -170,14 +184,46 @@ const Conversation = ({ route }) => {
             keyboardVerticalOffset={90}
         >
             <View style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%', }}>
-                <ScrollView
+                {messages?.length > 0 ? (<FlatList
+                    data={messages}
+                    renderItem={({ item }) => {
+                        return (
+                            <MessageBubble
+                                navigation={navigation}
+                                message={item}
+                                activeUserID={user.uid}
+                            />
+                        )
+                    }
+                    }
+                    keyExtractor={(item) => item.id}
+                    inverted={true}// This inverts the list
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                        paddingHorizontal: 30,
+                        paddingTop: 10,
+                        paddingBottom: 50,
+                    }}
+                />) : (
+                    <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
+                        Start a conversation!
+                    </Text>
+                )}
+                {/* <ScrollView
                     ref={scrollRef}
                     contentContainerStyle={{ flexGrow: 1, wdith: '100%', paddingHorizontal: 30, paddingTop: 10, paddingBottom: 50 }}
                     showsVerticalScrollIndicator={false}
                 >
                     {messages.map((message, index) => {
+                        if (!message) {
+                            return null
+                        }
                         return (
-                            <MessageBubble key={index} message={message} activeUserID={currentUserID} />
+                            <MessageBubble
+                                navigation={navigation}
+                                key={index}
+                                message={message}
+                                activeUserID={user.uid} />
                         )
                     })}
 
@@ -188,7 +234,7 @@ const Conversation = ({ route }) => {
                             </Text>
                         </View>
                     }
-                </ScrollView>
+                </ScrollView> */}
 
 
 
@@ -207,9 +253,9 @@ const Conversation = ({ route }) => {
                 )}
 
                 {/* Preview for Image */}
-                {img?.uri && (
+                {img && (
                     <View style={styles.previewImageContainer}>
-                        <Image source={{ uri: img?.uri }} style={styles.previewImage} />
+                        <Image source={{ uri: img }} style={styles.previewImage} />
                         <TouchableOpacity onPress={() => setImg(null)} style={styles.removePreviewButton}>
                             <XCircle weight='fill' size={30} color={colors.loginGray} />
                         </TouchableOpacity>
@@ -257,7 +303,7 @@ const styles = StyleSheet.create({
         maxWidth: '75%',
         borderRadius: 12,
         padding: 10,
-        marginVertical: 4,
+        marginVertical: 0,
         alignSelf: 'flex-start'
     },
     sent: {

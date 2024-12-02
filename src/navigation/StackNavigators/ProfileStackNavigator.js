@@ -10,28 +10,58 @@ import Analytics from "../../screens/Profile/Analytics";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import ListingScreen from "../../screens/Marketplace/ListingScreen";
 import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
+import UserProfile from '../../screens/Marketplace/UserProfile'
+import Conversation from "../../screens/Messages/Conversation";
+import OwnUserProfile from "../../screens/Profile/OwnUserProfile";
+import { Gear } from "phosphor-react-native";
 
 
 const ProfileStack = createNativeStackNavigator();
 
 const ProfileStackNavigator = () => {
     return (
+
         <ProfileStack.Navigator
-            // initialRouteName="Profile"
+            initialRouteName="OwnUserProfile"
             options={{ headerShown: false }}
             screenOptions={{
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false,
             }}
         >
+
             <ProfileStack.Screen
-                name="Profile"
-                component={Profile}
+                name="OwnUserProfile"
+                component={OwnUserProfile}
                 options={{
                     headerTitle: () => (
                         <Logo />
-                    )
+                    ),
+                    headerRight: () => {
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('Profile')}
+                        >
+                            <Gear />
+                        </TouchableOpacity>
+                    }
                 }}
+            />
+
+            <ProfileStack.Screen
+                name="Profile"
+                component={Profile}
+                options={({ navigation }) => ({
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.goBack()}
+                        >
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                    headerTitle: () => (
+                        <Logo />
+                    )
+                })}
             />
 
             <ProfileStack.Screen
@@ -127,6 +157,36 @@ const ProfileStackNavigator = () => {
             <ProfileStack.Screen
                 name="EditPost"
                 component={EditPost}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
+
+            <ProfileStack.Screen
+                name="UserProfile"
+                component={UserProfile}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
+
+            <ProfileStack.Screen
+                name="Conversation"
+                component={Conversation}
                 options={({ navigation }) => ({
                     headerTitle: () => (
                         <Logo />

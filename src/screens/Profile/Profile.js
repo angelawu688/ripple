@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { userContext } from "../../context/UserContext";
 import { Ionicons } from '@expo/vector-icons';
@@ -8,9 +8,18 @@ import { ChatTeardropText, User, Storefront, Bookmark, BookmarkSimple, ShoppingC
 
 
 const Profile = ({ navigation }) => {
-    const { user, setUser } = useContext(userContext);
-    const handleLogout = () => {
-        setUser(null)
+    const { user, setUser, handleSignOut } = useContext(userContext);
+    const [loading, setLoading] = useState(false)
+
+    const handleLogout = async () => {
+        try {
+            setLoading(true)
+            await handleSignOut()
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setLoading(false)
+        }
     }
 
     const handleDeleteAccount = () => {

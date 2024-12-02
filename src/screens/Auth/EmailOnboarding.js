@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../colors';
+import Asterisk from '../shared/Asterisk';
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')
@@ -192,6 +193,7 @@ const EmailOnboarding = ({ navigation }) => {
                 <View style={{ width: '100%', }}>
                     <Text style={styles.inputHeader}>
                         Enter UW NetID
+                        <Asterisk />
                     </Text>
                     <TextInput
                         ref={inputRef} // this is the reference to the input field
@@ -212,6 +214,7 @@ const EmailOnboarding = ({ navigation }) => {
                 <View style={{ width: '100%' }}>
                     <Text style={styles.inputHeader}>
                         Password
+                        <Asterisk />
                     </Text>
                     <TextInput
                         style={styles.input}
@@ -326,7 +329,7 @@ const styles = StyleSheet.create({
         fontSize: 26,
         fontWeight: '600',
         fontFamily: 'Syne_700Bold',
-        color: colors.loginBlue
+        color: colors.black
     },
     input: {
         backgroundColor: 'white',
@@ -356,7 +359,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginLeft: 5,
         marginBottom: 6,
-        fontFamily: 'inter'
+        fontFamily: 'inter',
+        color: colors.loginBlue
     },
     button: {
         display: 'flex',

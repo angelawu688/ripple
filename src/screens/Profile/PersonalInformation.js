@@ -8,19 +8,22 @@ import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../colors'
 import { isLoading } from 'expo-font';
 import { PencilSimple } from 'phosphor-react-native';
+import { uploadPFP } from '../../utils/firebaseUtils';
 
 
 
 // this defines the fields for us so that we can reuse our modal component
+// Took out prof photo for now
 const fields = [
     { label: 'Email', key: 'email', keyboardType: 'email-address', },
-    { label: 'name', key: 'name', keyboardType: 'default', },
+    { label: 'Name', key: 'name', keyboardType: 'default', },
     { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true, description: 'What makes you unique?' },
     { label: 'Major', key: 'major', keyboardType: 'default', },
     { label: 'Concentration', key: 'concentration', keyboardType: 'default', },
     { label: 'Grad Year', key: 'gradYear', keyboardType: 'numeric', description: 'Enter a four digit year (2026)' },
     { label: 'Instagram', key: 'instagram', keyboardType: 'default', description: 'Enter username' },
     { label: 'LinkedIn', key: 'linkedin', keyboardType: 'url', description: 'Enter profile link' },
+
 ];
 
 const PersonalInformation = () => {
@@ -28,7 +31,6 @@ const PersonalInformation = () => {
     const [modalVisible, setModalVisible] = useState(false)
     const [currentField, setCurrentField] = useState('')
     const [input, setInput] = useState('')
-    const [pfp, setPfp] = useState(undefined)
     const [errorMessage, setErrorMessage] = useState('')
     const [continueAvailable, setContinueAvailable] = useState('')
     const [isLoadingSave, setIsLoadingSave] = useState(false)
@@ -65,7 +67,7 @@ const PersonalInformation = () => {
                 return /^@[a-zA-Z0-9_]+$/.test(value) || 'Must be a username starting with @';
             case 'gradYear':
                 // Validate the graduation year
-                if (!/^\d{4}$/.test(value)) return 'Enter a valid four-digit year';
+                if (!/^\d{4}$/.test(value)) return 'Enter a four-digit year (2026)';
                 const yearNum = parseInt(value, 10);
                 const currentYear = new Date().getFullYear();
                 if (yearNum < currentYear || yearNum > currentYear + 6) {
@@ -132,16 +134,16 @@ const PersonalInformation = () => {
             if (!result.canceled) {
                 const selectedImages = result.assets.map(asset => ({
                     uri: asset.uri,
-                    name: asset.fileName || `photo_${Date.now()}.jpg`,
-                    type: asset.type || 'image/jpeg',
                 }));
-                console.log(selectedImages[0])
+                // backend change
+                const downloadLink = await uploadPFP(selectedImages[0].uri, user.uid)
+                const db = getFirestore();
+                const userRef = doc(db, "users", user.uid);
+                await updateDoc(userRef, { pfp: downloadLink });
 
-                // CHANGE PFP HERE
-                // TODO update DB and userContext
+                // frontend change
+                // setPfp(downloadLink)
 
-                // local change
-                setPfp(selectedImages[0])
             } else {
                 // user cancelled, do nothing
                 setIsLoadingImagePicker(false)
@@ -155,15 +157,14 @@ const PersonalInformation = () => {
 
     return (
         <View style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '90%', height: '100%', alignSelf: 'center' }}>
-
             <TouchableOpacity
                 disabled={isLoadingImagePicker}
                 onPress={() => handleChangePfp()}
                 style={{ width: 87, height: 87, alignSelf: 'center', borderColor: colors.accentGray, borderWidth: 1, borderRadius: 100 }}
             >
-                {pfp?.uri ?
+                {userData.pfp ?
                     <Image
-                        source={{ uri: pfp.uri }}
+                        source={{ uri: userData.pfp }}
                         style={{ width: 85, height: 85, borderRadius: 50 }}
 
                     /> :
@@ -225,13 +226,12 @@ const PersonalInformation = () => {
                             <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 26, alignSelf: 'center', }}>
                                 Edit {currentField.label}
                             </Text>
-                            {currentField.description && <Text
+                            {currentField.description && !errorMessage ? <Text
                                 style={{ fontFamily: 'Inter', fontSize: 14, color: colors.accentGray, marginVertical: 6 }}>
                                 {currentField.description}
-                            </Text>}
-                            <Text style={{ fontFamily: 'Inter', fontSize: 14, color: colors.errorMessage }}>
+                            </Text> : <Text style={{ fontFamily: 'Inter', fontSize: 14, color: colors.errorMessage }}>
                                 {errorMessage}
-                            </Text>
+                            </Text>}
                         </View>
                         <TextInput
                             onChangeText={(input) => {
@@ -240,6 +240,7 @@ const PersonalInformation = () => {
                             }}
                             value={input}
                             style={styles.input}
+                            keyboardType={currentField.keyboardType}
                         />
 
                         <View style={styles.modalButtonContainer}>
