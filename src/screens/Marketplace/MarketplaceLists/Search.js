@@ -27,8 +27,6 @@ const Search = ({ navigation }) => {
 
     const db = getFirestore();
 
-
-
     // search input ref, will autoselect when we open
     // be careful––if we end up putting recent searches in user context this will be an infinite loop
     const inputRef = useRef(null);
@@ -300,10 +298,9 @@ const Search = ({ navigation }) => {
                                         style={{ paddingBottom: 50 }} // this prevents clipping on bottom scroll
                                     />
                                 ) : (
-                                    <Text style={{ alignSelf: 'flex-start', fontFamily: 'inter' }}>
+                                    <Text style={{ alignSelf: 'flex-start', fontFamily: 'inter', marginTop: 8 }}>
                                         Your recent searches will pop up here!
                                     </Text>
-                                    // <EmptyMessage message={'Your recent searches will pop up here!'} />
                                 )
                             )}
                         </>

@@ -9,6 +9,7 @@ import { colors } from "../../../colors";
 import { userContext } from "../../../context/UserContext";
 import { MinusCircle, PlusCircle, UploadSimple } from "phosphor-react-native";
 import CurrencyInput from 'react-native-currency-input'
+import { uploadListingImage, deleteImageFromDB } from "../../../utils/firebaseUtils";
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -57,14 +58,17 @@ const TagPreview = ({ tag, removeTag }) => {
 
 const EditPost = ({ navigation, route }) => {
     const { listing, listingID } = route.params
-    const { setUserListings } = useContext(userContext);
+    const { user, userData, setUserListings } = useContext(userContext);
 
+    // all of these are grabbed from the route params, not a database read. Also is immediate
+    // cheaper, but if we are having issues with initialaztion that might be why
     const [photos, setPhotos] = useState(listing.photos || []) // array of photos
     const [tags, setTags] = useState(listing.tags || []) // array of tags
     const [title, setTitle] = useState(listing.title || '')
     const [price, setPrice] = useState(listing.price || 0)
     const [description, setDescription] = useState(listing.description || '')
     const [tagInput, setTagInput] = useState('')
+    const originalPhotos = listing?.photos // track to compare final in order to delete
 
 
     const [errorMessage, setErrorMessage] = useState('')
@@ -113,6 +117,8 @@ const EditPost = ({ navigation, route }) => {
                     name: asset.fileName || `photo_${Date.now()}.jpg`,
                     type: asset.type || 'image/jpeg',
                 }));
+
+                // frontend changes
                 setPhotos([...photos, ...selectedImages.map(img => img.uri)]);
                 setChanges(true)
                 setIsLoadingPhotoPicker(false)
@@ -130,21 +136,34 @@ const EditPost = ({ navigation, route }) => {
         }
     };
 
-    const removePhoto = (uri) => {
-        setPhotos(photos.filter(photoURI => photoURI !== uri));
-        setChanges(true)
-        // no backend update needed
-    };
+    // removes a photo from the DB then updates the UI
+    const removePhoto = async (uri) => {
+        try {
+            setErrorMessage('')
+            // do we need loading state?
+            const fileName = uri.split('/').pop().split('?')[0]; // Extract file name from URI
+            const photoRef = decodeURIComponent(`${fileName}`);
+            await deleteImageFromDB(photoRef);
 
-    const formatPrice = (input) => {
-        const cleanedPrice = input.replace(/[^0-9]/g, ''); // only allow numbers
-        const number = parseInt(cleanedPrice, 10);
-        if (isNaN(number)) {
-            return '' // reset if we get NAN
+            // update UI after successful image deletion
+            setPhotos(photos.filter(photoURI => photoURI !== uri));
+            setChanges(true)
+        } catch (e) {
+            if (e.code === 'storage/object-not-found') {
+                // update frontend regardless
+                setPhotos(photos.filter(photoURI => photoURI !== uri));
+                setChanges(true);
+
+            } else {
+                console.log('Error deleting photo:', e);
+                setErrorMessage('Failed to delete photo. Please try again.');
+            }
+
+        } finally {
+            // set some loading state to false?
         }
 
-        return number.toLocaleString() // method to format with commas and such
-    }
+    };
 
     const handlePublish = async () => {
         if (!title) {
@@ -173,41 +192,62 @@ const EditPost = ({ navigation, route }) => {
             return;
         }
         // allow empty description
-        // allow empty photos?
+        if (photos.length === 0) {
+            setErrorMessage('Enter photo(s)!')
+            return;
+        }
+        // allow empty description
 
         setIsLoading(true)
         try {
             const db = getFirestore();
+            // figure out which ones of the photos are new
+            const newPhotos = photos.filter((photo) => !originalPhotos.includes(photo))
+
+            // figure out which ones are deleted/missing
+            const removedPhotos = originalPhotos.filter((photo) => !photos.includes(photo));
+
+            // upload new ones to storage
+            // by using Date.now() in upload, we avoid potential issues with overwrites
+            const uploadPromises = newPhotos.map(async (uri, index) => {
+                return await uploadListingImage(uri, user.uid, listingID, index);
+            });
+            const newPhotoURLs = await Promise.all(uploadPromises);
+
+            // prepare photos (old + new photos)
+            const finalPhotoURLs = [
+                ...originalPhotos.filter((photo) => !removedPhotos.includes(photo)),
+                ...newPhotoURLs,
+            ];
+
             const listingData = {
                 title,
                 price,
                 description,
                 tags,
-                photos
-            }
+                photos: finalPhotoURLs,
+                userId: user.uid,
+                userName: userData.name,
+                userEmail: userData.email,
+                userPfp: userData.pfp,
+                sold: false, // if we are editing a post, it shouldnt be sold. Disallow editing while sold
+                createdAt: listing.createdAt, // keep the og date
+            };
+
+
+            // frontend and backend change
             const editDoc = await updateDoc(doc(db, "listings", listingID), listingData);
             setUserListings(prevUserListings =>
                 prevUserListings.map(listing =>
                     listing.id === listingID ? { ...listing, ...listingData } : listing
                 )
             );
-
-            setTimeout(() => {
-                // just chill for a sec, simulating loading
-                // using navigation reset so that we dont get a back buttons
-
-                // I think that we should keep this, but worth a convo on where to redirect next
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'Marketplace' }],
-                });
-            }, [2500])
+            navigation.goBack();
         } catch (e) {
             setErrorMessage(e.message)
             console.log(e);
         } finally {
             setIsLoading(false)
-            navigation.goBack(); // navigate back to the previous screen. This isnt ideal but should play for now
         }
     }
 
@@ -334,7 +374,6 @@ const EditPost = ({ navigation, route }) => {
                             placeholderTextColor="#7E7E7E"
                             value={tagInput}
                             onChangeText={(text) => {
-                                console.log(tagInput)
                                 setTagInput(text)
                             }}
                         />}

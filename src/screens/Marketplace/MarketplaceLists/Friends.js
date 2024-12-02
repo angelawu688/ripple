@@ -2,13 +2,18 @@ import { FlatList, Text, TouchableOpacity, View, StyleSheet } from "react-native
 import ListingCard from "../../../components/ListingCard"
 import { colors } from "../../../colors"
 import ListingsList from "../../../components/ListingsList"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { userContext } from "../../../context/UserContext"
 import * as Linking from 'expo-linking'
 
 
-const Friends = ({ listings, navigation }) => {
+const Friends = ({ navigation }) => {
     const { userData } = useContext(userContext)
+    const [friendsListings, setFriendsListings] = useState([])
+
+    useEffect(() => {
+        // grab the friends listings on component mount
+    }, [])
 
     const shareProfile = () => {
         if (!userData?.uid) {
@@ -30,7 +35,7 @@ const Friends = ({ listings, navigation }) => {
     }
 
     // empty
-    if (!listings) {
+    if (friendsListings?.length === 0) {
         return (
             <View style={styles.emptyContainer}>
                 <Text style={styles.title}>
@@ -52,7 +57,7 @@ const Friends = ({ listings, navigation }) => {
     return (
         // pass in a function to get more ?
         // i.e. onGetMore={getMoreFriendsPosts()} or something
-        <ListingsList navigation={navigation} listings={listings} />
+        <ListingsList navigation={navigation} listings={friendsListings} />
     )
 }
 

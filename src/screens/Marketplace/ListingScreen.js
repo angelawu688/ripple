@@ -12,13 +12,17 @@ import {
     where,
     updateDoc
 } from "firebase/firestore";
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
 import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, Tag } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 import * as Linking from 'expo-linking'
+import { formatDate } from '../../utils/formatDate'
+import { useFocusEffect } from '@react-navigation/native';
+import { getConversation } from '../../utils/firebaseUtils';
+
 
 
 const ListingScreen = ({ navigation, route }) => {
@@ -31,7 +35,7 @@ const ListingScreen = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true);
     // when you onboard, need to know if listing is saved or not by the user
     const [isSaved, setIsSaved] = useState(false);
-    const { listingID } = route.params;
+    const { listingID, } = route.params;
     const { user, savedPosts, setSavedPosts, setUserListings } = useContext(userContext);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     // edit, delete, markSold | used for toggling buttons
@@ -39,79 +43,81 @@ const ListingScreen = ({ navigation, route }) => {
     const [postSold, setPostSold] = useState(false) // grab this on init
     const [isOwnPost, setIsOwnPost] = useState(true) // grab this on init. Literally something like uid === userData.uid should be chill
     const [sellerID, setSellerID] = useState(null) // grab this on init
-
-
-    // const isOwnPost = true // TEST, GRAB ON COMPONENT MOUNT
-    // const otherUserID = 'TcxxqAtEwuPxzYLSoQdv12vWqp83';
-    const testPhotos = [
-        { id: '1', color: 'yellow' },
-        { id: '2', color: 'green' },
-        { id: '3', color: 'red' },
-        { id: '4', color: 'purple' },
-        { id: '5', color: 'blue' },
-    ]
-
     const db = getFirestore();
-    useEffect(() => {
-        const fetchListing = async () => {
-            setIsLoading(true)
-            try {
-                const docRef = doc(db, "listings", listingID);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    setListing({ id: docSnap.id, ...docSnap.data() });
-                    // check if it's their own post, can save their own posts
-                    if (docSnap.data().userId === user.uid) {
-                        setIsOwnPost(true);
-                        setSellerID(user.uid);
-                    }
-                    else {
-                        setIsOwnPost(false);
-                        setSellerID(docSnap.data().userId);
-                    }
 
-                    // check if it's sold or not
-                    if (docSnap.data().sold === true) {
-                        console.log(`Listing is sold`);
-                        setPostSold(true);
-                    }
-                    else {
-                        console.log(`Listing is not sold`);
-                        setPostSold(false);
-                    }
+    // useEffect(() => {
 
-                    // check if listing is saved already
-                    if (savedPosts && savedPosts.length !== 0) {
-                        const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
-                        if (saveStatus) {
-                            setIsSaved(true);
-                            console.log(`Listing with ID ${listingID} is saved.`);
-                        } else {
-                            setIsSaved(false)
-                            console.log(`Listing with ID ${listingID} is not saved.`);
-                        }
-                    }
-                    else {
-                        setIsSaved(false);
-                    }
 
-                } else {
-                    console.log("No such listing!");
+    // }, [listingID]);
+
+    // fetches a listing from the DB
+    const fetchListing = async () => {
+        setIsLoading(true)
+        try {
+            const docRef = doc(db, "listings", listingID);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                setListing({ id: docSnap.id, ...docSnap.data() });
+                // check if it's their own post, can save their own posts
+                if (docSnap.data().userId === user.uid) {
+                    setIsOwnPost(true);
+                    setSellerID(user.uid);
                 }
-            } catch (error) {
-                console.error("Error fetching listing:", error);
-            } finally {
-                setIsLoading(false);
+                else {
+                    setIsOwnPost(false);
+                    setSellerID(docSnap.data().userId);
+                }
+
+                // check if it's sold or not
+                if (docSnap.data().sold === true) {
+                    console.log(`Listing is sold`);
+                    setPostSold(true);
+                }
+                else {
+                    console.log(`Listing is not sold`);
+                    setPostSold(false);
+                }
+
+                // check if listing is saved already
+                if (savedPosts && savedPosts.length !== 0) {
+                    const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
+                    if (saveStatus) {
+                        setIsSaved(true);
+                        console.log(`Listing with ID ${listingID} is saved.`);
+                    } else {
+                        setIsSaved(false)
+                        console.log(`Listing with ID ${listingID} is not saved.`);
+                    }
+                }
+                else {
+                    setIsSaved(false);
+                }
+            } else {
+                console.log("No such listing!");
             }
-        };
+        } catch (error) {
+            console.error("Error fetching listing:", error);
+            // could we use toasts here?
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-        fetchListing();
 
-    }, [listingID]);
+    // this is what makes it immediately responsive after we edit and go back
+    // essentially the same as useEffect, but will do it every time we focus, not just the first time
+    // the component mounts
+    useFocusEffect(
+        useCallback(() => {
+            fetchListing();
 
-    useEffect(() => {
-        console.log(listing?.createdAt?.seconds)
-    }, [listing])
+            // might be a good idea for a cleanup function this is a placeholder
+            // i.e. use some sort of ref to tell fetchListing to not grab data if we close the screen
+            // before we get the data from fetch
+            // not doing rn, premature optimization
+            return () => { };
+        }, [listingID, user.uid, savedPosts])
+    );
 
 
     if (isLoading) {
@@ -148,38 +154,6 @@ const ListingScreen = ({ navigation, route }) => {
             ],
             { cancelable: true } // Allows dismissal by tapping outside the alert
         );
-    }
-
-    // TODO move this to utils
-    // test this too
-    const formatDate = (dateInSeconds) => {
-        // date.now is in ms, we are passing in as seconds
-        const seconds = (Date.now() / 1000) - dateInSeconds
-        console.log(Date.now())
-        const minute = 60;
-        const hour = 60 * minute;
-        const day = 24 * hour;
-        const month = 30 * day;
-        const year = 365 * day;
-
-        if (seconds < minute) {
-            return "Just now";
-        } else if (seconds < hour) {
-            const minutes = Math.floor(seconds / minute);
-            return `${minutes} min ago`;
-        } else if (seconds < day) {
-            const hours = Math.floor(seconds / hour);
-            return `${hours} hours ago`;
-        } else if (seconds < month) {
-            const days = Math.floor(seconds / day);
-            return `${days} days ago`;
-        } else if (seconds < year) {
-            const months = Math.floor(seconds / month);
-            return `${months} months ago`;
-        } else {
-            const years = Math.floor(seconds / year);
-            return `${years} years ago`;
-        }
     }
 
     // should only be available if it's their own listing
@@ -227,7 +201,7 @@ const ListingScreen = ({ navigation, route }) => {
     const markAsSold = async () => {
         console.log('marking post as sold')
         const docRef = doc(db, "listings", listingID);
-        const updatedData = {sold: true};
+        const updatedData = { sold: true };
         try {
             await updateDoc(docRef, updatedData);
         } catch (error) {
@@ -337,17 +311,18 @@ const ListingScreen = ({ navigation, route }) => {
         }
     }
 
-    const handleSendHi = () => {
-        // TODO
-        // conditionally create a new conversation on the backend and frontend
-        // loading states, etc. 
+    const handleSendHi = async () => {
+        if (!user.uid || !sellerID) {
+            console.log('ids undefined')
+            return
+        }
+        const conversationID = await getConversation(user.uid, sellerID)
 
         // this will navigate with the 
         navigation.navigate('MessagesStack', {
             screen: 'Conversation',
-            params: { listing },
+            params: { listing, conversationID },
         });
-        console.log('SEND HI')
     }
 
     const sharePost = () => {
@@ -367,9 +342,8 @@ const ListingScreen = ({ navigation, route }) => {
         <ScrollView
             contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
             style={{ width: '100%', paddingBottom: 50 }}
-
         >
-            <PhotoCarousel photos={testPhotos} sold={postSold} />
+            <PhotoCarousel photos={listing.photos} sold={postSold} />
 
 
             {/* name, price, date */}
@@ -384,7 +358,7 @@ const ListingScreen = ({ navigation, route }) => {
                     </Text>
                 </View>
                 {/* now showing date in own post per figma */}
-                {!isOwnPost && (<Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', color: colors.accentGray }}>
+                {(<Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', color: colors.accentGray }}>
                     {/* {listing.createdAt.toDate().toLocaleDateString()} */}
                     {formatDate(listing.createdAt.seconds)}
                 </Text>)}
@@ -600,7 +574,7 @@ const PhotoCarousel = ({ photos, sold }) => {
         imageContainer: {
             width: width,
             height: width,
-            borderRadius: 10,
+            borderRadius: 0,
             alignSelf: "center",
         },
         indicatorContainer: {
@@ -646,12 +620,22 @@ const PhotoCarousel = ({ photos, sold }) => {
                 ref={flatListRef}
                 horizontal={true}
                 data={photos}
-                renderItem={(item) => {
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => {
                     return (
                         // TODO change this to be an image
                         <View
-                            style={{ height: width, width: width, backgroundColor: item.item.color, alignSelf: 'center', justifyContent: 'center' }}
+                            style={{ height: width, width: width, alignSelf: 'center', justifyContent: 'center', }}
                         >
+                            <Image
+                                source={{ uri: item }}
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    borderRadius: 0,
+                                }}
+                                resizeMode="cover"
+                            />
                             {sold && (
                                 <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: '100%' }}>
                                     <Text
@@ -672,13 +656,11 @@ const PhotoCarousel = ({ photos, sold }) => {
                         </View>
                     )
                 }
-                }
-                keyExtractor={(item, index) => index.toString()}
-                showsHorizontalScrollIndicator={false}
+                } showsHorizontalScrollIndicator={false}
                 onScroll={handleScroll} // manage state variable
                 scrollEventThrottle={16} // slows down the rate of the event handler
             />
-            {photos?.length > 0 && <View style={carouselStyles.indicatorContainer}>
+            {photos?.length > 1 && <View style={carouselStyles.indicatorContainer}>
                 {photos.map((_, index) => (
                     <TouchableOpacity
                         key={index}
