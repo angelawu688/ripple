@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     },
     addPhotosContainer: {
         backgroundColor: 'white',
-        height: imageSize,
+        // height: imageSize,
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
@@ -517,10 +517,10 @@ const styles = StyleSheet.create({
         color: 'red',
         fontFamily: 'inter'
     },
-    scrollContent: {
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
+    // scrollContent: {
+    //     justifyContent: 'flex-start',
+    //     alignItems: 'center',
+    // },
     inputContainer: {
         marginBottom: 20,
         width: '100%'

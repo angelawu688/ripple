@@ -11,6 +11,7 @@ export const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [savedPosts, setSavedPosts] = useState([]);
   const [userListings, setUserListings] = useState([]);
+  const [userFollowing, setUserFollowing] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState(null)
 
@@ -31,6 +32,11 @@ export const UserProvider = ({ children }) => {
       const queryPosts = query(collection(db, "listings"), where("userId", "==", firebaseUser.uid));
       const queryPostsSnapshot = await getDocs(queryPosts);
 
+      // grab followers
+      const followingQuery = query(collection(db, 'following'), where('follower_id', '==', firebaseUser.uid));
+      const followingData = await getDocs(followingQuery);
+
+
       // update our state
       if (userDoc.exists()) {
         const savedListings = querySavedSnapshot.docs.map(doc => ({
@@ -41,14 +47,17 @@ export const UserProvider = ({ children }) => {
           id: doc.id,
           ...doc.data()
         }));
+        const followingIds = followingData.docs.map(doc => doc.data().following_id);
         setUserData(userDoc.data());
         setSavedPosts(savedListings || []);
         setUserListings(listings || []);
+        setUserFollowing(followingIds || []);
 
         // store all in async storage
         await AsyncStorage.setItem('userData', JSON.stringify(userDoc.data()));
         await AsyncStorage.setItem('savedPosts', JSON.stringify(savedListings));
         await AsyncStorage.setItem('userListings', JSON.stringify(listings));
+        await AsyncStorage.setItem('userFollowing', JSON.stringify(followingIds));
       } else {
         // do nothing
       }
@@ -103,6 +112,7 @@ export const UserProvider = ({ children }) => {
       setUserData(null);
       setSavedPosts([]);
       setUserListings([]);
+      setUserFollowing([]);
       setAuthError(null);
     } catch (e) {
       console.log('Error clearing states: ', e)
@@ -119,10 +129,12 @@ export const UserProvider = ({ children }) => {
         const storedUserData = await AsyncStorage.getItem('userData');
         const storedSavedPosts = await AsyncStorage.getItem('savedPosts');
         const storedUserListings = await AsyncStorage.getItem('userListings');
+        const storedUserFollowing = await AsyncStorage.getItem('userFollowing');
 
         if (storedUserData) setUserData(JSON.parse(storedUserData));
         if (storedSavedPosts) setSavedPosts(JSON.parse(storedSavedPosts));
         if (storedUserListings) setUserListings(JSON.parse(storedUserListings));
+        if (storedUserFollowing) setUserListings(JSON.parse(storedUserFollowing));
       } catch (error) {
         console.error("Error loading stored auth state:", error);
         throw new Error(`Error loading stored auth state: ${error.message}`)
@@ -147,6 +159,8 @@ export const UserProvider = ({ children }) => {
           const querySavedSnapshot = await getDocs(querySaved);
           const queryPosts = query(collection(db, "listings"), where("userId", "==", firebaseUser.uid));
           const queryPostsSnapshot = await getDocs(queryPosts);
+          const followingQuery = query(collection(db, 'following'), where('follower_id', '==', firebaseUser.uid));
+          const followingData = await getDocs(followingQuery);
           if (userDoc.exists()) {
             const savedListings = querySavedSnapshot.docs.map(doc => ({
               id: doc.id,
@@ -156,9 +170,11 @@ export const UserProvider = ({ children }) => {
               id: doc.id,
               ...doc.data()
             }));
+            const followingIds = followingData.docs.map(doc => doc.data().following_id);
             setUserData(userDoc.data());
             setSavedPosts(savedListings || []);
             setUserListings(listings || []);
+            setUserFollowing(followingIds || []);
           } else {
             console.warn("No such document!");
             setUserData(null);
@@ -192,6 +208,8 @@ export const UserProvider = ({ children }) => {
       setSavedPosts,
       setUserData,
       setUserListings,
+      userFollowing,
+      setUserFollowing
     }}>
       {children}
     </userContext.Provider>

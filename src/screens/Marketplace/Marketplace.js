@@ -79,11 +79,13 @@ const Marketplace = ({ navigation }) => {
         // NOTE:
         // just pass in undefined to test the empty case
         // this will throw an error for now
+        // TODO: we should pass in empty listing for Friends?
+        //  querying here or querying on Friends screen and then passing it in?
         switch (selectedOption) {
             case 'foryou':
                 return <ForYou listings={listings} navigation={navigation} />
             case 'friends':
-                return <Friends listings={listings} navigation={navigation} />
+                return <Friends  navigation={navigation} />
             case 'sell':
                 return <Sell activeListings={listings} navigation={navigation} />
             case 'search':

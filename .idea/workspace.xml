@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="mark posts as sold">
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="fixed up some duplicates in styling">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +36,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "angela",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -303,7 +303,23 @@
       <option name="project" value="LOCAL" />
       <updated>1732690927899</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="update from master">
+      <option name="closed" value="true" />
+      <created>1732696770789</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1732696770789</updated>
+    </task>
+    <task id="LOCAL-00030" summary="fixed up some duplicates in styling">
+      <option name="closed" value="true" />
+      <created>1732697010557</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1732697010557</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -321,9 +337,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="check if listing was saved by user" />
-    <MESSAGE value="display saved listings in user profile" />
-    <MESSAGE value="get seller info for user profile screen" />
     <MESSAGE value="update user profile screen with backend" />
     <MESSAGE value="updating saved posts (has errors and bugs), ignore" />
     <MESSAGE value="saving posts with usercontext" />
@@ -346,6 +359,9 @@
     <MESSAGE value="fixed id issue" />
     <MESSAGE value="not sure what these changes are" />
     <MESSAGE value="mark posts as sold" />
-    <option name="LAST_COMMIT_MESSAGE" value="mark posts as sold" />
+    <MESSAGE value="idk what this is" />
+    <MESSAGE value="update from master" />
+    <MESSAGE value="fixed up some duplicates in styling" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed up some duplicates in styling" />
   </component>
 </project>

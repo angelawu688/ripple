@@ -5,15 +5,63 @@ import ListingsList from "../../../components/ListingsList"
 import { useContext, useEffect, useState } from "react"
 import { userContext } from "../../../context/UserContext"
 import * as Linking from 'expo-linking'
+import {collection, getDocs, getFirestore, limit, orderBy, query, where} from "firebase/firestore";
+import ListingsListSkeletonLoaderFull from "../../../components/ListingsListSkeletonLoaderFull";
 
 
 const Friends = ({ navigation }) => {
-    const { userData } = useContext(userContext)
+    const { user, userData, userFollowing } = useContext(userContext)
     const [friendsListings, setFriendsListings] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
+    // grab the friends listings on component mount
+    // query following collection?
+    const db = getFirestore();
     useEffect(() => {
-        // grab the friends listings on component mount
-    }, [])
+        const fetchListings = async () => {
+            try {
+                // get following ids
+                // TODO:
+                // kinda expensive, use context to simplify this?
+                // const followingQuery = query(
+                //     collection(db, 'following'),
+                //     where('follower_id', '==', user.uid)
+                // );
+                // const followingData = await getDocs(followingQuery);
+                // const followingIds = followingData.docs.map(doc => doc.data().following_id);
+
+                // not following anyone
+                if (userFollowing.length === 0) {
+                    setFriendsListings([]);
+                    return;
+                }
+
+                // get listings from ppl we're following
+                // only gets 10 ids
+                // TODO: fix this so we can get more than 10
+                const listingsQuery = query(
+                    collection(db, 'listings'),
+                    where('userId', 'in', userFollowing),
+                    where("sold", "==", false),
+                    orderBy("createdAt", "desc"),
+                    limit(32)
+                );
+                const listingsSnapshot = await getDocs(listingsQuery);
+                const friendsListingsData = listingsSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                setFriendsListings(friendsListingsData);
+            } catch (error) {
+                console.error("Error fetching friends listings:", error);
+            } finally {
+                // TODO: need to handle when isLoading is true
+                setIsLoading(false);
+            }
+        };
+        fetchListings();
+    }, []);
 
     const shareProfile = () => {
         if (!userData?.uid) {

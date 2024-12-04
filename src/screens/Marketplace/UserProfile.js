@@ -2,7 +2,19 @@ import { useContext, useEffect, useState } from "react";
 import { Linking, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator, ScrollView, Image } from "react-native";
 import ForYou from "./MarketplaceLists/ForYou";
 import { Ionicons } from "@expo/vector-icons";
-import { collection, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore";
+import {
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    getDocs,
+    getFirestore,
+    query,
+    setDoc,
+    updateDoc,
+    addDoc,
+    where
+} from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
 import ListingsList from '../../components/ListingsList'
 import { Check, EnvelopeSimple, Gear, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
@@ -20,7 +32,7 @@ const testUserPosts = [
 ]
 const UserProfile = ({ navigation, route }) => {
     const { userID } = route.params
-    const { user } = useContext(userContext)
+    const { user, userFollowing, setUserFollowing } = useContext(userContext)
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
@@ -29,6 +41,7 @@ const UserProfile = ({ navigation, route }) => {
 
     const [loadingIG, setLoadingIG] = useState(false)
     const [loadingLI, setLoadingLI] = useState(false)
+    const db = getFirestore();
 
     // OCM grab if its the users own post
     // imo a little more bulletproof than having 2 diff accounts
@@ -52,6 +65,7 @@ const UserProfile = ({ navigation, route }) => {
                 }
             )
         }
+        // TODO: showing undefined rn
         console.log(user.pfp)
     }, [isOwnProfile])
 
@@ -82,6 +96,21 @@ const UserProfile = ({ navigation, route }) => {
                         return a.sold - b.sold;
                     });
                     setUserListings(sortedListings);
+
+                    // check if following user already
+                    if (userFollowing && userFollowing.length !== 0) {
+                        const followStatus = userFollowing.includes(userID);
+                        if (followStatus) {
+                            setFollowingUser(true)
+                            console.log("user is followed");
+                        } else {
+                            setFollowingUser(false);
+                            console.log("user is not followed");
+                        }
+                    }
+                    else {
+                        setFollowingUser(false);
+                    }
                 }
                 else {
                     console.error("No such user")
@@ -119,8 +148,48 @@ const UserProfile = ({ navigation, route }) => {
     }
 
     const handleFollow = () => {
+        if (followingUser) {
+            markAsUnfollowed();
+        }
+        else {
+            markAsFollowed();
+        }
         setFollowingUser(!followingUser)
-        // BACKEND CHANGES HERE
+        // TODO: BACKEND CHANGES HERE
+    }
+
+    const markAsFollowed = async () => {
+        console.log('following user')
+        try {
+            await setDoc(doc(db, "following", user.uid + userID), {
+                follower_id: user.uid,
+                following_id: userID
+            });
+        } catch (error) {
+            console.error("Error following user", error);
+        } finally {
+            // frontend update
+            setUserFollowing((prevUserFollowing) => [...prevUserFollowing, userID]);
+            setFollowingUser(!followingUser);
+            console.log("now following user");
+        }
+    }
+
+    const markAsUnfollowed = async () => {
+        console.log('unfollow user')
+        const docRef = doc(db, "following", user.uid + userID);
+        try {
+            await deleteDoc(docRef);
+        } catch (error) {
+            console.error("Error unfollowing error:", error);
+        } finally {
+            // frontend update
+            setUserFollowing((prevUserFollowing) =>
+                prevUserFollowing.filter((id) => id !== userID)
+            );
+            setFollowingUser(!followingUser)
+            console.log("user is unfollowed")
+        }
     }
 
     const handleMessage = async () => {
