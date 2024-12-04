@@ -62,7 +62,7 @@ export default function App() {
     <UserProvider>
       <NavigationContainer linking={linking}>
         <MainNavigator />
-        <StatusBar style="auto" />
+        <StatusBar style='dark'/>
       </NavigationContainer>
     </UserProvider>
   );
