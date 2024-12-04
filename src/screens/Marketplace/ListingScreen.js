@@ -194,6 +194,7 @@ const ListingScreen = ({ navigation, route }) => {
             );
         } else {
             markAsSold();
+            // TODO: is this necessary here? i feel like no
             setPostSold(!postSold)
         }
     }
@@ -256,6 +257,7 @@ const ListingScreen = ({ navigation, route }) => {
                     listing_id: listingID,
                     price: listing.price,
                     title: listing.title
+                    // TODO: add main image to display
                     // listing images requires firebase storage
                 });
                 const newSaved = {

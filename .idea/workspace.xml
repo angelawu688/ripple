@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="fixed up some duplicates in styling">
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="added friends feature">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/CreateListing.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/CreateListing.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,21 +35,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "angela",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/Users/angelawu/CSE_all/uw-marketplace/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;angela&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/angelawu/CSE_all/uw-marketplace/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
@@ -78,6 +81,8 @@
       <workItem from="1731611710568" duration="25335000" />
       <workItem from="1732039685359" duration="32348000" />
       <workItem from="1732395892769" duration="15238000" />
+      <workItem from="1733265184423" duration="206000" />
+      <workItem from="1733280444091" duration="8896000" />
     </task>
     <task id="LOCAL-00001" summary="adding collections setup">
       <option name="closed" value="true" />
@@ -319,7 +324,23 @@
       <option name="project" value="LOCAL" />
       <updated>1732697010557</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="merged from master">
+      <option name="closed" value="true" />
+      <created>1733129244299</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1733129244300</updated>
+    </task>
+    <task id="LOCAL-00032" summary="added friends feature">
+      <option name="closed" value="true" />
+      <created>1733301167315</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1733301167319</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -337,8 +358,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update user profile screen with backend" />
-    <MESSAGE value="updating saved posts (has errors and bugs), ignore" />
     <MESSAGE value="saving posts with usercontext" />
     <MESSAGE value="saved items update when changed" />
     <MESSAGE value="fixed typo with saved items (need to consolidate)" />
@@ -362,6 +381,8 @@
     <MESSAGE value="idk what this is" />
     <MESSAGE value="update from master" />
     <MESSAGE value="fixed up some duplicates in styling" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed up some duplicates in styling" />
+    <MESSAGE value="merged from master" />
+    <MESSAGE value="added friends feature" />
+    <option name="LAST_COMMIT_MESSAGE" value="added friends feature" />
   </component>
 </project>

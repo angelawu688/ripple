@@ -13,6 +13,7 @@ import { uploadListingImage } from "../../../utils/firebaseUtils";
 import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 
 
+
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
 
