@@ -132,12 +132,11 @@ const Search = ({ navigation }) => {
             const q = firestoreQuery(collection(db, "listings"), where("title", ">=", searchQuery), where("title", "<=", searchQuery + '\uf8ff'));
             const querySnapshot = await getDocs(q);
             const results = querySnapshot.docs.map(doc => ({
-                listingID: doc.id,
+                id: doc.id,
                 ...doc.data(),
             }));
+            console.log('Search results', results)
             setSearchResults(results);
-            console.log(results)
-
             await saveRecentSearch(searchQuery);
         } catch (e) {
             setErrorMessage(e.message)

@@ -33,8 +33,6 @@ const YourListings = ({ navigation }) => {
         try {
             // grab the users saved listings on component mount
             setYourListings(userListings)
-            console.log("userListings is", userListings)
-
         } catch (error) {
             console.error(error.message)
         } finally {

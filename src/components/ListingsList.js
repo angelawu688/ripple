@@ -1,16 +1,19 @@
 import { FlatList, View, Text, TouchableOpacity, StyleSheet } from "react-native"
 import ListingCard from "./ListingCard"
 import { MotiView } from 'moti';
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { userContext } from "../context/UserContext";
 
 
 
 const ListingsList = ({ listings, navigation, scrollEnabled = true }) => {
     const { user } = useContext(userContext)
+
     if (!listings || listings.length === 0) {
         return null
     }
+
+
 
     return (
         <FlatList
