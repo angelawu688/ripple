@@ -2,16 +2,17 @@ import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import MainNavigator from './src/navigation/MainNavigator';
-import { UserProvider } from './src/context/UserContext';
+import { userContext, UserProvider } from './src/context/UserContext';
 import 'react-native-url-polyfill/auto';
 import { AppRegistry } from 'react-native';
 import './firebaseConfig';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useFonts, Roboto_400Regular } from '@expo-google-fonts/roboto';
 import { Syne_700Bold, Syne_400Regular } from '@expo-google-fonts/syne';
 import { Inter_400Regular } from '@expo-google-fonts/inter'
 import * as SplashScreen from 'expo-splash-screen';
 import * as Linking from 'expo-linking'
+import FullLoadingScreen from './src/screens/shared/FullLoadingScreen';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -31,6 +32,21 @@ export default function App() {
   // dont load the app until the fonts are loaded
   if (!fontsLoaded) {
     return;
+  }
+
+  return (
+    <UserProvider>
+      <RootComponent />
+    </UserProvider>
+  );
+}
+
+// separate the middle into root so that we are able to grab the loading prop
+// from the user context, fixing the flickering issue
+const RootComponent = () => {
+  const { isLoading } = useContext(userContext);
+  if (isLoading) {
+    return <FullLoadingScreen text={'Loading auth from main'} />
   }
 
   // ALLOWS FOR DEEP LINKS
@@ -59,12 +75,11 @@ export default function App() {
   };
 
   return (
-    <UserProvider>
-      <NavigationContainer linking={linking}>
-        <MainNavigator />
-        <StatusBar style='dark'/>
-      </NavigationContainer>
-    </UserProvider>
-  );
+    <NavigationContainer linking={linking}>
+      <MainNavigator />
+      <StatusBar style='dark' />
+    </NavigationContainer>
+  )
 }
+
 AppRegistry.registerComponent('main', () => App);
