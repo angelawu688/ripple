@@ -221,8 +221,9 @@ const UserProfile = ({ navigation, route }) => {
                     console.log(userProfile.instagram)
                     return;
                 }
-                url = `https://www.instagram.com/${userProfile.instagram}`;
-                break; // this prevents fallthrough
+                // works for now
+                url = `https://www.instagram.com/${userProfile.instagram.split('@')[1]}`;
+                break;
             case ('linkedin'):
                 setLoadingLI(true)
                 const isUrl = /^https?:\/\/.+$/.test(userProfile.linkedin);
@@ -363,7 +364,7 @@ const UserProfile = ({ navigation, route }) => {
                                     style={{ width: 30, height: 30, borderRadius: 5 }}
                                 />)}
                                 <Text style={styles.socialText}>
-                                    {'@' + userProfile.instagram}
+                                    {userProfile.instagram}
                                 </Text>
                             </TouchableOpacity>}
 

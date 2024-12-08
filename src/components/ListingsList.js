@@ -6,7 +6,15 @@ import { userContext } from "../context/UserContext";
 
 
 
-const ListingsList = ({ listings, navigation, scrollEnabled = true }) => {
+const ListingsList = ({ listings,
+    navigation,
+    scrollEnabled = true,
+    refreshing = false, // essentially loading state for refreshing
+    onRefresh = () => { },
+    onEndReached = () => { },
+    onEndReachedThreshold = 0.5,
+    ListFooterComponent = null,
+}) => {
     const { user } = useContext(userContext)
 
     if (!listings || listings.length === 0) {
@@ -24,6 +32,18 @@ const ListingsList = ({ listings, navigation, scrollEnabled = true }) => {
             data={listings}
             showsVerticalScrollIndicator={false}
             scrollEnabled={scrollEnabled}
+
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.5}
+
+            ListFooterComponent={ListFooterComponent}
+
+
+            keyExtractor={item => item.id} // use the conversationID as a key
+            // this is where we will put the handling to load more
             renderItem={({ item }) => { // note: need to keep as "items", we are just renaming it to be clear
                 return (
                     <TouchableOpacity
@@ -38,10 +58,6 @@ const ListingsList = ({ listings, navigation, scrollEnabled = true }) => {
                     </TouchableOpacity>
                 )
             }}
-            keyExtractor={item => item.id} // use the conversationID as a key
-            // this is where we will put the handling to load more
-            onEndReachedThreshold={null}
-            onEndReached={null}
         />
     )
 }

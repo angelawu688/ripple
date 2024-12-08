@@ -6,6 +6,7 @@ import { useFocusEffect } from "@react-navigation/native"
 import { userContext } from "../../context/UserContext"
 import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../../../firebaseConfig"
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 
 const MessagesOverview = ({ navigation }) => {
@@ -17,6 +18,7 @@ const MessagesOverview = ({ navigation }) => {
             // make sure we have uid
             if (!user?.uid) return;
 
+            // function
             setIsLoading(true);
             const q = query(
                 collection(db, "conversations"),
@@ -36,8 +38,6 @@ const MessagesOverview = ({ navigation }) => {
                 setIsLoading(false);
             });
 
-
-
             // cleanup
             return () => unsubscribe();
         }, [user?.uid])
@@ -55,9 +55,11 @@ const MessagesOverview = ({ navigation }) => {
     const [otherUserPfp, setOtherUserPfp] = useState(undefined)
 
     if (isLoading) {
-        // todo skeleton loading
         return (
-            <ActivityIndicator />
+            <View style={{ flex: 1 }}>
+                <LoadingSpinner />
+            </View>
+
         )
     }
 

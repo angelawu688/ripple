@@ -111,14 +111,11 @@ const Search = ({ navigation }) => {
         }
     }
 
-
-
     const handleSearchSelect = async (item) => {
         setQuery(item)
         // pass directly, so that we can search. This is just how state works in react
         await handleSearch(item)
     }
-
 
     const handleSearch = async (searchQuery = query) => {
         if (isLoading || searchQuery.trim() === '') { // prevent duplicate requests

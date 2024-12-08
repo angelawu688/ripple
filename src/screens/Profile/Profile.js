@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { userContext } from "../../context/UserContext";
 import { Ionicons } from '@expo/vector-icons';
 
@@ -22,9 +22,35 @@ const Profile = ({ navigation }) => {
         }
     }
 
+    // will have to not only setUser(null)
+    // will delete 
+    const deleteAccount = () => {
+        // will move this into the firebase utils file, it is here for visibility atm
+
+        console.log('womp womp')
+        // a bunch of other actions that we want to make sure work
+        //  ...
+        setUser(null)
+    }
+
     const handleDeleteAccount = () => {
         console.log('deleted user (not actually)')
-        setUser(null)
+        Alert.alert('Delete Account',
+            'Are you sure? This action cannot be undone',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: null,
+                    style: 'cancel'
+                },
+                {
+                    text: 'Delete Account',
+                    onPress: () => deleteAccount(),
+                    style: 'destructive'
+                }
+            ]
+        )
+
     }
 
     return (

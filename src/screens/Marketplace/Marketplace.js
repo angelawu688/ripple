@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { getFirestore, where, setDoc, collection, query, orderBy, getDocs, limit } from "firebase/firestore";
+import { getFirestore, where, setDoc, collection, query, orderBy, getDocs, limit, startAfter } from "firebase/firestore";
 
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../colors'
@@ -14,31 +14,9 @@ import { MapPin, Plus } from "phosphor-react-native";
 import ListingsListSkeletonLoaderFull from "../../components/ListingsListSkeletonLoaderFull";
 
 
-const testPosts = [
-    { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-    { listingID: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
-    { listingID: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
-    { listingID: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: false },
-    { listingID: 5, img: undefined, title: 'Catan Set', price: 10, sold: false },
-    { listingID: 6, img: undefined, title: 'Catan Expansion Pack', price: 10, sold: false },
-    { listingID: 7, img: undefined, title: 'Exploding Kittens', price: 40, sold: true },
-    { listingID: 8, img: undefined, title: 'Macbook Pro', price: 100, sold: false },
-    { listingID: 9, img: undefined, title: 'Comfy Couch', price: 40, sold: false },
-    { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
-]
-
-
-const testFriendsListings = [
-    { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-    { listingID: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
-    { listingID: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
-    { listingID: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: false },
-    { listingID: 5, img: undefined, title: 'Catan Set', price: 10, sold: false },
-]
-
-const testActiveListings = [
-    { listingID: 9, img: undefined, title: 'Comfy Couch', price: 40, sold: false },
-]
+// how many items we fetch at a time
+// this is obviously terrible but makes it easy to see lol
+const PAGE_SIZE = 2;
 
 const Marketplace = ({ navigation }) => {
     // TODO refactor for clarity
@@ -50,30 +28,85 @@ const Marketplace = ({ navigation }) => {
     // possible options are foryou, friends, sell, search
     const [selectedOption, setSelectedOption] = useState('foryou')
 
-    const db = getFirestore();
-    useEffect(() => {
-        const fetchListings = async () => {
-            try {
-                const q = query(
-                    collection(db, "listings"),
-                    where("sold", "==", false),
-                    orderBy("createdAt", "desc"),
-                    limit(32));
-                const querySnapshot = await getDocs(q);
-                const listingsData = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                setListings(listingsData);
-            } catch (error) {
-                console.error("Error fetching listings:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    // for listingsList component pagination:
+    const [refreshing, setRefreshing] = useState(false)
+    const [loadingMore, setLoadingMore] = useState(false)
+    const [lastDoc, setLastDoc] = useState(null) // allow us to track from the last doc
 
-        fetchListings();
-    }, []);
+    const db = getFirestore();
+
+
+    // moved outside of the use effect hook so that we can call this elsewhere
+    const fetchListings = async (refresh = false) => {
+        if (refresh) {
+            setRefreshing(true)
+            setLastDoc(null)
+        } else if (listings.length === 0) {
+            // then this is an initial load
+            setIsLoading(true)
+        } else {
+            // we are loading more
+            setLoadingMore(true)
+        }
+
+        try {
+            let q = query(
+                collection(db, "listings"),
+                where("sold", "==", false),
+                orderBy("createdAt", "desc"), // most recent first
+                limit(PAGE_SIZE));
+
+            // if we have a lastdoc and arent refreshing, we are grabbing more
+            // so we change our query to start from there
+            if (lastDoc && !refresh) {
+                q = query(q, startAfter(lastDoc))
+            }
+
+            const querySnapshot = await getDocs(q);
+            const listingsData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            // store the last doc so that we can keep it for pagination
+            // if not present, then we just make it as null
+            const newLastDoc = querySnapshot.docs.length > 0 ? querySnapshot.docs[querySnapshot.docs.length - 1] : null
+
+            if (refresh) {
+                setListings(listingsData);
+            } else {
+                setListings(prev => [...prev, ...listingsData])
+            }
+
+            setLastDoc(newLastDoc)
+        } catch (error) {
+            console.error("Error fetching listings:", error);
+        } finally {
+            setIsLoading(false);
+            if (refresh) {
+                setRefreshing(false)
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchListings(true);
+    }, []); // db shouldnt change but just in case
+
+    const onRefresh = () => {
+        fetchListings(true)
+    }
+
+    // method for if we hit the bottom
+    const onLoadMore = async () => {
+        // avoid duplicate requests
+        if (loadingMore || refreshing || !lastDoc) {
+            return;
+        }
+        setLoadingMore(true)
+        await fetchListings(false)
+        setLoadingMore(false)
+    }
 
     const renderSelectedOption = () => {
         // NOTE:
@@ -83,9 +116,16 @@ const Marketplace = ({ navigation }) => {
         //  querying here or querying on Friends screen and then passing it in?
         switch (selectedOption) {
             case 'foryou':
-                return <ForYou listings={listings} navigation={navigation} />
+                return <ForYou
+                    listings={listings}
+                    navigation={navigation}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    onLoadMore={onLoadMore}
+                    loadingMore={loadingMore}
+                />
             case 'friends':
-                return <Friends  navigation={navigation} />
+                return <Friends navigation={navigation} />
             case 'sell':
                 return <Sell activeListings={listings} navigation={navigation} />
             case 'search':
@@ -94,6 +134,7 @@ const Marketplace = ({ navigation }) => {
                 return <Text>Oops! Option not found.</Text>
         }
     }
+
 
 
     return (
