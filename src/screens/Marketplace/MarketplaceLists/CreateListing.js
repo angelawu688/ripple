@@ -1,5 +1,5 @@
-import { useContext, useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { useContext, useRef, useState } from "react";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions, ActivityIndicator, TouchableWithoutFeedback, Keyboard, } from "react-native";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
@@ -14,6 +14,7 @@ import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 import { ImagePreview, TagPreview, uploadNewPhotos, validateListing } from "../../../utils/createEdit";
 import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
 import { generateKeywords } from "../../../utils/search";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
 
@@ -33,6 +34,32 @@ const CreateListing = ({ navigation }) => {
     const [isLoadingPhotoPicker, setIsLoadingPhotoPicker] = useState(false)
     const [imageErrorMessage, setImageErrorMessage] = useState('')
     const { user, userData, setUserListings } = useContext(userContext)
+
+    // AUTO SCROLLING
+    const scrollViewRef = useRef(null)
+    // stores the position of input fields {inputKey: number}
+    const [inputPositions, setInputPositions] = useState({})
+
+    // basically adds the position of the chosen input field to our state
+    const handleLayout = (key) => (event) => {
+        const { y } = event.nativeEvent.layout
+        setInputPositions((prev) => ({ ...prev, [key]: y }))
+    }
+
+    const scrollToInput = (key) => {
+        // ensure that our refs are defined
+        if (scrollViewRef.current && inputPositions[key] !== undefined) {
+            const offset = 100; // tune this
+            scrollViewRef.current.scrollTo({
+                y: inputPositions[key] - offset,
+                animated: true // pretty :)
+            })
+
+
+        }
+    }
+    // END AUTO SCROLLING
+
 
     const handleAddTag = async (newTag) => {
         if (newTag.trim().length === 0) {
@@ -150,13 +177,14 @@ const CreateListing = ({ navigation }) => {
     }
 
     return (
-        // TODO make the KAV work
         <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', }}
+            behavior={Platform.OS == "ios" ? "padding" : "height"}
+            enabled
+            keyboardVerticalOffset={100}
         >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <ScrollView >
+            <ScrollView ref={scrollViewRef}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View
                         style={styles.container}
                     >
@@ -166,6 +194,7 @@ const CreateListing = ({ navigation }) => {
                                 Upload images
                                 <Asterisk />
                             </Text>
+
                             {/* empty photos */}
                             {photos.length === 0 && <TouchableOpacity
                                 onPress={handleAddPhoto}
@@ -177,7 +206,7 @@ const CreateListing = ({ navigation }) => {
                             </TouchableOpacity>}
 
                             {/* photo preview and + icon */}
-                            {photos.length >= 1 && <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                            {photos.length >= 1 && <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 66 }}>
                                 {photos.map((uri, index) => {
                                     return (
                                         <ImagePreview key={index} uri={uri} imageSize={imageSize} removePhoto={removePhoto} />
@@ -193,7 +222,10 @@ const CreateListing = ({ navigation }) => {
                                 </TouchableOpacity>}
                             </View>}
 
-                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+
+
+                            <View
+                                style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
                                 <Text style={styles.footerText}>
                                     Photos | {photos.length}/5
                                 </Text>
@@ -201,10 +233,13 @@ const CreateListing = ({ navigation }) => {
                                     {imageErrorMessage}
                                 </Text>
                             </View>
+
                         </View>
 
                         {/* title */}
-                        <View style={styles.inputContainer}>
+                        <View onLayout={handleLayout('title')}
+                            style={styles.inputContainer}
+                        >
                             <Text style={styles.titleText}>
                                 Title
                                 <Asterisk />
@@ -219,10 +254,13 @@ const CreateListing = ({ navigation }) => {
                                     setErrorMessage('')
                                     setImageErrorMessage('')
                                 }}
+                                onFocus={() => scrollToInput('title')}
                             />
                         </View>
 
-                        <View style={[styles.inputContainer]}>
+                        <View onLayout={handleLayout('price')}
+                            style={[styles.inputContainer]}
+                        >
                             <Text style={styles.titleText}>
                                 Price
                                 <Asterisk />
@@ -241,6 +279,7 @@ const CreateListing = ({ navigation }) => {
                                 minValue={0}
                                 prefix='$'
                                 placeholder="$1.63"
+                                onFocus={() => scrollToInput('price')}
                             />
                             {/* <TextInput
                         style={[styles.shadow, styles.middleInput]}
@@ -254,7 +293,9 @@ const CreateListing = ({ navigation }) => {
 
 
                         {/* Tags input container */}
-                        <View style={styles.inputContainer}>
+                        <View onLayout={handleLayout('tags')}
+                            style={styles.inputContainer}
+                        >
                             <Text style={styles.titleText}>
                                 Tags | {tags.length}/3
                             </Text>
@@ -269,6 +310,7 @@ const CreateListing = ({ navigation }) => {
                                         setErrorMessage('')
                                         setImageErrorMessage('')
                                     }}
+                                    onFocus={() => scrollToInput('tags')}
                                 />}
                                 {tags.length < 3 && <TouchableOpacity
                                     onPress={() => handleAddTag(tagInput)}
@@ -294,7 +336,9 @@ const CreateListing = ({ navigation }) => {
                             </Text>
                         </View>
 
-                        <View style={styles.inputContainer}>
+                        <View onLayout={handleLayout('description')}
+                            style={styles.inputContainer}
+                        >
                             <Text style={styles.titleText}>
                                 Description
                                 <Asterisk />
@@ -309,6 +353,7 @@ const CreateListing = ({ navigation }) => {
                                     setErrorMessage('')
                                     setImageErrorMessage('')
                                 }}
+                                onFocus={() => scrollToInput('description')}
                                 multiline={true}
                             />
                             <Text style={[styles.footerText, { marginBottom: 0, color: '#7E7E7E' }, description.length > 163 && { color: 'red' }]}>
@@ -331,9 +376,9 @@ const CreateListing = ({ navigation }) => {
                             </Text> : <ActivityIndicator color='white' />}
                         </TouchableOpacity>
                     </View>
-                </ScrollView>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView >
+                </TouchableWithoutFeedback>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -349,7 +394,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 0,
         paddingHorizontal: 25,
-        paddingVertical: 15
+        paddingVertical: 0
     },
     titleText: {
         fontSize: 18,
@@ -427,8 +472,9 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'absolute',
-        bottom: 35,
+        marginBottom: 20
+        // position: 'absolute',
+        // bottom: 35,
     },
     publishButtonReady: {
         backgroundColor: colors.neonBlue,

@@ -199,10 +199,7 @@ const EditListing = ({ navigation, route }) => {
     }
 
     return (
-        // TODO make the KAV work
-
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-
             <View
                 style={styles.container}
             >
