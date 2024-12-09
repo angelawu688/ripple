@@ -9,17 +9,21 @@ import { colors } from "../../../colors";
 import ListingsList from '../../../components/ListingsList'
 import { MotiView } from 'moti';
 import ListingsListSkeletonLoaderFull from '../../../components/ListingsListSkeletonLoaderFull'
+import { searchByKeyword } from '../../../utils/search.js'
+import LoadingSpinner from "../../../components/LoadingSpinner.js";
 
 
 
 const Search = ({ navigation }) => {
-    // TODO add autocomplete API
-    // probably algolia
     const [recentSearches, setRecentSearches] = useState([]);
     const [query, setQuery] = useState('')
     const [displayResults, setDisplayResults] = useState(false)
     const [searchResults, setSearchResults] = useState([])
     const [loadingRecentSearches, setLoadingRecentSearches] = useState(false)
+
+    // for pagination
+    const [lastVisible, setLastVisible] = useState(null);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
 
     const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -44,7 +48,6 @@ const Search = ({ navigation }) => {
     // use some sort of caching for this so that we are not fetching this on every component render?
     // -- we are handling this below, but if user has 1000 recent searches, we are still grabbing 1000 items on every render
     const fetchRecentSearches = async () => {
-        console.log('fetching')
         setLoadingRecentSearches(true)
         try {
             const userDocRef = doc(db, "users", user.uid);
@@ -93,8 +96,6 @@ const Search = ({ navigation }) => {
     };
 
 
-
-
     const handleRemoveItemFromRecentSearches = async (item) => {
         if (!user) return;
 
@@ -117,23 +118,24 @@ const Search = ({ navigation }) => {
         await handleSearch(item)
     }
 
-    const handleSearch = async (searchQuery = query) => {
+    const handleSearch = async (searchQuery = query, reset = true) => {
         if (isLoading || searchQuery.trim() === '') { // prevent duplicate requests
             return
         }
 
-        setDisplayResults(true);
+        if (reset) {
+            setSearchResults([]);
+            setLastVisible(null); // Reset pagination
+        }
+
         setIsLoading(true)
+        setDisplayResults(true);
         Keyboard.dismiss()
+
         try {
-            const q = firestoreQuery(collection(db, "listings"), where("title", ">=", searchQuery), where("title", "<=", searchQuery + '\uf8ff'));
-            const querySnapshot = await getDocs(q);
-            const results = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-            console.log('Search results', results)
-            setSearchResults(results);
+            const { results, lastVisible: newLastVisible } = await searchByKeyword(searchQuery, 20, reset ? null : lastVisible);
+            setSearchResults(prevResults => [...prevResults, ...results]);
+            setLastVisible(newLastVisible);
             await saveRecentSearch(searchQuery);
         } catch (e) {
             setErrorMessage(e.message)
@@ -143,6 +145,24 @@ const Search = ({ navigation }) => {
                 setIsLoading(false)
             }, [1000])
 
+        }
+    }
+
+    const fetchMoreResults = async () => {
+        if (isFetchingMore || !lastVisible) {
+            // initial fetch or we are currently fecthing more––prevent duplicate requests
+            return
+        }
+        setIsFetchingMore(true)
+
+        try {
+            const { results, lastVisible: newLastVisible } = await searchByKeyword(query, 20, lastVisible);
+            setSearchResults(prevResults => [...prevResults, ...results])
+            setLastVisible(newLastVisible)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setIsFetchingMore(false)
         }
     }
 
@@ -160,7 +180,13 @@ const Search = ({ navigation }) => {
 
     const SearchResults = ({ query, results }) => {
         return (
-            <ListingsList listings={results} navigation={navigation} />
+            <ListingsList
+                listings={results}
+                navigation={navigation}
+                onEndReached={fetchMoreResults}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={isFetchingMore && <LoadingSpinner />}
+            />
         )
     }
 
@@ -226,7 +252,7 @@ const Search = ({ navigation }) => {
 
                     // i feel like these are really annoying as a user
                     autoComplete="off"
-                    autoCorrect={false}
+                    autoCorrect={true}
                     autoCapitalize="none"
                 />
             </View>

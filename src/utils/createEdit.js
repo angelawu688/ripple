@@ -25,8 +25,8 @@ export const validateListing = (title, price, description, tags, photos, setErro
         return false
     }
 
-    if (description.length > 150) {
-        setErrorMessage('Description length must be under 150 characters!')
+    if (description.length > 163) {
+        setErrorMessage('Description length must be under 163 characters!')
         return false
     }
 
