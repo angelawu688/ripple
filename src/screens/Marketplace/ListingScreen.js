@@ -70,11 +70,11 @@ const ListingScreen = ({ navigation, route }) => {
 
                 // check if it's sold or not
                 if (docSnap.data().sold === true) {
-                    console.log(`Listing is sold`);
+                    // console.log(`Listing is sold`);
                     setPostSold(true);
                 }
                 else {
-                    console.log(`Listing is not sold`);
+                    // console.log(`Listing is not sold`);
                     setPostSold(false);
                 }
 
@@ -83,10 +83,10 @@ const ListingScreen = ({ navigation, route }) => {
                     const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
                     if (saveStatus) {
                         setIsSaved(true);
-                        console.log(`Listing with ID ${listingID} is saved.`);
+                        // console.log(`Listing with ID ${listingID} is saved.`);
                     } else {
                         setIsSaved(false)
-                        console.log(`Listing with ID ${listingID} is not saved.`);
+                        // console.log(`Listing with ID ${listingID} is not saved.`);
                     }
                 }
                 else {
@@ -144,7 +144,7 @@ const ListingScreen = ({ navigation, route }) => {
                 {
                     text: "Cancel",
                     onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel", // Makes the "Cancel" button bold on iOS
+                    style: "cancel",
                 },
                 {
                     text: "Delete",
@@ -152,7 +152,7 @@ const ListingScreen = ({ navigation, route }) => {
                     style: "destructive", // makes it red
                 },
             ],
-            { cancelable: true } // Allows dismissal by tapping outside the alert
+            { cancelable: true }
         );
     }
 
@@ -190,7 +190,7 @@ const ListingScreen = ({ navigation, route }) => {
                         style: "destructive",
                     },
                 ],
-                { cancelable: true } // Allows dismissal by tapping outside the alert
+                { cancelable: true } // can outside to cancel
             );
         } else {
             markAsSold();

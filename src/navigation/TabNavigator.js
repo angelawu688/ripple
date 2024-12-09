@@ -29,16 +29,16 @@ const TabNavigator = () => {
 
                     if (route.name === 'MessagesStack') {
                         icon = focused
-                            ? <ChatTeardropText size={28} color={'white'} weight="fill" />
-                            : <ChatTeardropText size={28} color={'white'} />;
+                            ? <ChatTeardropText size={28} color={colors.loginBlue} weight="fill" />
+                            : <ChatTeardropText size={28} color={colors.loginBlue} />;
                     } else if (route.name === 'MarketplaceStack') {
                         icon = focused
-                            ? <Storefront size={28} color={'white'} weight="fill" />
-                            : <Storefront size={28} color={'white'} />;
+                            ? <Storefront size={28} color={colors.loginBlue} weight="fill" />
+                            : <Storefront size={28} color={colors.loginBlue} />;
                     } else if (route.name === 'ProfileStack') {
                         icon = focused
-                            ? <User size={28} color={'white'} weight="fill" />
-                            : <User size={28} color={'white'} />;
+                            ? <User size={28} color={colors.loginBlue} weight="fill" />
+                            : <User size={28} color={colors.loginBlue} />;
                     }
                     return icon;
                 },
@@ -49,10 +49,11 @@ const TabNavigator = () => {
                 tabBarInactiveTintColor: colors.black,
                 tabBarShowLabel: false,
                 tabBarStyle: {
-                    backgroundColor: colors.darkblue,
+                    backgroundColor: colors.white,
                     paddingTop: 12,
                     // borderTopLeftRadius: 10,
-                    // borderTopRightRadius: 10
+                    // borderTopRightRadius: 10,
+                    borderTopWidth: 0.5,
                 },
 
             })}

@@ -1,8 +1,9 @@
-import { FlatList, View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { FlatList, View, Text, TouchableOpacity, StyleSheet, RefreshControl } from "react-native"
 import ListingCard from "./ListingCard"
-import { MotiView } from 'moti';
+import { colorKeys, MotiView } from 'moti';
 import { useContext, useEffect } from "react";
 import { userContext } from "../context/UserContext";
+import { colors } from "../colors";
 
 
 
@@ -33,13 +34,27 @@ const ListingsList = ({ listings,
             showsVerticalScrollIndicator={false}
             scrollEnabled={scrollEnabled}
 
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            // this allows us to customize the refresh spinner
+            // custom spinner is a lot harder––RN problem
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    tintColor={colors.loginBlue}
+                    colors={[colors.loginBlue, colors.loginBlue, colors.loginBlue]}
+                />
+            }
+
 
             onEndReached={onEndReached}
             onEndReachedThreshold={0.5}
 
-            ListFooterComponent={ListFooterComponent}
+            ListFooterComponent={
+                <View style={{ width: 1, height: 20 }}>
+                    {ListFooterComponent}
+                </View>
+
+            }
 
 
             keyExtractor={item => item.id} // use the conversationID as a key

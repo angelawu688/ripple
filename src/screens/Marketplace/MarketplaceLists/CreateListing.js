@@ -11,52 +11,14 @@ import CurrencyInput from 'react-native-currency-input'
 import Asterisk from "../../shared/Asterisk";
 import { uploadListingImage } from "../../../utils/firebaseUtils";
 import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
+import { ImagePreview, TagPreview, uploadNewPhotos, validateListing } from "../../../utils/createEdit";
+import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
+import { generateKeywords } from "../../../utils/search";
 
 
 
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
-
-// renders the image preview
-const ImagePreview = ({ uri, removePhoto }) => {
-    return (
-        <View style={{
-            marginRight: 10,
-            marginTop: -16 // this is a little jank but it works
-        }}>
-            <TouchableOpacity
-                style={{
-                    top: imageSize * 0.25,
-                    right: -imageSize + imageSize * 0.25,
-                    zIndex: 1
-                }}
-                onPress={() => removePhoto(uri)}>
-                <MinusCircle weight="fill" color={colors.loginBlue} size={30} />
-            </TouchableOpacity>
-            <Image source={{ uri }} style={{
-                width: imageSize, height: imageSize, borderRadius: 8, borderWidth: 1, borderColor: 'lightgray'
-            }} />
-        </View>
-    )
-}
-
-// renders the little card for the tag
-const TagPreview = ({ tag, removeTag }) => {
-    return (
-        <View style={[{
-            display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', padding: 6, paddingHorizontal: 8, borderRadius: 12, marginRight: 8,
-            alignSelf: 'flex-start',
-        }, styles.shadow]}>
-            <Text style={{ fontFamily: 'inter', fontSize: 12, marginLeft: 2, color: '#7E7E7E' }}>
-                {tag}
-            </Text>
-            <TouchableOpacity onPress={() => removeTag(tag)}>
-                <Ionicons name="close-outline" size={24} />
-            </TouchableOpacity>
-        </View>
-    )
-}
-
 
 const CreateListing = ({ navigation }) => {
     const [photos, setPhotos] = useState([]) // array of photo uris
@@ -131,39 +93,8 @@ const CreateListing = ({ navigation }) => {
         // no backend update needed
     };
 
-    const handlePublish = async () => {
-        // TODO add some confetti or some fun animation or something
-        if (!title) {
-            setErrorMessage('Enter a title!')
-            return
-        }
-        if (title.length > 100) {
-            setErrorMessage('Enter a shorter title!')
-            return
-        }
-
-        if (!price) {
-            setErrorMessage('Enter a price!')
-            return
-        }
-        // if price is invalid
-
-        if (description.length > 163) {
-            setErrorMessage('Description length must be under 163 characters!')
-            return
-        }
-
-        // this should not happen
-        if (tags.length > 3 || photos.length > 5) {
-            setErrorMessage('Too many tags or photos!')
-            return;
-        }
-        // allow empty description
-        if (photos.length === 0) {
-            setErrorMessage('Enter photo(s)!')
-            return;
-        }
-
+    const handleCreatePost = async () => {
+        if (!validateListing(title, price, description, tags, photos, setErrorMessage)) { return }
         setIsLoading(true)
         try {
             const db = getFirestore();
@@ -173,24 +104,21 @@ const CreateListing = ({ navigation }) => {
             const newListingRef = doc(listingsCollectionRef); // this makes an ID
             const listingID = newListingRef.id;
 
+            // upload all the images
+            const downloadURLS = await uploadNewPhotos(photos, user.uid, listingID, setErrorMessage)
 
-            // 2. upload all the images
-            // making sure to await
-            const uniquePhotos = [...new Set(photos)];
-            const uploadPromises = uniquePhotos.map(async (uri, index) => {
-                // this -index is what allows for no duplicates within an upload
-                // we use date as an identifier in our path as well
-                return uploadListingImage(uri, user.uid, listingID, index)
-            });
-            const downloadURLs = await Promise.all(uploadPromises);
+            // generate the keywords for search
+            const keywords = generateKeywords(title, tags)
 
             // 3. prepare data listing
             const listingData = {
                 title,
+                titleLowerCase: title.toLowerCase(),
                 price,
                 description,
                 tags,
-                photos: downloadURLs,
+                keywords: keywords,
+                photos: downloadURLS,
                 userId: user.uid,
                 userName: userData.name,
                 userEmail: userData.email,
@@ -202,12 +130,8 @@ const CreateListing = ({ navigation }) => {
             // 4. backend udpate
             await setDoc(newListingRef, listingData)
 
-            // 5. frontend update
-            const updatedListingData = {
-                ...listingData,
-                id: listingID,
-            };
-            setUserListings((prevUserListings) => [...prevUserListings, updatedListingData]);
+            // append to the users listing
+            setUserListings((prevUserListings) => [...prevUserListings, { ...listingData, id: listingID }]);
 
             // 6. post completed message
             // can we use something like chakraUI toast?
@@ -215,6 +139,8 @@ const CreateListing = ({ navigation }) => {
                 index: 0,
                 routes: [{ name: 'Marketplace' }],
             });
+
+            // COMPLETED TOAST HERE
         } catch (e) {
             setErrorMessage(e.message)
             console.log(e);
@@ -254,7 +180,7 @@ const CreateListing = ({ navigation }) => {
                             {photos.length >= 1 && <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                                 {photos.map((uri, index) => {
                                     return (
-                                        <ImagePreview key={index} uri={uri} removePhoto={removePhoto} />
+                                        <ImagePreview key={index} uri={uri} imageSize={imageSize} removePhoto={removePhoto} />
                                     )
                                 })}
 
@@ -395,7 +321,7 @@ const CreateListing = ({ navigation }) => {
                         </View>
 
                         <TouchableOpacity
-                            onPress={() => handlePublish()}
+                            onPress={() => handleCreatePost()}
                             style={[styles.publishButton, styles.publishShadow, errorMessage && { borderWidth: 1, borderColor: 'red' }, title && price && photos.length > 0 && styles.publishButtonReady]}
                         >
 
