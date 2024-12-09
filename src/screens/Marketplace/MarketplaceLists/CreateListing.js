@@ -15,8 +15,7 @@ import { ImagePreview, TagPreview, uploadNewPhotos, validateListing } from "../.
 import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
 import { generateKeywords } from "../../../utils/search";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
-
+import LoadingSpinner from '../../../components/LoadingSpinner'
 
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
@@ -59,7 +58,6 @@ const CreateListing = ({ navigation }) => {
         }
     }
     // END AUTO SCROLLING
-
 
     const handleAddTag = async (newTag) => {
         if (newTag.trim().length === 0) {
@@ -281,14 +279,6 @@ const CreateListing = ({ navigation }) => {
                                 placeholder="$1.63"
                                 onFocus={() => scrollToInput('price')}
                             />
-                            {/* <TextInput
-                        style={[styles.shadow, styles.middleInput]}
-                        placeholder="0.00"
-                        placeholderTextColor="#7E7E7E"
-                        value={price}
-                        onChangeText={handlePriceChange}
-                        keyboardType="numeric"
-                    /> */}
                         </View>
 
 
@@ -341,7 +331,8 @@ const CreateListing = ({ navigation }) => {
                         >
                             <Text style={styles.titleText}>
                                 Description
-                                <Asterisk />
+                                {/* <Asterisk /> */}
+                                {/*not required, no asterisk  */}
                             </Text>
                             <TextInput
                                 style={[styles.shadow, styles.descriptionInput]}
@@ -361,20 +352,29 @@ const CreateListing = ({ navigation }) => {
                             </Text>
                         </View>
 
-                        <View style={styles.errorContainer}>
-                            {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+                        {/* error publish container */}
+                        <View style={{ width: '100%', marginTop: tags.length > 0 ? -32 : 0 }}>
+                            <View style={styles.errorContainer}>
+                                {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+                            </View>
+
+                            <TouchableOpacity
+                                onPress={() => handleCreatePost()}
+                                style={[
+                                    styles.publishButton,
+                                    styles.publishShadow,
+                                    errorMessage && { borderWidth: 1, borderColor: 'red' },
+                                    title && price && photos.length > 0 && styles.publishButtonReady]}
+                            >
+
+                                {!isLoading ? <Text style={[title && price && photos.length > 0 ? { fontSize: 20, color: 'white', fontFamily: 'inter', } : styles.placeholderText, { fontWeight: '600' }]}
+                                >
+                                    Publish
+                                </Text> : <LoadingSpinner />}
+                            </TouchableOpacity>
                         </View>
 
-                        <TouchableOpacity
-                            onPress={() => handleCreatePost()}
-                            style={[styles.publishButton, styles.publishShadow, errorMessage && { borderWidth: 1, borderColor: 'red' }, title && price && photos.length > 0 && styles.publishButtonReady]}
-                        >
 
-                            {!isLoading ? <Text style={[title && price && photos.length > 0 ? { fontSize: 20, color: 'white', fontFamily: 'inter', } : styles.placeholderText, { fontWeight: '600' }]}
-                            >
-                                Publish
-                            </Text> : <ActivityIndicator color='white' />}
-                        </TouchableOpacity>
                     </View>
                 </TouchableWithoutFeedback>
             </ScrollView>
@@ -473,8 +473,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 20
-        // position: 'absolute',
-        // bottom: 35,
     },
     publishButtonReady: {
         backgroundColor: colors.neonBlue,

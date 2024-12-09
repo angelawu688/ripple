@@ -84,7 +84,7 @@ export const ImagePreview = ({ uri, removePhoto, imageSize }) => {
 export const TagPreview = ({ tag, removeTag }) => {
     return (
         <View style={[{
-            display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', padding: 6, paddingHorizontal: 8, borderRadius: 12, marginRight: 8,
+            display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 12, marginRight: 8,
             alignSelf: 'flex-start',
         }, styles.shadow]}>
             <Text style={{ fontFamily: 'inter', fontSize: 12, marginLeft: 2, color: '#7E7E7E' }}>
