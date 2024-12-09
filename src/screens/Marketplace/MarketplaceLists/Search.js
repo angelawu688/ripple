@@ -9,7 +9,7 @@ import { colors } from "../../../colors";
 import ListingsList from '../../../components/ListingsList'
 import { MotiView } from 'moti';
 import ListingsListSkeletonLoaderFull from '../../../components/ListingsListSkeletonLoaderFull'
-import { searchByKeyword } from '../../../utils/search.js'
+import { EmptyMessage, fetchRecentSearches, RecentSearchItem, RecentSearchSkeletonLoader, removeItemFromRecentSearchesFirebase, saveRecentSearchFirebase, searchByKeyword } from '../../../utils/search.js'
 import LoadingSpinner from "../../../components/LoadingSpinner.js";
 
 
@@ -34,81 +34,69 @@ const Search = ({ navigation }) => {
     // search input ref, will autoselect when we open
     // be careful––if we end up putting recent searches in user context this will be an infinite loop
     const inputRef = useRef(null);
+
     useEffect(() => {
+        const getRecentSearches = async () => {
+            if (user) {
+                setLoadingRecentSearches(true)
+                try {
+                    // TODO MAKE THIS ASYNC FUNCTION WORK
+                    const recentSearches = await fetchRecentSearches(user.uid);
+                    setRecentSearches(recentSearches || []);
+
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    setLoadingRecentSearches(false)
+                }
+            }
+        }
         if (inputRef.current) {
             inputRef.current.focus();
         }
-        if (user) {
-            fetchRecentSearches();
-        }
+        getRecentSearches()
     }, [user?.uid]); // this will run less
 
 
-    // TODO
-    // use some sort of caching for this so that we are not fetching this on every component render?
-    // -- we are handling this below, but if user has 1000 recent searches, we are still grabbing 1000 items on every render
-    const fetchRecentSearches = async () => {
-        setLoadingRecentSearches(true)
-        try {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDocSnap = await getDoc(userDocRef);
-            if (userDocSnap.exists()) {
-                const userData = userDocSnap.data();
-                setRecentSearches(userData.recentSearches || []);
-            }
-        } catch (error) {
-            console.error("Error fetching recent searches:", error);
-        } finally {
-            setLoadingRecentSearches(false)
-        }
-    }
-
     // saves a search to the user's recent searches
+    // will optimistically update UI to be quick!
     const saveRecentSearch = async (searchQuery) => {
         if (!user) return;
 
-        const userDocRef = doc(db, "users", user.uid);
+        // optimimstic UI update
+        // we can do this because this has a really high chance of working, and makes UI more responsive
+        setRecentSearches((prevSearches) => {
+            // Remove searchQuery if it exists, then add it to the front
+            const updatedSearches = prevSearches.filter((term) => term.toLowerCase() !== searchQuery.toLowerCase());
+            return [...updatedSearches, searchQuery]; // this seems backwards (it is) but we reverse the list down below :)
+        });
+
         try {
             // backend update
-            // this implementation stores them in the wrong order
-            // reversing this on the frontend will take O(n), so there is a potential tradeoff here
-            // since reads are cheaper than writes, im just gonna reverse on frontend for now, especially since this array should be someqwhat small
-            await updateDoc(userDocRef, {
-                recentSearches: arrayUnion(searchQuery)
-            });
-
-            // we dont need to grab them again on the frontend, we already have it!
-            // fetchRecentSearches(); 
-
-            //   frontend update. Add it to the front. This way we dont need to grab the results again
-            // setRecentSearches((prevSearches) => [searchQuery, ...prevSearches]); (more basic version)
-
-            //  this adds a little time complexity but filters out duplicates (the backend does this by default)
-            setRecentSearches((prevSearches) => {
-                // Remove searchQuery if it exists, then add it to the front
-                const updatedSearches = prevSearches.filter((term) => term !== searchQuery);
-                return [...updatedSearches, searchQuery]; // this seems backwards (it is) but we reverse the list down below :)
-            });
-
-        } catch (error) {
-            console.error("Error saving recent search:", error);
+            await saveRecentSearchFirebase(searchQuery, user.uid)
+        } catch (e) {
+            // rollback the UI update
+            // look through the search terms and remove the one that is 
+            setRecentSearches((prevSearches) =>
+                prevSearches.filter((prevSearch) => prevSearch.toLowerCase() !== searchQuery.toLowerCase())
+            );
+            console.log(e)
         }
     };
 
-
     const handleRemoveItemFromRecentSearches = async (item) => {
         if (!user) return;
-
-        const userDocRef = doc(db, "users", user.uid);
+        // optimistic UI update
+        setRecentSearches(prev => prev.filter(search => search !== item));
         try {
-            await updateDoc(userDocRef, {
-                recentSearches: arrayRemove(item)
+            await removeItemFromRecentSearchesFirebase(item, user.uid)
+        } catch (e) {
+            // rollback frontend update
+            setRecentSearches((prevSearches) => {
+                const updatedSearches = prevSearches.filter((term) => term !== item);
+                return [...updatedSearches, item]; // this seems backwards (it is) but we reverse the list down below :)
             });
-
-            // frontend update
-            setRecentSearches(prev => prev.filter(search => search !== item));
-        } catch (error) {
-            console.error("Error removing recent search:", error);
+            console.error(e);
         }
     }
 
@@ -166,96 +154,24 @@ const Search = ({ navigation }) => {
         }
     }
 
-    const RecentSearchItem = ({ item, onSelect, onRemove }) => (
-        <View style={styles.recentSearchItem}>
-            <TouchableOpacity style={styles.recentSearchButton} onPress={() => onSelect(item)}>
-                <Ionicons name="time-outline" size={24} color="#000" />
-                <Text style={styles.recentSearchText}>{item}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => onRemove(item)}>
-                <Ionicons name="close-outline" size={24} color="#000" />
-            </TouchableOpacity>
-        </View>
-    );
-
-    const SearchResults = ({ query, results }) => {
-        return (
-            <ListingsList
-                listings={results}
-                navigation={navigation}
-                onEndReached={fetchMoreResults}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={isFetchingMore && <LoadingSpinner />}
-            />
-        )
-    }
-
-    const SkeletonLoader = () => {
-        const styles = StyleSheet.create({
-            skeletonItem: {
-                height: 45,
-                backgroundColor: '#E0E0E0',
-                borderRadius: 8,
-                marginVertical: 6,
-                width: '100%',
-            },
-        })
-        // will probably modify this and move it into its own component so keeping is all here for now
-
-        return (
-            <View>
-                {[...Array(8)].map((_, index) => (
-                    <MotiView
-                        key={index}
-                        from={{ opacity: 0.5 }}
-                        animate={{ opacity: 0.7 }}
-                        transition={{
-                            type: 'timing',
-                            duration: 750,
-                            loop: true,
-                        }}
-                        style={styles.skeletonItem}
-                    />
-                ))}
-            </View>
-        );
-    };
-
-    const EmptyMessage = ({ message }) => {
-        return (
-            <View style={{ width: '100%', height: '80%', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
-                <Text style={{ textAlign: 'center', fontSize: 18, fontFamily: 'inter', fontWeight: '500', maxWidth: '90%', }}>
-                    {message}
-                </Text>
-            </View>
-        )
-    }
-
-
     return (
         <View style={styles.container}>
-
-
             {/* top input part */}
-            <View style={styles.inputContainer}>
-                <TextInput
-                    ref={inputRef}
-                    value={query}
-                    onChangeText={(text) => {
-                        setQuery(text);
-                        setDisplayResults(false); // will hide results
-                    }}
-                    style={[styles.input, styles.shadow]}
-                    placeholder="What are you looking for?"
-                    onSubmitEditing={() => handleSearch(query)}
-                    returnKeyType="search" // gives us the blue button on keyboard
-
-                    // i feel like these are really annoying as a user
-                    autoComplete="off"
-                    autoCorrect={true}
-                    autoCapitalize="none"
-                />
-            </View>
+            <TextInput
+                ref={inputRef}
+                value={query}
+                onChangeText={(text) => {
+                    setQuery(text);
+                    setDisplayResults(false); // will hide results
+                }}
+                style={[styles.input, styles.shadow]}
+                placeholder="What are you looking for?"
+                onSubmitEditing={() => handleSearch(query)}
+                returnKeyType="search" // gives us the blue button on keyboard
+                autoComplete="off" // i feel like these are really annoying as a user
+                autoCorrect={true}
+                autoCapitalize="none"
+            />
 
             {/* icons */}
             <View style={styles.iconContainer}>
@@ -281,15 +197,17 @@ const Search = ({ navigation }) => {
                 )}
             </View>
 
-
-
             {/* Lower container */}
             {displayResults ? (
                 isLoading ? (
                     <ListingsListSkeletonLoaderFull />
                 ) : (
                     searchResults?.length > 0 ? (
-                        <ListingsList listings={searchResults} navigation={navigation} />
+                        <ListingsList
+                            listings={searchResults}
+                            navigation={navigation}
+
+                        />
                     ) : (
                         <EmptyMessage message={'No results found'} />
                     )
@@ -304,7 +222,7 @@ const Search = ({ navigation }) => {
                         <>
                             <Text style={styles.sectionHeader}>Recent searches</Text>
                             {loadingRecentSearches ? (
-                                <SkeletonLoader />
+                                <RecentSearchSkeletonLoader />
                             ) : (
                                 recentSearches.length > 0 ? (
                                     <FlatList
@@ -333,14 +251,11 @@ const Search = ({ navigation }) => {
     );
 }
 
-
 export default Search;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-
-
         width: '98%',
         alignSelf: 'center'
     },
@@ -375,23 +290,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         marginLeft: '5%'
     },
-    recentSearchItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginVertical: 8,
-        padding: 8,
-        borderRadius: 8,
-        backgroundColor: "#fff",
-    },
-    recentSearchButton: {
-        flexDirection: "row",
-        alignItems: "center",
-    },
-    recentSearchText: {
-        marginLeft: 8,
-        fontSize: 16,
-    },
     resultItem: {
         padding: 16,
         backgroundColor: "#fff",
@@ -418,7 +316,4 @@ const styles = StyleSheet.create({
         padding: 10,
 
     },
-    inputContainer: {}
-
 })
-
