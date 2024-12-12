@@ -209,35 +209,6 @@ const Conversation = ({ navigation, route }) => {
                         Start a conversation!
                     </Text>
                 )}
-                {/* <ScrollView
-                    ref={scrollRef}
-                    contentContainerStyle={{ flexGrow: 1, wdith: '100%', paddingHorizontal: 30, paddingTop: 10, paddingBottom: 50 }}
-                    showsVerticalScrollIndicator={false}
-                >
-                    {messages.map((message, index) => {
-                        if (!message) {
-                            return null
-                        }
-                        return (
-                            <MessageBubble
-                                navigation={navigation}
-                                key={index}
-                                message={message}
-                                activeUserID={user.uid} />
-                        )
-                    })}
-
-                    {!messages || messages.length === 0 &&
-                        <View style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                            <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
-                                Start a conversation!
-                            </Text>
-                        </View>
-                    }
-                </ScrollView> */}
-
-
-
                 {/* preview for listing  */}
                 {inputListing && (
                     <View style={styles.previewImageContainer}>

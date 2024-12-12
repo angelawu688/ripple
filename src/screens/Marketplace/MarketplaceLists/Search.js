@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useContext } from "react"
-import { ActivityIndicator, FlatList, Keyboard, StyleSheet, TouchableOpacity } from "react-native";
+import { FlatList, Keyboard, StyleSheet, TouchableOpacity } from "react-native";
 import { Text, TextInput, View } from "react-native"
 import { Ionicons } from '@expo/vector-icons';
 import ForYou from "./ForYou";
@@ -11,8 +11,6 @@ import { MotiView } from 'moti';
 import ListingsListSkeletonLoaderFull from '../../../components/ListingsListSkeletonLoaderFull'
 import { EmptyMessage, fetchRecentSearches, RecentSearchItem, RecentSearchSkeletonLoader, removeItemFromRecentSearchesFirebase, saveRecentSearchFirebase, searchByKeyword } from '../../../utils/search.js'
 import LoadingSpinner from "../../../components/LoadingSpinner.js";
-
-
 
 const Search = ({ navigation }) => {
     const [recentSearches, setRecentSearches] = useState([]);
@@ -56,7 +54,6 @@ const Search = ({ navigation }) => {
         }
         getRecentSearches()
     }, [user?.uid]); // this will run less
-
 
     // saves a search to the user's recent searches
     // will optimistically update UI to be quick!

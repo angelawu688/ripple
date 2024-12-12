@@ -14,7 +14,6 @@ import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 import { ImagePreview, TagPreview, uploadNewPhotos, validateListing } from "../../../utils/createEdit";
 import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
 import { generateKeywords } from "../../../utils/search";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import LoadingSpinner from '../../../components/LoadingSpinner'
 
 const screenWidth = Dimensions.get('window').width;

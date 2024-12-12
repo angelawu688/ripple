@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useContext } from 'react';
+import { Image, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import ProfileStackNavigator from './StackNavigators/ProfileStackNavigator';
@@ -9,8 +9,8 @@ import MessagesStackNavigator from './StackNavigators/MessagesStackNavigator';
 import Logo from '../components/Logo'
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../colors'
-
 import { ChatTeardropText, User, Storefront } from 'phosphor-react-native';
+import { userContext } from '../context/UserContext';
 
 
 
@@ -19,6 +19,8 @@ const Tab = createBottomTabNavigator();
 // note:
 // dont show headers on the stackNavigators, do that at a screen level
 const TabNavigator = () => {
+    const { userData } = useContext(userContext)
+
     return (
         <Tab.Navigator initialRouteName="MarketplaceStack"
             screenOptions={({ route }) => ({
@@ -36,9 +38,38 @@ const TabNavigator = () => {
                             ? <Storefront size={28} color={colors.loginBlue} weight="fill" />
                             : <Storefront size={28} color={colors.loginBlue} />;
                     } else if (route.name === 'ProfileStack') {
-                        icon = focused
-                            ? <User size={28} color={colors.loginBlue} weight="fill" />
-                            : <User size={28} color={colors.loginBlue} />;
+                        icon = userData?.pfp ? (
+                            <Image
+                                source={{ uri: userData?.pfp }}
+                                style={{
+                                    width: 28,
+                                    height: 28,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                    borderRadius: 50,
+                                    opacity: focused ? 1.0 : 0.7
+                                }}
+                            />
+                        ) : (
+                            <View
+                                style={{
+                                    width: 28,
+                                    height: 28,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                    borderRadius: 50,
+                                    backgroundColor: colors.loginGray,
+                                    opacity: focused ? 1.0 : 0.7
+                                }}
+                            >
+                                <User />
+                            </View>
+                        )
+                        // icon = focused
+                        //     ? <User size={28} color={colors.loginBlue} weight="fill" />
+                        //     : <User size={28} color={colors.loginBlue} />;
                     }
                     return icon;
                 },
