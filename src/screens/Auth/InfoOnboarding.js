@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react'
 import { useRef, useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Modal } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Modal, Platform, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import {
     getAuth,
     signInWithEmailAndPassword
@@ -15,6 +15,7 @@ import { colors } from '../../colors';
 import Asterisk from '../shared/Asterisk';
 import { UploadSimple } from 'phosphor-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { uploadPFP } from '../../utils/firebaseUtils'
 
 
 const InfoOnboarding = ({ navigation, route }) => {
@@ -33,6 +34,7 @@ const InfoOnboarding = ({ navigation, route }) => {
     const [continueAvailable, setContinueAvailable] = useState(false);
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     const [inputError, setInputError] = useState('')
+    const [bioHeight, setBioHeight] = useState(50)
     const { setUser, setUserData, setSavedPosts, setUserListings } = useContext(userContext);
 
     // focus the top text field on component mount
@@ -53,12 +55,13 @@ const InfoOnboarding = ({ navigation, route }) => {
                 setInputError('Username must start with @!')
                 return
             }
-            setIG(input);
+            setIG(input.trim());
         } else if (currentField.key === 'li') {
             // validate inputs. How? 
             // Just the same check if its a viable link?
-            setLI(input);
+            setLI(input.trim());
         }
+        setInputError('')
         setShowIGModal(false);
         setShowLIModal(false);
         setCurrentField({});
@@ -69,11 +72,29 @@ const InfoOnboarding = ({ navigation, route }) => {
 
     const handleSignUp = async () => {
         setIsLoading(true)
+        // validation
+        if (!pfp) {
+            setErrorMessage('Upload a profile picture!')
+            setIsLoading(false)
+            return;
+        }
+
+        if (bio.length > 163) {
+            setErrorMessage('Bio must be under 163 characters')
+            setIsLoading(false)
+            return;
+        }
+
         try {
             const auth = getAuth();
             const db = getFirestore();
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+
+            let pfpURL = ''
+            if (pfp) {
+                pfpURL = await uploadPFP(pfp, user.uid)
+            }
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
                 email: user.email,
@@ -84,7 +105,7 @@ const InfoOnboarding = ({ navigation, route }) => {
                 name: name,
                 instagram: ig,
                 linkedin: li,
-                pfp: pfp, // stores a reference to our storage :)
+                pfp: pfpURL, // stores a reference to our storage :)
             });
             const userDoc = await getDoc(doc(db, "users", user.uid))
             setUserData(userDoc.data());
@@ -92,19 +113,26 @@ const InfoOnboarding = ({ navigation, route }) => {
             setUserListings([]);
             setUser(user); // this will navigate to the home page
         } catch (error) {
-            console.log(error.message);
-            setErrorMessage(error.message);
+            let errorMsg = 'An error occurred. Please try again later.';
+            if (error.code === 'auth/invalid-email') {
+                // shouldnt happen, but if it does then we know. This is handled in the first screen, email doesnt change
+                errorMsg = 'Invalid email address.';
+            } else if (error.code === 'auth/wrong-password') {
+                // shouldnt happen
+                errorMsg = 'Incorrect password.';
+            } else if (error.code === 'auth/user-not-found') {
+                // shouldnt happen
+                errorMsg = 'No user found with this email.';
+            } else if (error.code === 'auth/network-request-failed') {
+                errorMsg = 'Network error. Please check your connection.';
+            } else {
+                // if this happens idk what it is, just use the default error message
+                console.error(error.message);
+            }
+            setErrorMessage(errorMsg)
         } finally {
             setIsLoading(false)
         }
-    }
-
-    const handleLI = () => {
-
-    }
-
-    const handleIG = () => {
-
     }
 
     const handleChangePfp = async () => {
@@ -125,10 +153,11 @@ const InfoOnboarding = ({ navigation, route }) => {
             });
 
             if (!result.canceled) {
-                const selectedImages = result.assets.map(asset => ({
-                    uri: asset.uri,
-                }));
-                setPfp(selectedImages[0].uri)
+                setPfp(result.assets[0].uri) // just set the local uri to the first one
+                // const selectedImages = result.assets.map(asset => ({
+                //     uri: asset.uri,
+                // }));
+                // setPfp(selectedImages[0].uri)
             } else {
                 // user cancelled, do nothing
             }
@@ -144,211 +173,235 @@ const InfoOnboarding = ({ navigation, route }) => {
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.headerText}>
-                Personal
-            </Text>
+        <TouchableWithoutFeedback
+            onPress={Keyboard.dismiss}
+        >
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={80}
+                style={[styles.container,]}
+                onPress={() => Keyboard.dismiss()}
+            >
+                <Text style={styles.headerText}>
+                    Personal
+                </Text>
 
-            <View style={{ height: 30, }}>
-                {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
-            </View>
-
-
-            <View style={styles.lowerContainer}>
-                <View style={{ width: '100%', }}>
-                    <Text style={styles.inputHeader}>
-                        Upload profile picture
-                        <Asterisk />
-                    </Text>
-
-                    {!pfp ? (<TouchableOpacity onPress={() => handleChangePfp()}
-                        style={{ width: '100%', height: 65, borderWidth: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 15, borderStyle: 'dashed', borderColor: '#808080', marginLeft: 8, alignSelf: 'center', marginTop: 8 }}>
-                        {loadingImage ? (<ActivityIndicator />) : (<UploadSimple size={24} color={'#808080'} />)}
-
-                    </TouchableOpacity>) : (
-                        <TouchableOpacity onPress={() => handleChangePfp()}
-                            style={{ width: 65, height: 65, borderWidth: 5, borderColor: colors.loginGray, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 50, marginLeft: 8, alignSelf: 'center', marginTop: 8 }}>
-
-
-                            <Image
-                                source={{ uri: pfp.uri }}
-                                style={{ width: 64, height: 64, borderRadius: 50 }}
-                            />
-                        </TouchableOpacity>
-                    )}
-                </View>
-                <View style={{ width: '100%', }}>
-                    <Text style={styles.inputHeader}>
-                        Bio
-                    </Text>
-                    <TextInput
-                        ref={inputRef}
-                        style={styles.input}
-                        placeholder='Michael Penix Jr.'
-                        multiline={true}
-                        value={bio}
-                        onChangeText={setBio}
-                        maxLength={163}
-                    />
+                <View style={{ height: 30, }}>
+                    {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
                 </View>
 
-                <View style={{ width: '100%', }}>
-                    <Text style={styles.inputHeader}>
-                        Add socials
-                    </Text>
-                    <View style={{ display: 'flex', justifyContent: 'space-between', width: '100%', flexDirection: 'row' }}>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setCurrentField({
-                                    key: 'ig',
-                                    label: 'Instagram',
-                                    description: 'Enter username starting with @',
-                                    placeholder: '@williamhuntt'
-                                })
-                                setShowIGModal(true)
+                <View style={styles.lowerContainer}>
+                    <View style={{ width: '100%', }}>
+                        <Text style={styles.inputHeader}>
+                            Upload profile picture
+                            <Asterisk />
+                        </Text>
+
+                        {!pfp ? (<TouchableOpacity onPress={() => handleChangePfp()}
+                            style={{ width: '100%', height: 65, borderWidth: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 15, borderStyle: 'dashed', borderColor: '#808080', marginLeft: 8, alignSelf: 'center', marginTop: 8 }}>
+                            {loadingImage ? (<ActivityIndicator />) : (<UploadSimple size={24} color={'#808080'} />)}
+
+                        </TouchableOpacity>) : (
+                            <TouchableOpacity onPress={() => handleChangePfp()}
+                                style={{ width: 65, height: 65, borderWidth: 5, borderColor: colors.loginGray, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 50, marginLeft: 8, alignSelf: 'center', marginTop: 8 }}>
+                                <Image
+                                    source={{ uri: pfp }}
+                                    style={{ width: 64, height: 64, borderRadius: 50 }}
+                                />
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                    <View style={{ width: '100%', marginTop: 20, marginBottom: 20 }}>
+                        <Text style={styles.inputHeader}>
+                            Bio
+                        </Text>
+                        <TextInput
+                            ref={inputRef}
+                            style={[styles.input, { height: bioHeight, textAlignVertical: 'top' }]} placeholder='Just a chill guy'
+                            multiline={true}
+                            value={bio}
+                            onChangeText={setBio}
+                            // makes it dynamically sized
+                            onContentSizeChange={(contentWidth, contentHeight) => {
+                                const minHeight = 35;
+                                const maxHeight = 100; // optional max
+                                if (contentHeight < minHeight) {
+                                    setBioHeight(minHeight);
+                                } else if (contentHeight > maxHeight) {
+                                    setBioHeight(maxHeight);
+                                } else {
+                                    setBioHeight(contentHeight);
+                                }
                             }}
+                        />
+                        <Text style={[{ color: bio.length > 163 ? colors.errorMessage : colors.placeholder },
+                        {
+                            marginTop: 4,
 
-                            style={styles.socialButton}>
-                            <LinearGradient
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={{
-                                    flex: 1, borderRadius: 15,
-                                    width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'
+                        }
+                        ]}>
+                            {bio.length} / 163
+                        </Text>
+                    </View>
+
+                    <View style={{ width: '100%', }}>
+                        <Text style={styles.inputHeader}>
+                            Add socials (optional)
+                        </Text>
+                        <View style={{ display: 'flex', justifyContent: 'space-between', width: '100%', flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setCurrentField({
+                                        key: 'ig',
+                                        label: 'Instagram',
+                                        description: 'Enter username starting with @',
+                                        placeholder: '@williamhuntt'
+                                    })
+                                    setInput(ig || '')
+                                    setInputError('')
+                                    setContinueAvailable(!!ig) // if already set, save is enabled
+                                    setShowIGModal(true)
                                 }}
-                                colors={['#FFA74C', '#BC32B4']}
+
+                                style={styles.socialButton}>
+                                <LinearGradient
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={{
+                                        flex: 1, borderRadius: 15,
+                                        width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'
+                                    }}
+                                    colors={['#FFA74C', '#BC32B4']}
+
+                                >
+                                    <Image
+                                        style={styles.image}
+                                        source={require('../../../assets/images/IG_logo.png')}
+                                    />
+                                </LinearGradient>
+
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#0274B3' }]}
+                                onPress={() => {
+                                    setCurrentField({
+                                        key: 'li',
+                                        label: 'LinkedIn',
+                                        description: 'Enter your LinkedIn URL',
+                                        error: 'Username must start with @!',
+                                        placeholder: 'https://...'
+                                    })
+                                    setInput(li || '')
+                                    setInputError('')
+                                    setContinueAvailable(!!li) // if already set, save is enabled
+                                    setShowLIModal(true)
+                                }}
 
                             >
                                 <Image
                                     style={styles.image}
-                                    source={require('../../../assets/images/IG_logo.png')}
+                                    source={require('../../../assets/images/LI_logo.png')}
                                 />
-                            </LinearGradient>
 
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#0274B3' }]}
-                            onPress={() => {
-                                setCurrentField({
-                                    key: 'li',
-                                    label: 'LinkedIn',
-                                    description: 'Enter your LinkedIn URL',
-                                    error: 'Username must start with @!',
-                                    placeholder: 'https://...'
-                                })
-                                setShowLIModal(true)
-                            }}
-
-                        >
-                            <Image
-                                style={styles.image}
-                                source={require('../../../assets/images/LI_logo.png')}
-                            />
-
-                        </TouchableOpacity>
-
-                    </View>
-
-                    {/* <TextInput
-                        ref={inputRef}
-                        style={styles.input}
-                        placeholder='Michael Penix Jr.'
-                        value={bio}
-                        onChangeText={setBio}
-                    /> */}
-                </View>
-            </View>
-
-
-            <TouchableOpacity
-                hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={[styles.button, { backgroundColor: pfp ? colors.loginBlue : colors.loginGray }]}
-                onPress={() => handleSignUp()}
-            >
-                <Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />
-
-            </TouchableOpacity>
-
-
-            {/* Modal */}
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={showIGModal || showLIModal}
-                onRequestClose={() => {
-                    setShowIGModal(false);
-                    setShowLIModal(false);
-                }}
-            >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <View style={styles.innerModalContainer}>
-                            <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 26, alignSelf: 'flex-start', marginBottom: 10 }}>
-                                Edit {currentField.label}
-                            </Text>
-
-                            {currentField.description && !inputError ?
-                                (
-                                    <Text
-                                        style={{ fontFamily: 'Inter', fontSize: 16, color: colors.loginBlue, marginVertical: 6 }}
-                                    >
-                                        {currentField.description}
-                                    </Text>
-                                ) :
-                                (
-                                    <Text
-                                        style={{ fontFamily: 'Inter', fontSize: 16, color: colors.errorMessage, marginVertical: 6 }}
-                                    >
-                                        {inputError}
-                                    </Text>
-                                )
-                            }
+                            </TouchableOpacity>
 
                         </View>
-                        <TextInput
-                            onChangeText={(input) => {
-                                setInput(input);
-                                setContinueAvailable(input.trim().length > 0);
-                            }}
-                            value={input}
-                            style={styles.input}
-                            keyboardType="url"
-                            placeholder={currentField.placeholder}
-                        />
-                        <View style={styles.modalButtonContainer}>
-                            <TouchableOpacity
-                                style={[styles.modalCloseButton, { backgroundColor: colors.loginGray }]}
-                                onPress={() => {
-                                    setShowIGModal(false);
-                                    setShowLIModal(false);
-                                    setInput('')
-                                    setInputError('')
-                                    setContinueAvailable(false)
+                    </View>
+
+                </View>
+                <TouchableOpacity
+                    hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
+                    style={[styles.button, { backgroundColor: pfp && bio.length <= 163 ? colors.loginBlue : colors.loginGray }]}
+                    disabled={!pfp || bio.length > 163}
+                    onPress={() => handleSignUp()}
+                >
+                    <Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />
+
+                </TouchableOpacity>
+
+
+
+                {/* Modal */}
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={showIGModal || showLIModal}
+                    onRequestClose={() => {
+                        setShowIGModal(false);
+                        setShowLIModal(false);
+                    }}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <View style={styles.innerModalContainer}>
+                                <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 26, alignSelf: 'flex-start', marginBottom: 10 }}>
+                                    Edit {currentField.label}
+                                </Text>
+
+                                {currentField.description && !inputError ?
+                                    (
+                                        <Text
+                                            style={{ fontFamily: 'Inter', fontSize: 16, color: colors.loginBlue, marginVertical: 6 }}
+                                        >
+                                            {currentField.description}
+                                        </Text>
+                                    ) :
+                                    (
+                                        inputError && <Text
+                                            style={{ fontFamily: 'Inter', fontSize: 16, color: colors.errorMessage, marginVertical: 6 }}
+                                        >
+                                            {inputError}
+                                        </Text>
+                                    )
+                                }
+
+                            </View>
+                            <TextInput
+                                onChangeText={(newInput) => {
+                                    setInput(newInput);
+                                    setContinueAvailable(input.trim().length > 0);
+                                    if (inputError) setInputError(''); // removes error persistence
                                 }}
-                            >
-                                <Text style={[styles.modalCloseButtonText, { color: 'black' }]}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                disabled={!continueAvailable}
-                                style={[
-                                    styles.modalCloseButton,
-                                    { backgroundColor: continueAvailable ? colors.loginBlue : colors.loginGray },
-                                ]}
-                                onPress={handleSave}
-                            >
-                                {isLoadingSave ? (
-                                    <ActivityIndicator size="small" color="white" />
-                                ) : (
-                                    <Text style={[styles.modalCloseButtonText, {
-                                        color: continueAvailable ? 'white' : 'black'
-                                    }]}>Save</Text>
-                                )}
-                            </TouchableOpacity>
+                                value={input}
+                                style={styles.modalInput}
+                                keyboardType="url"
+                                placeholder={currentField.placeholder}
+                                placeholderTextColor={colors.placeholder}
+                            />
+                            <View style={styles.modalButtonContainer}>
+                                <TouchableOpacity
+                                    style={[styles.modalCloseButton, { backgroundColor: colors.loginGray }]}
+                                    onPress={() => {
+                                        setShowIGModal(false);
+                                        setShowLIModal(false);
+                                        setInput('')
+                                        setInputError('')
+                                        setContinueAvailable(false)
+                                    }}
+                                >
+                                    <Text style={[styles.modalCloseButtonText, { color: 'black' }]}>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    disabled={!continueAvailable}
+                                    style={[
+                                        styles.modalCloseButton,
+                                        { backgroundColor: continueAvailable ? colors.loginBlue : colors.loginGray },
+                                    ]}
+                                    onPress={handleSave}
+                                >
+                                    {isLoadingSave ? (
+                                        <ActivityIndicator size="small" color="white" />
+                                    ) : (
+                                        <Text style={[styles.modalCloseButtonText, {
+                                            color: continueAvailable ? 'white' : 'black'
+                                        }]}>Save</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
-                </View>
-            </Modal >
-
-        </View >
+                </Modal >
+            </KeyboardAvoidingView >
+        </TouchableWithoutFeedback>
     )
 }
 
@@ -373,14 +426,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 12,
         width: '100%',
-        height: 35,
         paddingHorizontal: 12,
+        paddingVertical: 8,
         // shadow
         shadowColor: 'rgba(0, 0, 0, 0.25)',
         shadowOffset: { width: 5, height: 5 },
         shadowOpacity: 0.5,
         shadowRadius: 10,
         elevation: 5,
+        maxHeight: 100,
+
     },
     errorText: {
         fontFamily: 'inter',
@@ -391,7 +446,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        height: 250,
     },
     inputHeader: {
         fontSize: 16,
@@ -484,7 +538,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 10,
     },
-    input: {
+    modalInput: {
         backgroundColor: 'white',
         borderRadius: 12,
         width: '100%',

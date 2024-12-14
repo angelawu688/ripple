@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native'
 import { userContext } from '../../context/UserContext'
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -24,7 +24,11 @@ const EducationOnboarding = ({ navigation, route }) => {
     }, []);
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={80}
+            style={styles.container}
+        >
             <Text style={styles.headerText}>
                 Education
             </Text>
@@ -43,6 +47,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                         ref={inputRef}
                         style={styles.input}
                         placeholder='Michael Penix Jr.'
+                        placeholderTextColor={colors.placeholder}
                         value={name}
                         onChangeText={setName}
                     />
@@ -57,6 +62,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                         ref={inputRef}
                         style={styles.input}
                         placeholder='CS'
+                        placeholderTextColor={colors.placeholder}
                         value={major}
                         onChangeText={setMajor}
                     />
@@ -69,6 +75,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                     <TextInput
                         style={styles.input}
                         placeholder="Data Science"
+                        placeholderTextColor={colors.placeholder}
                         value={concentration}
                         onChangeText={setConcentration}
                     />
@@ -82,6 +89,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                     <TextInput
                         style={styles.input}
                         placeholder='2024'
+                        placeholderTextColor={colors.placeholder}
                         value={gradYear}
                         onChangeText={(text) => {
                             // only allow 4 numbers for this!
@@ -101,7 +109,7 @@ const EducationOnboarding = ({ navigation, route }) => {
             <TouchableOpacity
                 hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
                 style={[styles.button, { backgroundColor: !name || !major || gradYear.length !== 4 ? colors.loginGray : colors.loginBlue }]}
-                disabled={!name || !major || gradYear.length !== 4}
+                disabled={!name || !major || gradYear.length < 2}
                 onPress={() => {
                     if (!major) {
                         // concentration not required
@@ -119,7 +127,7 @@ const EducationOnboarding = ({ navigation, route }) => {
                 <Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />
 
             </TouchableOpacity>
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 

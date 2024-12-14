@@ -192,12 +192,13 @@ const EmailOnboarding = ({ navigation }) => {
             <View style={styles.lowerContainer}>
                 <View style={{ width: '100%', }}>
                     <Text style={styles.inputHeader}>
-                        Enter UW NetID
+                        Enter @uw.edu email
                         <Asterisk />
                     </Text>
                     <TextInput
                         ref={inputRef} // this is the reference to the input field
                         placeholder='Email'
+                        placeholderTextColor={colors.placeholder}
                         value={email}
                         onChangeText={(text) => {
                             setEmail(text)
@@ -213,12 +214,13 @@ const EmailOnboarding = ({ navigation }) => {
 
                 <View style={{ width: '100%' }}>
                     <Text style={styles.inputHeader}>
-                        Password
+                        Create password
                         <Asterisk />
                     </Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
+                        placeholderTextColor={colors.placeholder}
                         value={password}
                         onChangeText={(text) => {
                             setPassword(text)

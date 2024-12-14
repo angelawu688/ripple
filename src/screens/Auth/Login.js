@@ -90,7 +90,7 @@ const Login = ({ navigation }) => {
       <View style={styles.lowerContainer}>
         <View style={{ width: '100%' }}>
           <Text style={styles.inputHeader}>
-            Enter UW NetID
+            UW email
           </Text>
           <TextInput
             placeholder='Email'

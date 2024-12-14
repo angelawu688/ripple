@@ -120,13 +120,17 @@ const LandingPage = ({ navigation }) => {
 
 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate('EmailOnboarding')}
+                <TouchableOpacity
+                    hitSlop={{ top: 30, bottom: 5, left: 10, right: 10 }}
+                    onPress={() => navigation.navigate('EmailOnboarding')}
                     style={[styles.button, { backgroundColor: colors.loginBlue }]}>
                     <Text style={[styles.buttonText, { color: 'white' }]}>
                         Create account
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('Login')}
+                <TouchableOpacity
+                    hitSlop={{ top: 5, bottom: 30, left: 10, right: 10 }}
+                    onPress={() => navigation.navigate('Login')}
                     style={[styles.button, { backgroundColor: 'white', borderColor: colors.loginBlue, borderWidth: 1 }]}>
                     <Text style={[styles.buttonText, { color: colors.loginBlue }]}>
                         Login

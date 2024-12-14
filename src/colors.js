@@ -13,4 +13,5 @@ export const colors = {
     errorMessage: 'red',
     neonBlue: '#5FAFBA',
     skeletonGray: '#D9D9D9',
+    placeholder: '#7E7E7E',
 }
