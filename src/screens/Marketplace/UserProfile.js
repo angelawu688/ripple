@@ -117,11 +117,12 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                     }));
                     // sort by 1) sold or not sold, 2) time as tiebreaker
                     const sortedListings = listingsData.sort((a, b) => {
-                        if (a.sold === b.sold) {
-
-                            return new Date(b.createdAt) - new Date(a.createdAt);
+                        if (a.sold !== b.sold) {
+                            return a.sold ? 1 : -1;
                         }
-                        return a.sold - b.sold;
+                        // convert to ms so that we can compare with subtraction
+                        return b.createdAt.toMillis() - a.createdAt.toMillis();
+
                     });
                     setUserListings(sortedListings);
 
