@@ -12,6 +12,23 @@ import LoadingSpinner from '../../components/LoadingSpinner'
 const MessagesOverview = ({ navigation }) => {
     const { user, userData } = useContext(userContext)
 
+    // const fetchOtherUserData = async (userId) => {
+    //     try {
+    //         const userDoc = await getDoc(doc(db, "users", userId))
+    //         if (userDoc.exists()) {
+    //             const otherUserData = userDoc.data()
+    //             return {
+    //                 id: userId,
+    //                 name: otherUserData.name || undefined,
+    //                 pfp: otherUserData.pfp || undefined,
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching user data:", error)
+    //     }
+    //     return null
+    // }
+
     // on component focus, grab all of the conversations for that user
     useFocusEffect(
         useCallback(() => {
@@ -30,7 +47,12 @@ const MessagesOverview = ({ navigation }) => {
                     id: doc.id,
                     ...doc.data(),
                 }));
-                setConversations(fetchedConversations);
+
+                // sort the conversations in last read order
+                setConversations(
+                    fetchedConversations.sort((a, b) => b.timestamp - a.timestamp)
+                );
+
                 console.log(fetchedConversations)
                 setIsLoading(false);
             }, (error) => {
@@ -50,10 +72,6 @@ const MessagesOverview = ({ navigation }) => {
     const [conversations, setConversations] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
-
-    // todo fetch and cache the other users pfp!
-    const [otherUserPfp, setOtherUserPfp] = useState(undefined)
-
     if (isLoading) {
         return (
             <View style={{ flex: 1 }}>
@@ -62,7 +80,6 @@ const MessagesOverview = ({ navigation }) => {
 
         )
     }
-
 
     return (
         <View style={styles.container}>
@@ -84,14 +101,20 @@ const MessagesOverview = ({ navigation }) => {
                             return null
                         }
                         const conversationID = item.id
-                        const otherUserId = item.users.find(id => id !== user.uid);
-                        const otherUserDetails = item.userDetails[otherUserId];
-                        console.log('item', item)
+                        const otherUserId = item.users.find(id => id !== user.uid); // extract otheruserID from array
+                        const otherUserDetails = item.userDetails[otherUserId]; // grab the userdetails that we store there
+                        console.log('userdetails', otherUserDetails)
 
 
                         return (
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('Conversation', { conversationID: conversationID })}
+                                onPress={() => navigation.navigate('Conversation', {
+                                    conversationID: conversationID,
+                                    otherUserDetails: {
+                                        ...otherUserDetails,
+                                        id: otherUserId
+                                    }
+                                })}
                             >
                                 <MessagePreviewCard
                                     pfp={otherUserDetails?.pfp}

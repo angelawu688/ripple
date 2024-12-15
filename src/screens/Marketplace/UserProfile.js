@@ -27,6 +27,21 @@ import QRCode from "react-native-qrcode-svg";
 import * as Linking from 'expo-linking'
 
 
+
+
+
+
+/* 
+If on ownProfile stack, we will disable the header 
+If !profileScreen:
+    if is own profile
+        change the behavior of 3 dots in top left accordingly
+    else (other profile)
+        change the behavior of the 3 dots
+
+**/
+
+
 const testUserPosts = [
     { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
     { id: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
@@ -34,7 +49,7 @@ const testUserPosts = [
     { id: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: true },
     { id: 5, img: undefined, title: 'Catan Set', price: 10, sold: true },
 ]
-const UserProfile = ({ navigation, route }) => {
+const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
     const { user, userFollowing, setUserFollowing } = useContext(userContext)
     const [followingUser, setFollowingUser] = useState(false)
@@ -67,21 +82,20 @@ const UserProfile = ({ navigation, route }) => {
         }
     }, [user])
 
-    // useEffect(() => {
-    //     if (isOwnProfile) {
-    //         navigation.setOptions(
-    //             {
-    //                 headerRight: () => (
-    //                     <TouchableOpacity
-    //                         onPress={() => navigation.navigate('Profile')}
-    //                     >
-    //                         <Gear size={60} />
-    //                     </TouchableOpacity>
-    //                 )
-    //             }
-    //         )
-    //     }
-    // }, [isOwnProfile])
+
+    // set navigation options and header based on what stack we are in
+    useEffect(() => {
+        if (isOwnProfileInProfileStack) {
+            navigation.setOptions({
+
+            })
+        } else {
+            // is own profile 
+            // is other user profile
+            // regardless, no 3 dots, top header is just the back arrow
+            // just want the back arrow
+        }
+    })
 
     // grab the profile from the backend by the userID
     useEffect(() => {
@@ -274,11 +288,11 @@ const UserProfile = ({ navigation, route }) => {
     }
 
     return (
-        <View style={[styles.container, { marginTop: isOwnProfile ? 0 : 0 }]}>
+        <View style={[styles.container, { marginTop: isOwnProfileInProfileStack ? 80 : 0 }]}>
             <View style={styles.topContainer}>
                 {userProfile.pfp ? (<Image
                     // pfp would go here
-                    style={{ width: 60, height: 60, borderRadius: 75, backgroundColor: 'yellow' }}
+                    style={{ width: 60, height: 60, borderRadius: 75, backgroundColor: 'gray' }}
                     source={{ uri: userProfile?.pfp }}
 
                 />) :
@@ -300,16 +314,16 @@ const UserProfile = ({ navigation, route }) => {
                 </View>
 
                 {/* navigation to other  */}
-                {isOwnProfile && (
+                {isOwnProfileInProfileStack && (
                     <TouchableOpacity
                         style={{
                             position: 'absolute', right: 20,
-                            top: 0
+                            top: 5
                         }}
                         onPress={() => navigation.navigate('Profile')}
                     >
                         {/* <Gear size={30} /> */}
-                        {/* <DotsThree size={30} weight="bold" /> */}
+                        <DotsThree size={30} weight="bold" />
                     </TouchableOpacity>
                 )}
             </View>

@@ -34,16 +34,17 @@ const ProfileStackNavigator = () => {
                 name="OwnUserProfile"
                 component={OwnUserProfile}
                 options={({ navigation }) => ({
-                    headerTitle: () => (
-                        <></>
-                    ),
-                    headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Profile')}
-                        >
-                            <DotsThree size={32} />
-                        </TouchableOpacity>
-                    )
+                    headerShown: false
+                    // headerTitle: () => (
+                    //     <></>
+                    // ),
+                    // headerRight: () => (
+                    //     <TouchableOpacity
+                    //         onPress={() => navigation.navigate('Profile')}
+                    //     >
+                    //         <DotsThree size={32} />
+                    //     </TouchableOpacity>
+                    // )
                 })}
             />
 
@@ -180,14 +181,15 @@ const ProfileStackNavigator = () => {
                 name="UserProfile"
                 component={UserProfile}
                 options={({ navigation }) => ({
-                    headerTitle: () => (
-                        <Logo />
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    )
+                    headerShown: false
+                    // headerTitle: () => (
+                    //     <Logo />
+                    // ),
+                    // headerLeft: () => (
+                    //     <TouchableOpacity onPress={() => navigation.goBack()}>
+                    //         <Ionicons name="chevron-back" size={24} color="#000" />
+                    //     </TouchableOpacity>
+                    // )
                 })}
             />
 

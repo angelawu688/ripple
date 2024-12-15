@@ -8,6 +8,7 @@ import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
 import { Image, TouchableOpacity } from "react-native";
 import { DotsThree } from "phosphor-react-native";
+import UserProfile from "../../screens/Marketplace/UserProfile";
 
 const MessagesStack = createNativeStackNavigator();
 
@@ -44,7 +45,7 @@ const MessagesStackNavigator = () => {
                 component={Conversation}
                 options={({ navigation }) => ({
                     headerTitle: () => (
-                        <Logo />
+                        <></>
                     ),
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => navigation.reset({
@@ -53,6 +54,9 @@ const MessagesStackNavigator = () => {
                         })}>
                             <Ionicons name="chevron-back" size={24} color="#000" />
                         </TouchableOpacity>
+                    ),
+                    headerRight: () => (
+                        <></>
                     ),
                 })}
             />
@@ -75,6 +79,24 @@ const MessagesStackNavigator = () => {
                         >
                             <DotsThree size={32} />
                         </TouchableOpacity>
+                    )
+                })}
+            />
+
+            <MessagesStack.Screen
+                name="UserProfile"
+                component={UserProfile}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <></>
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => (
+                        <></>
                     )
                 })}
             />

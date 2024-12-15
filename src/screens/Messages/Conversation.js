@@ -1,25 +1,27 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useContext, useEffect, useRef, useState } from 'react'
-import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, FlatList } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, FlatList, Keyboard, Modal } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
 import ListingCard from '../../components/ListingCard';
-import { XCircle } from 'phosphor-react-native';
+import { ArrowBendRightUp, CaretRight, User, XCircle } from 'phosphor-react-native';
 import { colors } from '../../colors';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { getListingFromID, sendMessage } from '../../utils/firebaseUtils';
 import { db } from '../../../firebaseConfig';
 import { userContext } from '../../context/UserContext';
+import { ZoomableView } from 'react-native-zoom-toolkit';
+import { formatDate } from '../../utils/formatDate';
 
 
-// TODO in cleanup move this to another file
-// TODO add support for text and listings, posts and text, etc. 
-const MessageBubble = ({ navigation, message, activeUserID }) => {
+
+
+const MessageBubble = ({ navigation, message, activeUserID, formattedDate = undefined }) => {
     if (!message) {
         return null
     }
     const { textContent, imageUri, postID, sentBy } = message
     const [listing, setListing] = useState(undefined)
-
+    const [showZoomModal, setShowZoomModal] = useState(false)
     const isCurrentUser = sentBy === activeUserID
 
     useEffect(() => {
@@ -38,11 +40,24 @@ const MessageBubble = ({ navigation, message, activeUserID }) => {
         return;
     }
 
-    // add suport for images and posts
+
 
     // TODO make look cleaner
     return (
         <View style={{ flexDirection: 'column', alignItems: isCurrentUser ? 'flex-end' : 'flex-start', marginVertical: 2 }}>
+            {formattedDate && (
+                <View style={{
+                    width: '100%', display: 'flex', alignContent: 'center', justifyContent: 'center', marginBottom: 12, marginTop: 10
+
+                }}
+                >
+                    <Text style={{ fontSize: 14, color: colors.accentGray, textAlign: 'center' }}>
+                        {formattedDate}
+                    </Text>
+                </View>
+
+            )}
+
             {listing && (
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ListingScreen', { listingID: listing.id })}
@@ -50,17 +65,44 @@ const MessageBubble = ({ navigation, message, activeUserID }) => {
                     style={{
                         width: 150,
                         height: 170,
-                        marginVertical: 8,
+                        marginVertical: 12,
                     }}>
                     <ListingCard listing={listing} containerWidth={170} />
                 </TouchableOpacity>
             )}
 
-            {imageUri && (
+            {/* {imageUri && (
                 <Image
-                    style={{ width: 170, height: 170, borderWidth: 1, borderColor: colors.loginGray, borderRadius: 8 }}
+                    style={{
+                        width: 170,
+                        height: 170,
+                        // borderWidth: 1,
+                        borderColor: colors.loginGray,
+                        borderRadius: 8
+                    }}
+                    resizeMode='contain'
                     source={{ uri: imageUri }}
                 />
+            )} */}
+            {imageUri && (
+                <TouchableOpacity onPress={() => {
+                    console.log('first')
+                    setShowZoomModal(true)
+                }}>
+                    <Image
+                        source={{ uri: imageUri }}
+                        style={[
+                            {
+                                width: 170,
+                                height: 170,
+                                borderRadius: 8
+                            },
+                            // styles.messageImage,
+                            isCurrentUser ? styles.sentImage : styles.receivedImage
+                        ]}
+                        resizeMode="cover"
+                    />
+                </TouchableOpacity>
             )}
 
             {textContent && textContent.length !== 0 && (
@@ -71,6 +113,26 @@ const MessageBubble = ({ navigation, message, activeUserID }) => {
                     </Text>
                 </View>
             )}
+
+            <Modal
+                visible={showZoomModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowZoomModal(false)}>
+                <TouchableOpacity
+                    style={styles.modalContainer}
+                    activeOpacity={1}
+                    onPress={() => setShowZoomModal(false)}
+                >
+                    <Image
+                        source={{ uri: imageUri }}
+                        style={styles.fullScreenImage}
+                        resizeMode="contain"
+                    />
+                </TouchableOpacity>
+            </Modal>
+
+
         </View>
     )
 }
@@ -78,13 +140,15 @@ const MessageBubble = ({ navigation, message, activeUserID }) => {
 
 const Conversation = ({ navigation, route }) => {
     // pass in the listing from the route
-    const { listing, conversationID } = route.params
+    const { listing, conversationID, otherUserDetails } = route.params
+
     const [inputListing, setInputListing] = useState(listing || null)
     const { user } = useContext(userContext)
     const [messages, setMessages] = useState([])
     const [input, setInput] = useState(listing ? ('Hi, is this still available?') : '')
     const [img, setImg] = useState(undefined)
     const [openingImagePicker, setOpeningImagePicker] = useState(false)
+    const [inputHeight, setInputHeight] = useState(50)
 
     // auto-scroll to the bottom. Animated asf too 😮‍💨
     const scrollRef = useRef(null)
@@ -93,6 +157,10 @@ const Conversation = ({ navigation, route }) => {
             scrollRef.current.scrollToEnd({ animated: true });
         }
     }, [messages]);
+
+    useEffect(() => {
+        console.log(otherUserDetails)
+    }, [])
 
     // load messages from firebase
     useEffect(() => {
@@ -110,6 +178,37 @@ const Conversation = ({ navigation, route }) => {
 
         // unsub on unmount
         return () => unsubscribe();
+    }, [])
+
+    useEffect(() => {
+        console.log(otherUserDetails)
+        navigation.setOptions({
+            headerTitle: () => (
+                <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { userID: otherUserDetails.id })}
+                    style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+                >
+                    {otherUserDetails?.pfp ? (
+                        <Image
+                            source={otherUserDetails.pfp}
+                            style={{ borderRadius: 50, width: 35, height: 35, marginRight: 8 }}
+                            resizeMethod='cover'
+                        />
+                    ) : (
+                        <View
+                            style={{ borderRadius: 50, width: 35, height: 35, display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: 8, backgroundColor: colors.loginGray }}
+                        >
+                            <User size={18} />
+                        </View>
+                    )}
+                    <Text style={{ fontSize: 18, fontWeight: '500', fontFamily: 'inter', marginRight: 10 }}>
+                        {otherUserDetails?.name}
+                    </Text>
+                    <CaretRight size={14} weight='bold' color={colors.accentGray} />
+
+
+                </TouchableOpacity>
+            )
+        })
     }, [])
 
     const handleSendMessage = async (text, image, post, clearInputs) => {
@@ -182,25 +281,47 @@ const Conversation = ({ navigation, route }) => {
             style={{ flex: 1 }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={90}
+            onPress={() => Keyboard.dismiss()}
         >
             <View style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%', }}>
                 {messages?.length > 0 ? (<FlatList
                     data={messages}
-                    renderItem={({ item }) => {
+                    renderItem={({ item, index }) => {
+                        const previousMessage = messages[index + 1];
+                        let showDate = false;
+
+                        if (!previousMessage) {
+                            //    oldest message, so show the timestamp
+                            showDate = true;
+                        } else {
+                            // compare to the previous message. If more than 30 min, then show timestamp
+                            const currentTime = item.timestamp;
+                            const prevTime = previousMessage.timestamp;
+                            const diffInMinutes = Math.abs((prevTime - currentTime) / 60000);
+                            if (diffInMinutes > 30) {
+                                showDate = true;
+                            }
+                        }
+
+                        // todo some sort of formatting. We only get a formatted date if we show the date
+                        const formattedDate = showDate ? formatDate(item.timestamp / 1000) : null;
+
                         return (
                             <MessageBubble
                                 navigation={navigation}
                                 message={item}
                                 activeUserID={user.uid}
+                                formattedDate={formattedDate}
                             />
                         )
                     }
                     }
                     keyExtractor={(item) => item.id}
+                    keyboardShouldPersistTaps='handled'
                     inverted={true}// This inverts the list
                     contentContainerStyle={{
                         flexGrow: 1,
-                        paddingHorizontal: 30,
+                        paddingHorizontal: 10,
                         paddingTop: 10,
                         paddingBottom: 50,
                     }}
@@ -224,25 +345,28 @@ const Conversation = ({ navigation, route }) => {
                 )}
 
                 {/* Preview for Image */}
-                {img && (
+                {/* {img && (
                     <View style={styles.previewImageContainer}>
                         <Image source={{ uri: img }} style={styles.previewImage} />
                         <TouchableOpacity onPress={() => setImg(null)} style={styles.removePreviewButton}>
                             <XCircle weight='fill' size={30} color={colors.loginGray} />
                         </TouchableOpacity>
                     </View>
-                )}
+                )} */}
 
                 {/* input bar at the bottom */}
                 <View style={styles.inputBar}>
                     <TouchableOpacity onPress={() => handleAddImage()}
                         style={{
-                            width: 30, height: 30, borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: 'rgba(0, 0, 0, 0.25)',
+                            width: 35, height: 35, borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: 'rgba(0, 0, 0, 0.25)',
                             shadowOffset: { width: 5, height: 5 },
                             shadowOpacity: 0.5,
                             shadowRadius: 10,
                             backgroundColor: 'white',
-                            marginRight: 10
+                            marginRight: 10,
+                            alignSelf: 'flex-end',
+                            marginBottom: 4
+
                         }}>
                         {openingImagePicker ? <ActivityIndicator color='#767676' /> : <Ionicons name='add-outline' size={20} color='#767676' />}
                     </TouchableOpacity>
@@ -252,12 +376,24 @@ const Conversation = ({ navigation, route }) => {
                         placeholder='Message'
                         value={input}
                         onChangeText={setInput}
-                        style={styles.input}
+                        style={[styles.input, { height: inputHeight, textAlignVertical: 'top', }]}
                         onSubmitEditing={() => handleSendMessage(input, img, inputListing, clearInputs)}
+                        multiline={true}
+                        onContentSizeChange={(contentWidth, contentHeight) => {
+                            const minHeight = 35;
+                            const maxHeight = 100; // optional max
+                            if (contentHeight < minHeight) {
+                                setInputHeight(minHeight);
+                            } else if (contentHeight > maxHeight) {
+                                setInputHeight(maxHeight);
+                            } else {
+                                setInputHeight(contentHeight);
+                            }
+                        }}
                     />
 
-                    <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() || img || inputListing ? 'black' : '#D9D9D9' }]} onPress={() => handleSendMessage(input, img, inputListing, clearInputs)}>
-                        <Ionicons name='arrow-redo-outline' size={20} color='white' />
+                    <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() || img || inputListing ? colors.neonBlue : colors.loginGray }]} onPress={() => handleSendMessage(input, img, inputListing, clearInputs)}>
+                        <ArrowBendRightUp size={20} color='white' />
                     </TouchableOpacity>
 
                 </View>
@@ -295,8 +431,9 @@ const styles = StyleSheet.create({
         marginBottom: 4
     },
     input: {
-        flex: 1,
         height: 40,
+        flex: 1,
+        paddingVertical: 8,
         borderWidth: 1,
         borderColor: '#ddd',
         borderRadius: 20,
@@ -306,9 +443,10 @@ const styles = StyleSheet.create({
     sendButton: {
         marginLeft: 10,
         paddingVertical: 10,
-        paddingHorizontal: 15,
+        paddingHorizontal: 12,
         backgroundColor: '#007aff',
         borderRadius: 20,
+        alignSelf: 'flex-end'
     },
     sendButtonText: {
         color: '#fff',
@@ -365,6 +503,35 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: -53,
         left: -28
-    }
+    },
+
+
+    // modal styles: 
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'black'
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 100,
+        right: 50,
+        zIndex: 9999,
+        backgroundColor: colors.black
+    },
+    closeButtonText: {
+        fontSize: 30,
+        color: colors.white,
+        fontWeight: 'bold',
+    },
+    zoomContainer: {
+        width: '100%',
+        height: '100%',
+    },
+    fullScreenImage: {
+        width: '100%',
+        height: '100%',
+    },
 
 })

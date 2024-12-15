@@ -24,7 +24,7 @@ const OwnUserProfile = ({ navigation }) => {
 
     return (
         <View style={{ width: '100%', height: '100%' }}>
-            <UserProfile navigation={navigation} route={{ params: { userID } }} />
+            <UserProfile navigation={navigation} route={{ params: { userID } }} isOwnProfileInProfileStack={true} />
         </View>
 
     )

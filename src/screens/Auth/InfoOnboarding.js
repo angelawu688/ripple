@@ -217,7 +217,8 @@ const InfoOnboarding = ({ navigation, route }) => {
                         </Text>
                         <TextInput
                             ref={inputRef}
-                            style={[styles.input, { height: bioHeight, textAlignVertical: 'top' }]} placeholder='Just a chill guy'
+                            style={[styles.input, { height: bioHeight, textAlignVertical: 'top' }]}
+                            placeholder='Just a chill guy'
                             multiline={true}
                             value={bio}
                             onChangeText={setBio}

@@ -50,7 +50,11 @@ const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt }) => {
                     </Text>
                 </View>
 
-                <Text style={styles.lowerText}>
+                <Text
+                    style={styles.lowerText}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                >
                     {lastMessage}
                 </Text>
 
