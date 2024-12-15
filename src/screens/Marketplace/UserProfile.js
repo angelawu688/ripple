@@ -17,7 +17,7 @@ import {
 } from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
 import ListingsList from '../../components/ListingsList'
-import { Check, EnvelopeSimple, Gear, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
+import { Check, DotsThree, EnvelopeSimple, Gear, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
 import { colors } from "../../colors";
 import { userContext } from "../../context/UserContext";
 import ListingCard from "../../components/ListingCard";
@@ -59,14 +59,12 @@ const UserProfile = ({ navigation, route }) => {
                         <TouchableOpacity
                             onPress={() => navigation.navigate('Profile')}
                         >
-                            <Gear />
+                            <Gear size={60} />
                         </TouchableOpacity>
                     )
                 }
             )
         }
-        // TODO: showing undefined rn
-        console.log(user.pfp)
     }, [isOwnProfile])
 
     // grab the profile from the backend by the userID
@@ -148,14 +146,17 @@ const UserProfile = ({ navigation, route }) => {
     }
 
     const handleFollow = () => {
-        if (followingUser) {
-            markAsUnfollowed();
+        try {
+            if (followingUser) {
+                markAsUnfollowed();
+            }
+            else {
+                markAsFollowed();
+            }
+            setFollowingUser(!followingUser)
+        } catch (e) {
+            console.log(e)
         }
-        else {
-            markAsFollowed();
-        }
-        setFollowingUser(!followingUser)
-        // TODO: BACKEND CHANGES HERE
     }
 
     const markAsFollowed = async () => {
@@ -170,7 +171,6 @@ const UserProfile = ({ navigation, route }) => {
         } finally {
             // frontend update
             setUserFollowing((prevUserFollowing) => [...prevUserFollowing, userID]);
-            setFollowingUser(!followingUser);
             console.log("now following user");
         }
     }
@@ -187,7 +187,6 @@ const UserProfile = ({ navigation, route }) => {
             setUserFollowing((prevUserFollowing) =>
                 prevUserFollowing.filter((id) => id !== userID)
             );
-            setFollowingUser(!followingUser)
             console.log("user is unfollowed")
         }
     }
@@ -202,6 +201,7 @@ const UserProfile = ({ navigation, route }) => {
         });
     }
 
+    // just navigation here
     const handleFollowers = () => {
 
     }
@@ -258,7 +258,7 @@ const UserProfile = ({ navigation, route }) => {
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={[styles.container, { marginTop: isOwnProfile ? 80 : 0 }]}>
             <View style={styles.topContainer}>
                 {userProfile.pfp ? (<Image
                     // pfp would go here
@@ -271,14 +271,31 @@ const UserProfile = ({ navigation, route }) => {
                     </View>)
                 }
                 <View style={styles.headerTextContainer}>
-                    <Text style={styles.nameText}>
-                        {userProfile?.name || "Nameless"}
+                    <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={styles.nameText}
+                    >
+                        {userProfile?.name || "Anonymous"}
                     </Text>
-                    <Text style={{ fontFamily: 'inter', fontSize: 18, color: colors.accentGray }}>
-                        {userProfile?.email || "Nameless"}
+                    <Text style={styles.netIDText}>
+                        {userProfile?.email || "mystery@uw.edu"}
                     </Text>
-
                 </View>
+
+                {/* navigation to other  */}
+                {isOwnProfile && (
+                    <TouchableOpacity
+                        style={{
+                            position: 'absolute', right: 20,
+                            top: 0
+                        }}
+                        onPress={() => navigation.navigate('Profile')}
+                    >
+                        {/* <Gear size={30} /> */}
+                        <DotsThree size={30} weight="bold" />
+                    </TouchableOpacity>
+                )}
             </View>
 
             <ScrollView
@@ -424,6 +441,9 @@ const UserProfile = ({ navigation, route }) => {
 export default UserProfile;
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     scrollContainer: {
         display: 'flex',
         height: '100%',
@@ -444,18 +464,19 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         marginLeft: 12,
-        marginBottom: 6
+        marginBottom: 6,
+        maxWidth: '70%',
 
     },
     nameText: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: '600',
         fontFmaily: 'inter'
     },
     netIDText: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: 'gray',
+        fontSize: 17,
+        fontWeight: '400',
+        color: colors.accentGray,
         fontFmaily: 'inter'
     },
     bioContainer: {

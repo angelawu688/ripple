@@ -1,6 +1,6 @@
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { db, storage } from "../../firebaseConfig"
-import { getDownloadURL, ref, uploadBytesResumable, deleteObject } from 'firebase/storage'
+import { getDownloadURL, ref, uploadBytesResumable, refFromURL, deleteObject } from 'firebase/storage'
 
 
 
@@ -224,4 +224,44 @@ export const getListingFromID = async (listingID) => {
         console.log(e)
         throw e
     }
+}
+
+
+// delete functions
+
+
+// given an array of photo urls, deletes them all from the db
+// regardless of collection/location
+export const deleteImages = async (photos) => {
+    const deletePromises = photos.map(async (photoURL) => {
+        const url = new URL(photoURL);
+        const fullPath = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
+        const imageRef = ref(storage, fullPath);
+
+        // handling errors if already deleted, ect,
+        // logs for debugging
+        try {
+            await deleteObject(imageRef);
+            console.log(`Successfully deleted: ${fullPath}`);
+        } catch (deleteError) {
+            if (deleteError.code === 'storage/object-not-found') {
+                console.log(`File already deleted or not found: ${fullPath}`);
+                return;
+            }
+            throw deleteError;
+        }
+
+    })
+    await Promise.all(deletePromises)
+}
+
+// given a listingID, will delete all references to it in saved posts
+export const deleteFromSavedPosts = async (listingID) => {
+    const q = query(collection(db, 'savedPosts'), where('listing_id', '==', listingID))
+    const querySnapshot = await getDocs(q);
+    const deletePromises = [];
+    querySnapshot.forEach((docSnap) => {
+        deletePromises.push(deleteDoc(docSnap.ref))
+    })
+    await Promise.all(deletePromises)
 }

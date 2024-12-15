@@ -1,6 +1,8 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text } from 'react-native'
+import { Image } from 'expo-image'
 import { useEffect, useState } from 'react'
 import { colors } from '../colors';
+import { MotiView } from 'moti';
 
 const ListingCard = ({ listing }) => {
     if (!listing) {

@@ -7,6 +7,7 @@ import ListingScreen from '../../screens/Marketplace/ListingScreen'
 import Logo from '../../components/Logo'
 import BackArrow from "../../components/BackArrow";
 import { Image, TouchableOpacity } from "react-native";
+import { DotsThree } from "phosphor-react-native";
 
 const MessagesStack = createNativeStackNavigator();
 
@@ -59,7 +60,7 @@ const MessagesStackNavigator = () => {
             <MessagesStack.Screen
                 name="ListingScreen"
                 component={ListingScreen}
-                options={({ navigation }) => ({
+                options={({ navigation, route }) => ({
                     headerTitle: () => (
                         <Logo />
                     ),
@@ -68,6 +69,13 @@ const MessagesStackNavigator = () => {
                             <Ionicons name="chevron-back" size={24} color="#000" />
                         </TouchableOpacity>
                     ),
+                    headerRight: () => (
+                        <TouchableOpacity
+                            onPress={() => route.params?.toggleModal && route.params.toggleModal()}
+                        >
+                            <DotsThree size={32} />
+                        </TouchableOpacity>
+                    )
                 })}
             />
 

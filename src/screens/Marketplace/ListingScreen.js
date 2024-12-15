@@ -1,27 +1,20 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, FlatList, Dimensions, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList, Dimensions, Alert, Modal, Pressable, TouchableWithoutFeedback } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import {
-    getFirestore,
-    doc,
-    getDoc,
-    getDocs,
-    deleteDoc,
-    setDoc,
-    collection,
-    query,
-    where,
-    updateDoc
+    getFirestore, doc, getDoc, getDocs, deleteDoc, setDoc, collection, query, where, updateDoc
 } from "firebase/firestore";
+
 import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
-import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, Tag } from 'phosphor-react-native';
+import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, Tag, SmileySad } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 import * as Linking from 'expo-linking'
 import { formatDate } from '../../utils/formatDate'
 import { useFocusEffect } from '@react-navigation/native';
-import { getConversation } from '../../utils/firebaseUtils';
+import { deleteFromSavedPosts, deleteImages, getConversation } from '../../utils/firebaseUtils';
 
 
 
@@ -40,15 +33,24 @@ const ListingScreen = ({ navigation, route }) => {
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     // edit, delete, markSold | used for toggling buttons
     const [selectedBottomButton, setSelectedBottomButton] = useState('markSold')
+
     const [postSold, setPostSold] = useState(false) // grab this on init
-    const [isOwnPost, setIsOwnPost] = useState(true) // grab this on init. Literally something like uid === userData.uid should be chill
+    const [isOwnPost, setIsOwnPost] = useState(false) // grab this on init. Literally something like uid === userData.uid should be chill
     const [sellerID, setSellerID] = useState(null) // grab this on init
+
+
+    // 3 dots 
+    const [modalVisible, setModalVisible] = useState(false)
+    const toggleModal = () => {
+        setModalVisible(!modalVisible);
+    };
+
+    // pass in the toggle modal function
+    useEffect(() => {
+        navigation.setParams({ toggleModal });
+    }, [modalVisible]);
+
     const db = getFirestore();
-
-    // useEffect(() => {
-
-
-    // }, [listingID]);
 
     // fetches a listing from the DB
     const fetchListing = async () => {
@@ -57,46 +59,54 @@ const ListingScreen = ({ navigation, route }) => {
             const docRef = doc(db, "listings", listingID);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                setListing({ id: docSnap.id, ...docSnap.data() });
+                const data = docSnap.data()
+                setListing({ id: docSnap.id, ...data });
                 // check if it's their own post, can save their own posts
-                if (docSnap.data().userId === user.uid) {
+                if (data.userId === user.uid) {
                     setIsOwnPost(true);
                     setSellerID(user.uid);
                 }
                 else {
                     setIsOwnPost(false);
-                    setSellerID(docSnap.data().userId);
+                    setSellerID(data.userId);
                 }
 
-                // check if it's sold or not
-                if (docSnap.data().sold === true) {
-                    // console.log(`Listing is sold`);
-                    setPostSold(true);
-                }
-                else {
-                    // console.log(`Listing is not sold`);
-                    setPostSold(false);
-                }
+                setPostSold(!!data.sold)
 
-                // check if listing is saved already
-                if (savedPosts && savedPosts.length !== 0) {
-                    const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
-                    if (saveStatus) {
-                        setIsSaved(true);
-                        // console.log(`Listing with ID ${listingID} is saved.`);
-                    } else {
-                        setIsSaved(false)
-                        // console.log(`Listing with ID ${listingID} is not saved.`);
-                    }
-                }
-                else {
-                    setIsSaved(false);
-                }
+                // // check if it's sold or not
+                // if (docSnap.data().sold === true) {
+                //     // console.log(`Listing is sold`);
+                //     setPostSold(true);
+                // }
+                // else {
+                //     // console.log(`Listing is not sold`);
+                //     setPostSold(false);
+                // }
+
+                const alreadySaved = savedPosts?.some(
+                    (post) => post.listing_id === listingID && post.userID === user.uid
+                )
+                setIsSaved(!!alreadySaved)
+
+                // // check if listing is saved already
+                // if (savedPosts && savedPosts.length !== 0) {
+                //     const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
+                //     if (saveStatus) {
+                //         setIsSaved(true);
+                //         // console.log(`Listing with ID ${listingID} is saved.`);
+                //     } else {
+                //         setIsSaved(false)
+                //         // console.log(`Listing with ID ${listingID} is not saved.`);
+                //     }
+                // }
+                // else {
+                //     setIsSaved(false);
+                // }
             } else {
                 console.log("No such listing!");
             }
         } catch (error) {
-            console.error("Error fetching listing:", error);
+            console.log("Error fetching listing:", error);
             // could we use toasts here?
         } finally {
             setIsLoading(false);
@@ -116,7 +126,7 @@ const ListingScreen = ({ navigation, route }) => {
             // before we get the data from fetch
             // not doing rn, premature optimization
             return () => { };
-        }, [listingID, user.uid, savedPosts])
+        }, [listingID, user.uid])
     );
 
 
@@ -129,11 +139,35 @@ const ListingScreen = ({ navigation, route }) => {
     }
 
     if (!listing) {
-        return <View style={styles.container}><Text>Listing not found</Text></View>;
+        return <View style={styles.container}>
+            <SmileySad size={100} />
+            <Text style={{ fontSize: 18, fontWeight: '600', fontFamily: 'inter', marginTop: 4, marginBottom: 2 }}>
+                Oops! We couldn't find that listing
+            </Text>
+            <Text style={{ fontFamily: 'inter', }}>
+                It may have been deleted, please refresh your page
+            </Text>
+        </View>;
+    } else {
+        console.log(listing)
     }
 
     const handleEditListing = () => {
         navigation.navigate('EditPost', { listing: listing, listingID: listingID })
+    }
+
+
+    const handleReportUser = () => {
+        console.log('reporting user')
+        try {
+
+        } catch (e) {
+
+        } finally {
+
+        }
+        // set some sort of toast or something
+        setModalVisible(false)
     }
 
     const handleDeleteListing = () => {
@@ -148,28 +182,41 @@ const ListingScreen = ({ navigation, route }) => {
                 },
                 {
                     text: "Delete",
-                    onPress: () => deletePost(),
+                    onPress: () => {
+                        deleteListing();
+                        setModalVisible(false)
+                    },
                     style: "destructive", // makes it red
                 },
             ],
             { cancelable: true }
         );
+
     }
 
-    // should only be available if it's their own listing
-    const deletePost = async () => {
+    const handleShareListing = () => {
+        shareListing()
+        setModalVisible(false)
+    }
+
+    const deleteListing = async () => {
         console.log('DELETE POST')
         const docRef = doc(db, "listings", listingID);
         try {
+            if (listing.photos && listing.photos.length > 0) {
+                await deleteImages(listing.photos)
+            }
+            await deleteFromSavedPosts(listingID)
             await deleteDoc(docRef);
             // frontend update
             setUserListings((prevUserListings) =>
                 prevUserListings.filter((post) => post.id !== listingID)
             );
+            navigation.goBack();
+            // toast "post deleted successfully"
         } catch (error) {
             console.error("Error deleting listing:", error);
-        } finally {
-            console.log("listing is deleted")
+            // toast the error
         }
     }
 
@@ -237,8 +284,6 @@ const ListingScreen = ({ navigation, route }) => {
         }
     }
 
-
-
     const handleSavePost = async () => {
         // frontend change
         setIsLoadingSave(true)
@@ -247,64 +292,34 @@ const ListingScreen = ({ navigation, route }) => {
             return;
         }
 
-        // TODO :
-        // we probably should throttle this
         try {
+            const listingRef = doc(db, 'savedPosts', user.uid + listingID)
             if (!isSaved) {
-                // add it
-                await setDoc(doc(db, "savedPosts", user.uid + listingID), {
-                    userID: user.uid,
-                    listing_id: listingID,
-                    price: listing.price,
-                    title: listing.title
-                    // TODO: add main image to display
-                    // listing images requires firebase storage
-                });
                 const newSaved = {
                     userID: user.uid,
                     listing_id: listingID,
                     price: listing.price,
                     title: listing.title,
                 };
-                setSavedPosts((prevSavedPosts) => [...prevSavedPosts, newSaved]);
+                // add it
+                await setDoc(listingRef, newSaved);
+
+                setSavedPosts(prev => [...prev, newSaved])
+                // setSavedPosts((prevSavedPosts) => [...prevSavedPosts, newSaved]);
             }
             else {
-                // TODO:
-                // can also directly query the savedPosts collection to check
-                const listingRef = doc(db, "savedPosts", user.uid + listingID);
-                if (savedPosts && savedPosts.length !== 0) {
-                    const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
-                    if (saveStatus) {
-                        await deleteDoc(listingRef);
-                    } else {
-                        console.error("no document to delete");
-                    }
-                }
-                else {
-                    console.error("no document to delete");
-                }
-                setSavedPosts((prevSavedPosts) =>
-                    prevSavedPosts.filter((post) => post.listing_id !== listingID || user.uid !== post.userID)
-                );
-                // delete it
-                // const listingRef = doc(db, "savedPosts", user.uid + listing.listing_id);
-                // const savedPostsRef = collection(db, "savedPosts");
-                // const queryPosts = query(savedPostsRef,
-                //     where("user_id", "==", user.uid),
-                //     where("listing_id", "==", listingID)
-                // );
-                // try {
-                //     const savedSnapshot = await getDocs(queryPosts)
-                //     if (savedSnapshot.exists()) {
-                //         console.log("Listing is in savedPosts, listing.listing_id is: ");
-                //         await deleteDoc(listingRef);
-                //     } else {
-                //         console.log("Listing is not saved.");
-                //     }
-                // } catch (error) {
-                //     console.error("Error checking if listing is saved:", error);
-                // }
+                // unsave the post
+                await deleteDoc(listingRef)
+
+                // filter it out from savedPosts
+                setSavedPosts(prevSavedPosts =>
+                    prevSavedPosts.filter(
+                        (post) => !(post.listing_id === listingID && post.userID === user.uid)
+                    )
+                )
             }
+
+            // toggle the value of saved
             setIsSaved(!isSaved);
         } catch (e) {
             console.log(e)
@@ -327,7 +342,7 @@ const ListingScreen = ({ navigation, route }) => {
         });
     }
 
-    const sharePost = () => {
+    const shareListing = () => {
         // will have to flesh out what this looks like, thinking like a pop up to send as a text?
         const deepLink = Linking.createURL(`listing/${listingID}`)
         const messageBody = `Check out this listing on Ripple!\n${deepLink}`
@@ -374,25 +389,27 @@ const ListingScreen = ({ navigation, route }) => {
 
                     style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
 
-                    {listing?.pfp?.uri ? (
+                    {listing?.userPfp ? (
                         <Image
-                            source={{ uri: listing.pfp.uri }}
-                            style={{ width: 60, height: 60, borderRadius: 60 }}
+                            source={{ uri: listing.userPfp }}
+                            // this will allow for use of qr codes and copy pasting text
+                            enableLiveTextInteraction={true}
+                            style={{ width: 40, height: 40, borderRadius: 60 }}
                         />
                     ) : (
                         <View
-                            style={{ height: 60, width: 60, borderRadius: 60, backgroundColor: colors.loginGray, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                            style={{ height: 40, width: 40, borderRadius: 60, backgroundColor: colors.loginGray, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
-                            <User color='black' size={32} />
+                            <User color='black' size={24} />
                         </View>
                     )}
 
                     <View>
                         <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: 'black', fontWeight: '500' }} >
-                            {listing.userName || 'no name available'}
+                            {listing.userName || 'anonymous'}
                         </Text>
-                        <Text style={{ fontFamily: 'inter', fontSize: 18, marginLeft: 8, color: colors.accentGray }} >
-                            {listing.userEmail || 'no email available'}
+                        <Text style={{ fontFamily: 'inter', fontSize: 14, marginLeft: 8, color: colors.accentGray, fontWeight: '400' }} >
+                            {listing.userEmail || 'mystery@uw.edu'}
                         </Text>
                     </View>
 
@@ -422,8 +439,8 @@ const ListingScreen = ({ navigation, route }) => {
 
                 <View style={styles.bottomButtonContainer}>
 
-                    <TouchableOpacity style={styles.bottomButton} onPress={() => sharePost()}>
-                        <PaperPlaneTilt size={26} color="black" s />
+                    <TouchableOpacity style={styles.bottomButton} onPress={() => shareListing()}>
+                        <PaperPlaneTilt size={26} color="black" />
                         <Text style={{ marginLeft: 12, fontFamily: 'inter', fontSize: 18 }}>
                             Share
                         </Text>
@@ -482,7 +499,44 @@ const ListingScreen = ({ navigation, route }) => {
 
             <View style={{ width: 1, height: 20 }} />
 
-        </ScrollView >
+
+
+            {/* MODAL VIEW */}
+            {modalVisible && (
+                <TouchableWithoutFeedback
+                    style={styles.modalBackdrop}
+                    onPress={() => {
+                        console.log('dismiss')
+                        setModalVisible(false)
+                    } // Dismiss modal on backdrop press
+                    }
+                >
+                    <View style={styles.modalContainer}>
+                        {isOwnPost ? (
+                            <>
+                                <TouchableOpacity style={styles.modalOption} onPress={() => shareListing()}>
+                                    <Text style={styles.modalText}>Share Post</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.modalOption, { borderBottomWidth: 0 }]} onPress={() => handleDeleteListing()}>
+                                    <Text style={[styles.modalText, { color: 'red' }]}>
+                                        Delete Post
+                                    </Text>
+                                </TouchableOpacity>
+                            </>
+                        ) : (
+                            <TouchableOpacity style={[styles.modalOption, { borderBottomWidth: 0 }]} onPress={() => handleReportUser()}>
+                                <Text style={[styles.modalText, { color: 'red' }]}>Report User</Text>
+                            </TouchableOpacity>
+                        )}
+                        {/* <TouchableOpacity style={[styles.modalOption, { borderBottomWidth: 0 }]} onPress={() => setModalVisible(false)}>
+                            <Text style={[styles.modalText, { color: 'black' }]}>
+                                Cancel
+                            </Text>
+                        </TouchableOpacity> */}
+                    </View>
+                </TouchableWithoutFeedback>
+            )}
+        </ScrollView>
     )
 }
 
@@ -490,6 +544,13 @@ export default ListingScreen;
 
 
 const styles = StyleSheet.create({
+    container: {
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     shadow: {
         shadowColor: "#000",
         shadowOffset: {
@@ -559,7 +620,42 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 25
-    }
+    },
+    // modal styles: 
+    modalBackdrop: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 99,
+        flex: 1,
+    },
+    modalContainer: {
+        position: 'absolute',
+        top: 10, // Adjust to position the modal just below the header
+        right: 10, // Align with the three dots
+        width: 150,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        padding: 10,
+        paddingVertical: 4,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+    },
+    modalOption: {
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.loginGray,
+    },
+    modalText: {
+        fontSize: 16,
+        textAlign: 'center',
+    },
 })
 
 
@@ -622,10 +718,10 @@ const PhotoCarousel = ({ photos, sold }) => {
                 ref={flatListRef}
                 horizontal={true}
                 data={photos}
+                scrollEnabled={photos.length > 1} // wont scroll when only one photo
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => {
                     return (
-                        // TODO change this to be an image
                         <View
                             style={{ height: width, width: width, alignSelf: 'center', justifyContent: 'center', }}
                         >
@@ -636,7 +732,7 @@ const PhotoCarousel = ({ photos, sold }) => {
                                     height: "100%",
                                     borderRadius: 0,
                                 }}
-                                resizeMode="cover"
+                                contentFit="cover"
                             />
                             {sold && (
                                 <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: '100%' }}>

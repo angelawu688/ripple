@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Alert, Image, Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { userContext } from "../../context/UserContext";
 import { Ionicons } from '@expo/vector-icons';
 
@@ -31,6 +31,19 @@ const Profile = ({ navigation }) => {
         // a bunch of other actions that we want to make sure work
         //  ...
         setUser(null)
+    }
+
+    const openURL = async (url) => {
+        try {
+            const supported = await Linking.canOpenURL(url);
+            if (supported) {
+                await Linking.openURL(url)
+            } else {
+                Alert.alert('Error', "Can't open URL")
+            }
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     const handleDeleteAccount = () => {
@@ -159,7 +172,7 @@ const Profile = ({ navigation }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.profileCard}
-                    onPress={() => console.log('OPEN WEB URL TO LINK')}
+                    onPress={() => openURL('https://www.rippleu.net/')}
                 >
                     <View style={styles.profileCardLeft}>
                         <ShareFat size={24} color={'black'} style={styles.icon} />

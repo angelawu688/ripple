@@ -22,8 +22,6 @@ const ListingsList = ({ listings,
         return null
     }
 
-
-
     return (
         <FlatList
             style={styles.container}

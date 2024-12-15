@@ -13,7 +13,7 @@ import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
 import UserProfile from '../../screens/Marketplace/UserProfile'
 import Conversation from "../../screens/Messages/Conversation";
 import OwnUserProfile from "../../screens/Profile/OwnUserProfile";
-import { Gear } from "phosphor-react-native";
+import { DotsThree, Gear } from "phosphor-react-native";
 
 
 const ProfileStack = createNativeStackNavigator();
@@ -34,16 +34,7 @@ const ProfileStackNavigator = () => {
                 name="OwnUserProfile"
                 component={OwnUserProfile}
                 options={{
-                    headerTitle: () => (
-                        <Logo />
-                    ),
-                    headerRight: () => {
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Profile')}
-                        >
-                            <Gear />
-                        </TouchableOpacity>
-                    }
+                    headerShown: false
                 }}
             />
 
@@ -142,13 +133,20 @@ const ProfileStackNavigator = () => {
             <ProfileStack.Screen
                 name="ListingScreen"
                 component={ListingScreen}
-                options={({ navigation }) => ({
+                options={({ navigation, route }) => ({
                     headerTitle: () => (
                         <Logo />
                     ),
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => (
+                        <TouchableOpacity
+                            onPress={() => route.params?.toggleModal && route.params.toggleModal()}
+                        >
+                            <DotsThree size={32} />
                         </TouchableOpacity>
                     )
                 })}

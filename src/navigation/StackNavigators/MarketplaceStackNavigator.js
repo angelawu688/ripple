@@ -10,6 +10,7 @@ import { Text, TouchableOpacity, Image, View } from "react-native";
 import CreateListing from "../../screens/Marketplace/MarketplaceLists/CreateListing";
 import UserProfile from "../../screens/Marketplace/UserProfile";
 import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
+import { DotsThree } from "phosphor-react-native";
 
 const MarketplaceStack = createNativeStackNavigator();
 
@@ -46,32 +47,24 @@ const MarketplaceStackNavigator = () => {
             <MarketplaceStack.Screen
                 name="ListingScreen"
                 component={ListingScreen}
-                options={({ navigation }) => ({
+                options={({ navigation, route }) => ({
                     headerTitle: () => (
                         <Logo />
                     ),
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => (
+                        <TouchableOpacity
+                            onPress={() => route.params?.toggleModal && route.params.toggleModal()}
+                        >
+                            <DotsThree size={32} />
                         </TouchableOpacity>
                     )
                 })}
             />
-
-            {/* <MarketplaceStack.Screen
-                name="SellScreen"
-                component={SellScreen}
-                options={({ navigation }) => ({
-                    headerTitle: () => (
-                        <Logo />
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    )
-                })}
-            /> */}
 
             <MarketplaceStack.Screen
                 name="CreateListing"
