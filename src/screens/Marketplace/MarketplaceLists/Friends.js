@@ -7,6 +7,8 @@ import { userContext } from "../../../context/UserContext"
 import * as Linking from 'expo-linking'
 import { collection, getDocs, getFirestore, limit, orderBy, query, where } from "firebase/firestore";
 import ListingsListSkeletonLoaderFull from "../../../components/ListingsListSkeletonLoaderFull";
+// import { useFocusEffects } from "expo-router"
+import { useFocusEffect } from "@react-navigation/native"
 
 
 const Friends = ({ navigation }) => {
@@ -17,7 +19,7 @@ const Friends = ({ navigation }) => {
     // grab the friends listings on component mount
     // query following collection?
     const db = getFirestore();
-    useEffect(() => {
+    useFocusEffect(() => {
         const fetchListings = async () => {
             try {
                 // get following ids
@@ -61,7 +63,7 @@ const Friends = ({ navigation }) => {
             }
         };
         fetchListings();
-    }, []);
+    });
 
     const shareProfile = () => {
         if (!userData?.uid) {

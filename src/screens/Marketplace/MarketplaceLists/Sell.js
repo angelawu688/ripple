@@ -3,18 +3,29 @@ import ListingCard from "../../../components/ListingCard"
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ListingsList from "../../../components/ListingsList";
 import { colors } from "../../../colors";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { userContext } from "../../../context/UserContext";
-
+import { useFocusEffect } from "@react-navigation/native";
 
 
 const Sell = ({ navigation }) => {
     const { userListings } = useContext(userContext)
     const [activeListings, setActiveListings] = useState([])
 
-    useEffect(() => {
-        setActiveListings(userListings.filter((listing) => listing.sold !== true))
-    }, [userListings])
+    useFocusEffect(
+        useCallback(() => {
+            setActiveListings(userListings.filter((listing) => listing.sold !== true))
+
+
+            // empty cleanup function
+            return () => {
+
+            };
+        }, [userListings])
+    );
+
+
+
 
     return (
         <View style={styles.container}>

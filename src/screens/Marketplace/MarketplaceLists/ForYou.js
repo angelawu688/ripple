@@ -3,9 +3,6 @@ import ListingCard from "../../../components/ListingCard"
 import ListingsList from "../../../components/ListingsList"
 import LoadingSpinner from '../../../components/LoadingSpinner'
 
-
-
-
 const ForYou = ({
     listings,
     navigation,

@@ -12,11 +12,12 @@ import Sell from './MarketplaceLists/Sell'
 import Search from './MarketplaceLists/Search'
 import { MapPin, Plus } from "phosphor-react-native";
 import ListingsListSkeletonLoaderFull from "../../components/ListingsListSkeletonLoaderFull";
+import { useFocusEffect } from "@react-navigation/native";
 
 
 // how many items we fetch at a time
 // this is obviously terrible but makes it easy to see lol
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 30;
 
 const Marketplace = ({ navigation }) => {
     // TODO refactor for clarity
@@ -34,6 +35,10 @@ const Marketplace = ({ navigation }) => {
     const [lastDoc, setLastDoc] = useState(null) // allow us to track from the last doc
 
     const db = getFirestore();
+
+    useFocusEffect(() => {
+        fetchListings(true);
+    }) // db shouldnt change but just in case
 
 
     // moved outside of the use effect hook so that we can call this elsewhere
@@ -89,9 +94,7 @@ const Marketplace = ({ navigation }) => {
         }
     };
 
-    useEffect(() => {
-        fetchListings(true);
-    }, []); // db shouldnt change but just in case
+
 
     const onRefresh = () => {
         fetchListings(true)
