@@ -5,7 +5,7 @@ import ListingsList from "../../../components/ListingsList"
 import { useContext, useEffect, useState } from "react"
 import { userContext } from "../../../context/UserContext"
 import * as Linking from 'expo-linking'
-import {collection, getDocs, getFirestore, limit, orderBy, query, where} from "firebase/firestore";
+import { collection, getDocs, getFirestore, limit, orderBy, query, where } from "firebase/firestore";
 import ListingsListSkeletonLoaderFull from "../../../components/ListingsListSkeletonLoaderFull";
 
 
@@ -80,6 +80,13 @@ const Friends = ({ navigation }) => {
         // example dev URL: exp://10.155.102.135:8081/--/user/RsYuNgUxSUTm0xdD0CMi6Yhkjc73 
         // prod urls will look different
         // we will need to use firebase dynamic URLs so that people without the app will be prompted to go download
+    }
+
+    // loading
+    if (isLoading) {
+        return (
+            <ListingsListSkeletonLoaderFull />
+        )
     }
 
     // empty

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Linking, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator, ScrollView, Image } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator, ScrollView, Image, Modal, TouchableWithoutFeedback } from "react-native";
 import ForYou from "./MarketplaceLists/ForYou";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -17,11 +17,15 @@ import {
 } from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
 import ListingsList from '../../components/ListingsList'
-import { Check, DotsThree, EnvelopeSimple, Gear, InstagramLogo, LinkedinLogo, Mailbox, Plus, User, XLogo } from "phosphor-react-native";
+import { ChatCircleDots, Check, DotsThree, EnvelopeSimple, Gear, InstagramLogo, Link, LinkedinLogo, Mailbox, Plus, QrCode, User, XLogo } from "phosphor-react-native";
 import { colors } from "../../colors";
 import { userContext } from "../../context/UserContext";
 import ListingCard from "../../components/ListingCard";
 import { getConversation } from '../../utils/firebaseUtils'
+import { sendProfile } from "../../utils/socialUtils";
+import QRCode from "react-native-qrcode-svg";
+import * as Linking from 'expo-linking'
+
 
 const testUserPosts = [
     { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
@@ -38,9 +42,21 @@ const UserProfile = ({ navigation, route }) => {
     const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
     const [isOwnProfile, setIsOwnProfile] = useState(false)
     const [userListings, setUserListings] = useState([])
+    const [shareModalVisible, setShareModalVisible] = useState(false)
 
     const [loadingIG, setLoadingIG] = useState(false)
     const [loadingLI, setLoadingLI] = useState(false)
+
+    // temp here, clean this up later to only do it once
+    const [profileLink, setProfileLink] = useState('');
+
+    useEffect(() => {
+        if (userID) {
+            const link = Linking.createURL(`user/${userID}`);
+            setProfileLink(link);
+        }
+    }, [userID]);
+
     const db = getFirestore();
 
     // OCM grab if its the users own post
@@ -51,21 +67,21 @@ const UserProfile = ({ navigation, route }) => {
         }
     }, [user])
 
-    useEffect(() => {
-        if (isOwnProfile) {
-            navigation.setOptions(
-                {
-                    headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Profile')}
-                        >
-                            <Gear size={60} />
-                        </TouchableOpacity>
-                    )
-                }
-            )
-        }
-    }, [isOwnProfile])
+    // useEffect(() => {
+    //     if (isOwnProfile) {
+    //         navigation.setOptions(
+    //             {
+    //                 headerRight: () => (
+    //                     <TouchableOpacity
+    //                         onPress={() => navigation.navigate('Profile')}
+    //                     >
+    //                         <Gear size={60} />
+    //                     </TouchableOpacity>
+    //                 )
+    //             }
+    //         )
+    //     }
+    // }, [isOwnProfile])
 
     // grab the profile from the backend by the userID
     useEffect(() => {
@@ -258,15 +274,15 @@ const UserProfile = ({ navigation, route }) => {
     }
 
     return (
-        <View style={[styles.container, { marginTop: isOwnProfile ? 80 : 0 }]}>
+        <View style={[styles.container, { marginTop: isOwnProfile ? 0 : 0 }]}>
             <View style={styles.topContainer}>
                 {userProfile.pfp ? (<Image
                     // pfp would go here
-                    style={{ width: 45, height: 45, borderRadius: 75, }}
+                    style={{ width: 60, height: 60, borderRadius: 75, backgroundColor: 'yellow' }}
                     source={{ uri: userProfile?.pfp }}
 
                 />) :
-                    (<View style={{ backgroundColor: colors.loginGray, width: 45, height: 45, borderRadius: 75, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                    (<View style={{ backgroundColor: colors.loginGray, width: 60, height: 60, borderRadius: 75, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                         <User size={24} />
                     </View>)
                 }
@@ -293,7 +309,7 @@ const UserProfile = ({ navigation, route }) => {
                         onPress={() => navigation.navigate('Profile')}
                     >
                         {/* <Gear size={30} /> */}
-                        <DotsThree size={30} weight="bold" />
+                        {/* <DotsThree size={30} weight="bold" /> */}
                     </TouchableOpacity>
                 )}
             </View>
@@ -368,8 +384,6 @@ const UserProfile = ({ navigation, route }) => {
                                 {userProfile.bio}
                             </Text>
                         </View>)}
-
-
                         {(userProfile.instagram || userProfile.linkedin || userProfile.twitter) && (<View style={styles.socials}>
 
                             {userProfile.instagram && <TouchableOpacity
@@ -378,7 +392,7 @@ const UserProfile = ({ navigation, route }) => {
                             >
                                 {loadingIG ? (<ActivityIndicator />) : (<Image
                                     source={require('../../../assets/images/IG_logo.png')}
-                                    style={{ width: 30, height: 30, borderRadius: 5 }}
+                                    style={{ width: 25, height: 25, borderRadius: 5 }}
                                 />)}
                                 <Text style={styles.socialText}>
                                     {userProfile.instagram}
@@ -391,7 +405,7 @@ const UserProfile = ({ navigation, route }) => {
                             >
                                 <Image
                                     source={require('../../../assets/images/LI_logo.png')}
-                                    style={{ width: 30, height: 30, borderRadius: 5 }}
+                                    style={{ width: 25, height: 25, borderRadius: 5 }}
                                 />
                                 <Text numberOfLines={1}
                                     style={styles.socialText}>
@@ -403,17 +417,13 @@ const UserProfile = ({ navigation, route }) => {
                         </View>)}
                         {userListings && userListings.length > 0 && (
                             // <View>
-                            <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 20, marginTop: 12 }}>
+                            <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 0 }}>
                                 Listings
                             </Text>
                             // </View>
                         )}
                     </View>
                 </View>
-
-
-
-                {/* getting hella conditional w it */}
                 {
                     userListings && userListings.length > 0 ? (userListings.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
                         <ListingCard listing={userListings[0]} />
@@ -432,8 +442,86 @@ const UserProfile = ({ navigation, route }) => {
                 }
 
             </ScrollView >
-        </View >
 
+            {isOwnProfile && (
+                <TouchableOpacity style={{ backgroundColor: 'white', borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.35, shadowRadius: 5, position: 'absolute', bottom: 15, right: 15, shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 } }}
+                    onPress={() => {
+                        setShareModalVisible(true)
+                        console.log('clicked')
+                    }}
+                >
+                    <QrCode color={colors.darkblue} size={30} />
+                </TouchableOpacity>
+            )}
+
+            <Modal
+                transparent={true}
+                visible={shareModalVisible}
+                onRequestClose={() => setShareModalVisible(false)}
+                animationType="fade"
+            >
+                <TouchableOpacity
+                    style={{
+                        flex: 1,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                    activeOpacity={1}
+                    onPress={() => setShareModalVisible(false)}
+                >
+                    <TouchableOpacity
+                        activeOpacity={1}
+                        style={{
+                            width: '80%',
+                            backgroundColor: 'white',
+                            borderRadius: 20,
+                            padding: 25,
+                            alignItems: 'center',
+                            shadowColor: "#000",
+                            shadowOffset: {
+                                width: 0,
+                                height: 2
+                            },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 4,
+                            elevation: 5
+                        }}
+                    >
+                        <Text style={{
+                            fontSize: 20,
+                            fontFamily: 'inter',
+                            fontWeight: '600',
+                            marginBottom: 20
+                        }}>
+                            Scan to share your account!
+                        </Text>
+
+                        <QRCode
+                            value={profileLink}
+                            size={200}
+                            color={colors.black}
+                            backgroundColor="white"
+                        />
+
+                        <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'flex-start', paddingTop: 24 }}>
+                            {/* socials container */}
+                            <TouchableOpacity
+                                style={styles.modalSocialButton}
+                            >
+                                <Link size={20} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+
+                                onPress={() => sendProfile(user?.uid)}
+                                style={styles.modalSocialButton}>
+                                <ChatCircleDots size={20} />
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                </TouchableOpacity>
+            </Modal>
+        </View >
     )
 
 }
@@ -463,10 +551,11 @@ const styles = StyleSheet.create({
     headerTextContainer: {
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'center',
         marginLeft: 12,
         marginBottom: 6,
         maxWidth: '70%',
-
+        height: 60,
     },
     nameText: {
         fontSize: 22,
@@ -491,8 +580,8 @@ const styles = StyleSheet.create({
         marginTop: 16,
         width: '100%',
         justifyContent: 'space-between',
-        marginBottom: 25,
-        height: 80
+        marginBottom: 20,
+        height: 60
     },
     followText: {
         marginLeft: 4,
@@ -529,9 +618,17 @@ const styles = StyleSheet.create({
     },
     socialText: {
         marginLeft: 8,
-        fontSize: 18,
+        fontSize: 17,
         fontFamily: 'inter',
         color: colors.loginBlue,
         maxWidth: '80%',
+    },
+    // modals
+    modalSocialButton: {
+        borderRadius: 50,
+        padding: 10,
+        borderColor: colors.neonBlue,
+        borderWidth: 1,
+        marginRight: 10
     }
 })

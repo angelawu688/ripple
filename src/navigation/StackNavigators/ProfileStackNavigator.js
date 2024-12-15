@@ -33,9 +33,18 @@ const ProfileStackNavigator = () => {
             <ProfileStack.Screen
                 name="OwnUserProfile"
                 component={OwnUserProfile}
-                options={{
-                    headerShown: false
-                }}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <></>
+                    ),
+                    headerRight: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('Profile')}
+                        >
+                            <DotsThree size={32} />
+                        </TouchableOpacity>
+                    )
+                })}
             />
 
             <ProfileStack.Screen

@@ -42,6 +42,7 @@ const ListingScreen = ({ navigation, route }) => {
     // 3 dots 
     const [modalVisible, setModalVisible] = useState(false)
     const toggleModal = () => {
+        console.log('wahaawe')
         setModalVisible(!modalVisible);
     };
 
@@ -73,35 +74,11 @@ const ListingScreen = ({ navigation, route }) => {
 
                 setPostSold(!!data.sold)
 
-                // // check if it's sold or not
-                // if (docSnap.data().sold === true) {
-                //     // console.log(`Listing is sold`);
-                //     setPostSold(true);
-                // }
-                // else {
-                //     // console.log(`Listing is not sold`);
-                //     setPostSold(false);
-                // }
-
                 const alreadySaved = savedPosts?.some(
                     (post) => post.listing_id === listingID && post.userID === user.uid
                 )
                 setIsSaved(!!alreadySaved)
 
-                // // check if listing is saved already
-                // if (savedPosts && savedPosts.length !== 0) {
-                //     const saveStatus = savedPosts.some((post) => post.listing_id === listingID && post.userID === user.uid);
-                //     if (saveStatus) {
-                //         setIsSaved(true);
-                //         // console.log(`Listing with ID ${listingID} is saved.`);
-                //     } else {
-                //         setIsSaved(false)
-                //         // console.log(`Listing with ID ${listingID} is not saved.`);
-                //     }
-                // }
-                // else {
-                //     setIsSaved(false);
-                // }
             } else {
                 console.log("No such listing!");
             }
@@ -149,7 +126,6 @@ const ListingScreen = ({ navigation, route }) => {
             </Text>
         </View>;
     } else {
-        console.log(listing)
     }
 
     const handleEditListing = () => {
@@ -247,7 +223,6 @@ const ListingScreen = ({ navigation, route }) => {
     }
 
     const markAsSold = async () => {
-        console.log('marking post as sold')
         const docRef = doc(db, "listings", listingID);
         const updatedData = { sold: true };
         try {
@@ -256,7 +231,6 @@ const ListingScreen = ({ navigation, route }) => {
             console.error("Error marking listing as sold:", error);
         } finally {
             setPostSold(!postSold)
-            console.log("listing is now marked as sold")
             setUserListings(prevUserListings =>
                 prevUserListings.map(listing =>
                     listing.id === listingID ? { ...listing, ...updatedData } : listing
@@ -266,7 +240,6 @@ const ListingScreen = ({ navigation, route }) => {
     }
 
     const markAsActive = async () => {
-        console.log('marking post as active')
         const docRef = doc(db, "listings", listingID);
         const updatedData = { sold: false }
         try {
@@ -275,7 +248,6 @@ const ListingScreen = ({ navigation, route }) => {
             console.error("Error marking listing as active:", error);
         } finally {
             setPostSold(!postSold)
-            console.log("listing is now marked as active")
             setUserListings(prevUserListings =>
                 prevUserListings.map(listing =>
                     listing.id === listingID ? { ...listing, ...updatedData } : listing
