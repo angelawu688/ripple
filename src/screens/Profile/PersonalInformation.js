@@ -36,18 +36,6 @@ const PersonalInformation = () => {
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     const [isLoadingImagePicker, setIsLoadingImagePicker] = useState(false)
 
-    // FOR TESTING PURPOSES
-    // const [fakeUser, setFakeUser] = useState({
-    //     email: 'phunt22@uw.edu',
-    //     name: 'Schoolboy Q',
-    //     bio: undefined,
-    //     major: 'Not CS for long',
-    //     gradYear: '2026',
-    //     instagram: '@daxflame',
-    //     linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/',
-    //     twitter: '@beabadoobee',
-    // })
-
 
     // this will give us the modal, and tell us what we are doing
     const handleNext = (field) => {
