@@ -13,6 +13,8 @@ import { Inter_400Regular } from '@expo-google-fonts/inter'
 import * as SplashScreen from 'expo-splash-screen';
 import * as Linking from 'expo-linking'
 import FullLoadingScreen from './src/screens/shared/FullLoadingScreen';
+import { registerForPushNotificationsAsync } from './src/utils/notifications';
+import { handleUrlParams } from 'expo-router/build/fork/getStateFromPath-forks';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -44,10 +46,25 @@ export default function App() {
 // separate the middle into root so that we are able to grab the loading prop
 // from the user context, fixing the flickering issue
 const RootComponent = () => {
-  const { isLoading } = useContext(userContext);
+  const { isLoading, user } = useContext(userContext);
+
+  // register the user for async notifications
+  useEffect(() => {
+    const handleRegisterForPushNotificationsAsync = async () => {
+      if (!isLoading && user) {
+        const token = await registerForPushNotificationsAsync(user.uid);
+        console.log(token)
+      }
+    }
+    handleRegisterForPushNotificationsAsync()
+  }, [isLoading, user])
+
   if (isLoading) {
     return <FullLoadingScreen text={'Loading auth from main'} />
   }
+
+
+
 
   // ALLOWS FOR DEEP LINKS
   // this needs a lot more testing lmao
