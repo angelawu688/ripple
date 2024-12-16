@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, FlatList, Keyboard, Modal } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
 import ListingCard from '../../components/ListingCard';
-import { ArrowBendRightUp, CaretRight, User, XCircle } from 'phosphor-react-native';
+import { ArrowBendRightUp, CaretRight, User, X, XCircle } from 'phosphor-react-native';
 import { colors } from '../../colors';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { getListingFromID, sendMessage } from '../../utils/firebaseUtils';
@@ -119,6 +119,13 @@ const MessageBubble = ({ navigation, message, activeUserID, formattedDate = unde
                 transparent={true}
                 animationType="fade"
                 onRequestClose={() => setShowZoomModal(false)}>
+                <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setShowZoomModal(false)}
+                >
+                    <X size={32} color='white' weight='bold' />
+                    <Text style={styles.closeButtonText}>X</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.modalContainer}
                     activeOpacity={1}
@@ -506,32 +513,27 @@ const styles = StyleSheet.create({
     },
 
 
-    // modal styles: 
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'black'
-    },
-    closeButton: {
-        position: 'absolute',
-        top: 100,
-        right: 50,
-        zIndex: 9999,
-        backgroundColor: colors.black
-    },
-    closeButtonText: {
-        fontSize: 30,
-        color: colors.white,
-        fontWeight: 'bold',
-    },
-    zoomContainer: {
-        width: '100%',
-        height: '100%',
-    },
-    fullScreenImage: {
-        width: '100%',
-        height: '100%',
-    },
+    // // modal styles: 
+    // modalContainer: {
+    //     flex: 1,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     backgroundColor: 'black'
+    // },
+    // zoomContainer: {
+    //     width: '100%',
+    //     height: '100%',
+    // },
+    // fullScreenImage: {
+    //     width: '100%',
+    //     height: '100%',
+    // },
+    // closeButton: {
+    //     position: 'absolute',
+    //     top: 50,
+    //     left: 10,
+    //     zIndex: 9999,
+    //     padding: 10,
+    // },
 
 })
