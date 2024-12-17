@@ -265,3 +265,27 @@ export const deleteFromSavedPosts = async (listingID) => {
     })
     await Promise.all(deletePromises)
 }
+
+// updating listings with user profile changes
+
+// given a user id and profile image url, will update all listings with it
+export const updateAllListingsPfp = async (userId, pfpLink) => {
+    const q = query(collection(db, 'listings'), where('userId', '==', userId))
+    const querySnapshot = await getDocs(q);
+    const updatePromises = [];
+    querySnapshot.forEach((docSnap) => {
+        updatePromises.push(updateDoc(docSnap.ref, { userPfp: pfpLink }))
+    })
+    await Promise.all(updatePromises)
+}
+
+// given a user id and new name, will update all listings with it
+export const updateAllListingsName = async (userId, userName) => {
+    const q = query(collection(db, 'listings'), where('userId', '==', userId))
+    const querySnapshot = await getDocs(q);
+    const updatePromises = [];
+    querySnapshot.forEach((docSnap) => {
+        updatePromises.push(updateDoc(docSnap.ref, { userName: userName }))
+    })
+    await Promise.all(updatePromises)
+}

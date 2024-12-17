@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../colors'
 import { isLoading } from 'expo-font';
 import { PencilSimple } from 'phosphor-react-native';
-import { uploadPFP } from '../../utils/firebaseUtils';
+import { uploadPFP, updateAllListingsPfp } from '../../utils/firebaseUtils';
 
 
 
@@ -35,18 +35,6 @@ const PersonalInformation = () => {
     const [continueAvailable, setContinueAvailable] = useState('')
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     const [isLoadingImagePicker, setIsLoadingImagePicker] = useState(false)
-
-    // FOR TESTING PURPOSES
-    // const [fakeUser, setFakeUser] = useState({
-    //     email: 'phunt22@uw.edu',
-    //     name: 'Schoolboy Q',
-    //     bio: undefined,
-    //     major: 'Not CS for long',
-    //     gradYear: '2026',
-    //     instagram: '@daxflame',
-    //     linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/',
-    //     twitter: '@beabadoobee',
-    // })
 
 
     // this will give us the modal, and tell us what we are doing
@@ -101,7 +89,11 @@ const PersonalInformation = () => {
             const db = getFirestore();
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, updatedInfo);
+            if (currentField.key === 'name') {
+                await updateAllListingsPfp(user.uid, input)
+            }
             const userDoc = await getDoc(userRef);
+
 
             // frontend change
             setUserData(userDoc.data());
@@ -141,9 +133,13 @@ const PersonalInformation = () => {
                 const userRef = doc(db, "users", user.uid);
                 await updateDoc(userRef, { pfp: downloadLink });
 
+                const userDoc = await getDoc(userRef);
+                setUserData(userDoc.data());
+
+                await updateAllListingsPfp(user.uid, downloadLink)
+
                 // frontend change
                 // setPfp(downloadLink)
-
             } else {
                 // user cancelled, do nothing
                 setIsLoadingImagePicker(false)
