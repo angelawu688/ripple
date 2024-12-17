@@ -2,7 +2,7 @@ import { FlatList, Text, TouchableOpacity, View, StyleSheet } from "react-native
 import ListingCard from "../../../components/ListingCard"
 import { colors } from "../../../colors"
 import ListingsList from "../../../components/ListingsList"
-import { useContext, useEffect, useState } from "react"
+import {useCallback, useContext, useEffect, useState} from "react"
 import { userContext } from "../../../context/UserContext"
 import * as Linking from 'expo-linking'
 import { collection, getDocs, getFirestore, limit, orderBy, query, where } from "firebase/firestore";
@@ -18,41 +18,44 @@ const Friends = ({ navigation }) => {
 
     // grab the friends listings on component mount
     const db = getFirestore();
-    useFocusEffect(() => {
-        const fetchListings = async () => {
-            try {
-                // not following anyone
-                if (userFollowing.length === 0) {
-                    setFriendsListings([]);
-                    return;
+    useFocusEffect(
+        useCallback(() => {
+            const fetchListings = async () => {
+                try {
+                    // not following anyone
+                    if (userFollowing.length === 0) {
+                        setFriendsListings([]);
+                        return;
+                    }
+
+                    // get listings from ppl we're following
+                    // only gets 10 ids
+                    // TODO: fix this so we can get more than 10
+                    const listingsQuery = query(
+                        collection(db, 'listings'),
+                        where('userId', 'in', userFollowing),
+                        where("sold", "==", false),
+                        orderBy("createdAt", "desc"),
+                        limit(32)
+                    );
+                    const listingsSnapshot = await getDocs(listingsQuery);
+                    const friendsListingsData = listingsSnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+
+                    setFriendsListings(friendsListingsData);
+                } catch (error) {
+                    console.error("Error fetching friends listings:", error);
+                } finally {
+                    // TODO: need to handle when isLoading is true
+                    setIsLoading(false);
                 }
 
-                // get listings from ppl we're following
-                // only gets 10 ids
-                // TODO: fix this so we can get more than 10
-                const listingsQuery = query(
-                    collection(db, 'listings'),
-                    where('userId', 'in', userFollowing),
-                    where("sold", "==", false),
-                    orderBy("createdAt", "desc"),
-                    limit(32)
-                );
-                const listingsSnapshot = await getDocs(listingsQuery);
-                const friendsListingsData = listingsSnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-
-                setFriendsListings(friendsListingsData);
-            } catch (error) {
-                console.error("Error fetching friends listings:", error);
-            } finally {
-                // TODO: need to handle when isLoading is true
-                setIsLoading(false);
             }
-        };
-        fetchListings();
-    }, [userFollowing])
+            fetchListings()
+        }, [userFollowing])
+    );
 
     const shareProfile = () => {
         if (!userData?.uid) {
