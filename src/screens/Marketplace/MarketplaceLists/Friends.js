@@ -28,9 +28,7 @@ const Friends = ({ navigation }) => {
                         return;
                     }
 
-                    // get listings from ppl we're following
-                    // only gets 10 ids
-                    // TODO: fix this so we can get more than 10
+
                     const listingsQuery = query(
                         collection(db, 'listings'),
                         where('userId', 'in', userFollowing),
