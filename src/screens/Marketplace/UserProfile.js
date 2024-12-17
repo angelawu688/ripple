@@ -26,6 +26,7 @@ import { sendProfile } from "../../utils/socialUtils";
 import QRCode from "react-native-qrcode-svg";
 import * as Linking from 'expo-linking'
 import ShareModal from "../../components/ShareModal";
+import { useFocusEffect } from "@react-navigation/native";
 
 
 
@@ -52,7 +53,7 @@ const testUserPosts = [
 ]
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
-    const { user, userFollowing, setUserFollowing } = useContext(userContext)
+    const { user, userData, userFollowing, setUserFollowing } = useContext(userContext)
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
@@ -150,16 +151,16 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
             } finally {
                 setIsLoading(false);
             }
-            // setting the socials for testing
-            // TODO CHANGE TESTING
-            setUserProfile(prevProfile => ({
-                ...prevProfile,
-                // instagram: 'williamhuntt',
-                // linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
-            }));
+            // // setting the socials for testing
+            // // TODO CHANGE TESTING
+            // setUserProfile(prevProfile => ({
+            //     ...prevProfile,
+            //     // instagram: 'williamhuntt',
+            //     // linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
+            // }));
         };
         getProfile();
-    }, []);
+    }, [userData])
 
 
 

@@ -159,11 +159,13 @@ export default function ShareModal({ isVisible, qrCode, setShareModalVisible }) 
                     <View style={styles.socialsContainer}>
                         {/* socials container */}
                         <View style={[styles.socialButtonContainer, { marginRight: 29 }]}>
-                            <TouchableOpacity
+                            <TouchableOpacity style={styles.modalSocialButton}
                                 onPress={() => sendProfile(user?.uid)}
-                                style={[styles.modalSocialButton, styles.shadow]}
+                            // style={[styles.modalSocialButton, styles.shadow]}
                             >
-                                <Export size={24} color={colors.loginBlue} weight='bold' />
+                                <Export size={24} color={colors.loginBlue}
+                                // weight='bold'
+                                />
 
                             </TouchableOpacity>
                             <Text style={styles.modalSocialText}>
@@ -173,9 +175,11 @@ export default function ShareModal({ isVisible, qrCode, setShareModalVisible }) 
 
                         <View style={[styles.socialButtonContainer]}>
                             <TouchableOpacity
-                                style={[styles.modalSocialButton, styles.shadow]}
+                                style={[styles.modalSocialButton]}
                             >
-                                <Link size={24} color={colors.loginBlue} weight='bold' />
+                                <Link size={24} color={colors.loginBlue}
+                                // weight='bold'
+                                />
 
                             </TouchableOpacity>
                             <Text style={styles.modalSocialText}>
@@ -223,17 +227,17 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
     },
-    modalSocialButton: {
-        borderRadius: 50,
-        height: 55,
-        width: 55,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: colors.neonBlue,
-        borderWidth: 1,
-        backgroundColor: 'white'
-    },
+    // modalSocialButton: {
+    //     borderRadius: 50,
+    //     height: 55,
+    //     width: 55,
+    //     display: 'flex',
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     borderColor: colors.neonBlue,
+    //     borderWidth: 1,
+    //     backgroundColor: 'white'
+    // },
     closeButton: {
         position: 'absolute',
         top: 50,
@@ -304,4 +308,18 @@ const styles = StyleSheet.create({
         bottom: -100,
         left: -100,
     },
+    modalSocialButton: {
+        backgroundColor: 'white',
+        borderColor: colors.darkblue,
+        width: 60,
+        height: 60,
+        borderRadius: 50,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: colors.neonBlue,
+        shadowOpacity: 0.7,
+        shadowRadius: 5,
+        shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 }
+    }
 })
