@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../colors'
 import { isLoading } from 'expo-font';
 import { PencilSimple } from 'phosphor-react-native';
-import { uploadPFP } from '../../utils/firebaseUtils';
+import { uploadPFP, updateAllListingsPfp } from '../../utils/firebaseUtils';
 
 
 
@@ -89,7 +89,11 @@ const PersonalInformation = () => {
             const db = getFirestore();
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, updatedInfo);
+            if (currentField.key === 'name') {
+                await updateAllListingsPfp(user.uid, input)
+            }
             const userDoc = await getDoc(userRef);
+
 
             // frontend change
             setUserData(userDoc.data());
@@ -129,9 +133,13 @@ const PersonalInformation = () => {
                 const userRef = doc(db, "users", user.uid);
                 await updateDoc(userRef, { pfp: downloadLink });
 
+                const userDoc = await getDoc(userRef);
+                setUserData(userDoc.data());
+
+                await updateAllListingsPfp(user.uid, downloadLink)
+
                 // frontend change
                 // setPfp(downloadLink)
-
             } else {
                 // user cancelled, do nothing
                 setIsLoadingImagePicker(false)

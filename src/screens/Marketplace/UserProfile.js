@@ -51,12 +51,12 @@ const testUserPosts = [
 ]
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
-    const { user, userFollowing, setUserFollowing } = useContext(userContext)
+    const { user, userData, userListings, userFollowing, setUserFollowing } = useContext(userContext)
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
     const [isOwnProfile, setIsOwnProfile] = useState(false)
-    const [userListings, setUserListings] = useState([])
+    const [userPosts, setUserPosts] = useState([])
     const [shareModalVisible, setShareModalVisible] = useState(false)
 
     const [loadingIG, setLoadingIG] = useState(false)
@@ -79,8 +79,19 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     useEffect(() => {
         if (user.uid === userID) {
             setIsOwnProfile(true)
+            const sortedListings = userListings.sort((a, b) => {
+                if (a.sold !== b.sold) {
+                    return a.sold ? 1 : -1;
+                }
+                // convert to ms so that we can compare with subtraction
+                return b.createdAt.toMillis() - a.createdAt.toMillis();
+
+            });
+            setUserPosts(sortedListings);
+            setUserProfile(userData)
+            setIsLoading(false);
         }
-    }, [user])
+    }, [user, userData, userListings])
 
 
     // set navigation options and header based on what stack we are in
@@ -96,6 +107,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
             // just want the back arrow
         }
     })
+
 
     // grab the profile from the backend by the userID
     useEffect(() => {
@@ -124,7 +136,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         return b.createdAt.toMillis() - a.createdAt.toMillis();
 
                     });
-                    setUserListings(sortedListings);
+                    setUserPosts(sortedListings);
 
                     // check if following user already
                     if (userFollowing && userFollowing.length !== 0) {
@@ -157,10 +169,10 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 // linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
             }));
         };
-        getProfile();
+        if (user.uid !== userID) {
+            getProfile();
+        }
     }, []);
-
-
 
     if (isLoading) {
         return <FullLoadingScreen />
@@ -430,7 +442,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 
 
                         </View>)}
-                        {userListings && userListings.length > 0 && (
+                        {userPosts && userPosts.length > 0 && (
                             // <View>
                             <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 0 }}>
                                 Listings
@@ -440,10 +452,10 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                     </View>
                 </View>
                 {
-                    userListings && userListings.length > 0 ? (userListings.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
-                        <ListingCard listing={userListings[0]} />
+                    userPosts && userPosts.length > 0 ? (userPosts.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
+                        <ListingCard listing={userPosts[0]} />
                     </View>) : (<View style={{ flex: 1 }}>
-                        <ListingsList listings={userListings} navigation={navigation} scrollEnabled={false} />
+                        <ListingsList listings={userPosts} navigation={navigation} scrollEnabled={false} />
                     </View>)
 
 
