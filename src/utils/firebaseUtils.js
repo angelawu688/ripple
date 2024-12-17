@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where, deleteDoc } from "firebase/firestore";
 import { db, storage } from "../../firebaseConfig"
 import { getDownloadURL, ref, uploadBytesResumable, refFromURL, deleteObject } from 'firebase/storage'
 
@@ -266,7 +266,7 @@ export const deleteFromSavedPosts = async (listingID) => {
     await Promise.all(deletePromises)
 }
 
-// updating listings with user profile changes
+// UPDATE functions
 
 // given a user id and profile image url, will update all listings with it
 export const updateAllListingsPfp = async (userId, pfpLink) => {
@@ -289,3 +289,15 @@ export const updateAllListingsName = async (userId, userName) => {
     })
     await Promise.all(updatePromises)
 }
+
+// update saved posts with listing changes
+export const updateAllSaved = async (listingID, listingTitle, listingPrice) => {
+    const q = query(collection(db, 'savedPosts'), where('listing_id', '==', listingID))
+    const querySnapshot = await getDocs(q);
+    const updatePromises = [];
+    querySnapshot.forEach((docSnap) => {
+        updatePromises.push(updateDoc(docSnap.ref, { title: listingTitle, price: listingPrice }))
+    })
+    await Promise.all(updatePromises)
+}
+
