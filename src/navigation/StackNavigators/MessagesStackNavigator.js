@@ -97,7 +97,7 @@ const MessagesStackNavigator = () => {
                     ),
                     headerRight: () => (
                         <></>
-                    )
+                    ),
                 })}
             />
 

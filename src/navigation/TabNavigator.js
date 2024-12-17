@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../colors'
 import { ChatTeardropText, User, Storefront } from 'phosphor-react-native';
 import { userContext } from '../context/UserContext';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 
 
@@ -104,9 +105,23 @@ const TabNavigator = () => {
 
             <Tab.Screen name="MessagesStack"
                 component={MessagesStackNavigator}
-                options={{
-                    headerShown: false
-                }}
+                options={({ route }) => ({
+                    headerShown: false,
+                    // remove the tab bar if we are in a conversation
+                    tabBarStyle: ((route) => {
+                        const routeName = getFocusedRouteNameFromRoute(route) ?? ''
+                        if (routeName === 'Conversation') {
+                            return {
+                                display: 'none'
+                            }
+                        }
+                        return {
+                            backgroundColor: colors.white,
+                            paddingTop: 12,
+                            borderTopWidth: 0.5,
+                        }
+                    })(route),
+                })}
             />
         </Tab.Navigator>
     )
