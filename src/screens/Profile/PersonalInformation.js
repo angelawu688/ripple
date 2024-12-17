@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../colors'
 import { isLoading } from 'expo-font';
 import { PencilSimple } from 'phosphor-react-native';
-import { uploadPFP, updateAllListingsPfp } from '../../utils/firebaseUtils';
+import { uploadPFP, updateAllListingsPfp, updateAllListingsName } from '../../utils/firebaseUtils';
 
 
 
@@ -90,7 +90,7 @@ const PersonalInformation = () => {
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, updatedInfo);
             if (currentField.key === 'name') {
-                await updateAllListingsPfp(user.uid, input)
+                await updateAllListingsName(user.uid, input)
             }
             const userDoc = await getDoc(userRef);
 
