@@ -17,21 +17,10 @@ const Friends = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true)
 
     // grab the friends listings on component mount
-    // query following collection?
     const db = getFirestore();
     useFocusEffect(() => {
         const fetchListings = async () => {
             try {
-                // get following ids
-                // TODO:
-                // kinda expensive, use context to simplify this?
-                // const followingQuery = query(
-                //     collection(db, 'following'),
-                //     where('follower_id', '==', user.uid)
-                // );
-                // const followingData = await getDocs(followingQuery);
-                // const followingIds = followingData.docs.map(doc => doc.data().following_id);
-
                 // not following anyone
                 if (userFollowing.length === 0) {
                     setFriendsListings([]);
@@ -63,7 +52,7 @@ const Friends = ({ navigation }) => {
             }
         };
         fetchListings();
-    });
+    }, [userFollowing])
 
     const shareProfile = () => {
         if (!userData?.uid) {
