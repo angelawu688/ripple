@@ -1,5 +1,5 @@
-import React, { useContext } from 'react'
-import { ImageBackground, Modal, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import React, { useContext, useEffect } from 'react'
+import { ImageBackground, Modal, StyleSheet, Text, TouchableOpacity, Animated } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { colors } from '../colors'
 import { ChatCircleDots, Export, Link, X } from 'phosphor-react-native'
@@ -10,6 +10,64 @@ import { userContext } from '../context/UserContext'
 
 export default function ShareModal({ isVisible, qrCode, setShareModalVisible }) {
     const { user, userData } = useContext(userContext)
+
+
+    const topCircleAnim = new Animated.ValueXY({ x: -10, y: -10 })
+    const bottomCircleAnim = new Animated.ValueXY({ x: -10, y: -10 })
+
+    const startAnimation = () => {
+        // random amount within a small range
+        const randomOffset = () => Math.random() * 40
+
+
+        const animateCircles = () => {
+            Animated.parallel([
+                Animated.sequence([
+                    Animated.timing(topCircleAnim, {
+                        toValue: {
+                            x: randomOffset(),
+                            y: randomOffset()
+                        },
+                        duration: 5000,
+                        useNativeDriver: true
+                    }),
+                    Animated.timing(topCircleAnim, {
+                        toValue: { x: 10, y: 20 },
+                        duration: 4000,
+                        useNativeDriver: true
+                    })
+                ]),
+                Animated.sequence([
+                    Animated.timing(bottomCircleAnim, {
+                        toValue: {
+                            x: randomOffset(),
+                            y: randomOffset()
+                        },
+                        duration: 3000,
+                        useNativeDriver: true
+                    }),
+                    Animated.timing(bottomCircleAnim, {
+                        toValue: { x: -20, y: 20 },
+                        duration: 5000,
+                        useNativeDriver: true
+                    })
+                ])
+            ]).start(() => animateCircles())
+        }
+        animateCircles()
+    }
+
+
+
+    // start animation when component mounts
+    useEffect(() => {
+        if (isVisible) {
+            startAnimation()
+        }
+    }, [isVisible])
+
+
+
     return (
         <Modal
             transparent={true}
@@ -38,19 +96,48 @@ export default function ShareModal({ isVisible, qrCode, setShareModalVisible }) 
                         activeOpacity={1}
                         style={styles.subContainer}
                     >
+
+                        {/* BLUR CONTAINER */}
                         <View style={styles.blurCirclesContainer}>
-                            <View style={[styles.circleWrapper, styles.topCircle]}>
+                            <Animated.View
+                                style={[
+                                    styles.circleWrapper,
+                                    styles.topCircle,
+                                    {
+                                        transform: [
+                                            { translateX: topCircleAnim.x },
+                                            { translateY: topCircleAnim.y }
+                                        ]
+                                    }
+                                ]}
+                            >
                                 <View style={[styles.blurCircle, { backgroundColor: colors.loginBlue }]} />
-                            </View>
-                            <View style={[styles.circleWrapper, styles.bottomCircle]}>
+                            </Animated.View>
+                            <Animated.View
+                                style={[
+                                    styles.circleWrapper,
+                                    styles.bottomCircle,
+                                    {
+                                        transform: [
+                                            { translateX: bottomCircleAnim.x },
+                                            { translateY: bottomCircleAnim.y }
+                                        ]
+                                    }
+                                ]}
+                            >
                                 <View style={[styles.blurCircle, { backgroundColor: '#33D4D1' }]} />
-                            </View>
+                            </Animated.View>
 
                             <BlurView // the blurview is placed ON TOP of the circles, absolutely. similar to above actually
                                 intensity={20}
                                 style={StyleSheet.absoluteFillObject}
                             />
                         </View>
+
+
+
+
+
                         <Text style={[styles.qrText, { marginBottom: 14 }]}>
                             Add me on Ripple!
                         </Text>
