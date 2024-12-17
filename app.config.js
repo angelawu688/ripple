@@ -32,10 +32,10 @@ export default () => ({
       [
         "expo-splash-screen",
         {
-          backgroundColor: "#ffffff",
-          resizeMode: "contain",
-          image: "./assets/images/ripplesplash.png",
-          imageWidth: "250"
+          backgroundColor: "white",
+          // resizeMode: "contain",
+          image: "./assets/images/ripple_splashicon3.png",
+          imageWidth: "600" // todo play with this
         }
       ],
       "expo-router",

@@ -126,7 +126,7 @@ const PersonalInformation = () => {
             // Launch image picker
             let result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsMultipleSelection: true,
+                allowsMultipleSelection: false,
                 quality: 0.7,
                 selectionLimit: 1
             });
@@ -141,8 +141,8 @@ const PersonalInformation = () => {
                 const userRef = doc(db, "users", user.uid);
                 await updateDoc(userRef, { pfp: downloadLink });
 
-                // frontend change
-                // setPfp(downloadLink)
+                const userDoc = await getDoc(userRef);
+                setUserData(userDoc.data());
 
             } else {
                 // user cancelled, do nothing

@@ -11,134 +11,8 @@ import { db } from '../../../firebaseConfig';
 import { userContext } from '../../context/UserContext';
 import { ZoomableView } from 'react-native-zoom-toolkit';
 import { formatDate, formatDateForMessages } from '../../utils/formatDate';
+import { MessageBubble } from '../../components/MessageBubble';
 
-
-
-
-const MessageBubble = ({ navigation, message, activeUserID, formattedDate = undefined }) => {
-    if (!message) {
-        return null
-    }
-    const { textContent, imageUri, postID, sentBy } = message
-    const [listing, setListing] = useState(undefined)
-    const [showZoomModal, setShowZoomModal] = useState(false)
-    const isCurrentUser = sentBy === activeUserID
-
-    useEffect(() => {
-        const fetchListing = async () => {
-            if (!postID) return;
-            const fetchedListing = await getListingFromID(postID)
-            if (!fetchedListing) {
-                return
-            }
-            setListing(fetchedListing)
-        }
-        fetchListing()
-    }, [postID])
-
-    if (!textContent && !imageUri && !postID) {
-        return;
-    }
-
-    // TODO make look cleaner
-    return (
-        <View style={{ flexDirection: 'column', alignItems: isCurrentUser ? 'flex-end' : 'flex-start', marginVertical: 2 }}>
-            {formattedDate && (
-                <View style={{
-                    width: '100%', display: 'flex', alignContent: 'center', justifyContent: 'center', marginBottom: 12, marginTop: 10
-
-                }}
-                >
-                    <Text style={{ fontSize: 14, color: colors.accentGray, textAlign: 'center' }}>
-                        {formattedDate}
-                    </Text>
-                </View>
-
-            )}
-
-            {listing && (
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('ListingScreen', { listingID: listing.id })}
-
-                    style={{
-                        width: 150,
-                        height: 170,
-                        marginVertical: 12,
-                    }}>
-                    <ListingCard listing={listing} containerWidth={170} />
-                </TouchableOpacity>
-            )}
-
-            {/* {imageUri && (
-                <Image
-                    style={{
-                        width: 170,
-                        height: 170,
-                        // borderWidth: 1,
-                        borderColor: colors.loginGray,
-                        borderRadius: 8
-                    }}
-                    resizeMode='contain'
-                    source={{ uri: imageUri }}
-                />
-            )} */}
-
-            {imageUri && (
-                <TouchableOpacity onPress={() => {
-                    setShowZoomModal(true)
-                }}>
-                    <Image
-                        source={{ uri: imageUri }}
-                        style={[
-                            {
-                                width: 170,
-                                height: 170,
-                                borderRadius: 8
-                            },
-                            // styles.messageImage,
-                            isCurrentUser ? styles.sentImage : styles.receivedImage
-                        ]}
-                        resizeMode="cover"
-                    />
-                </TouchableOpacity>
-            )}
-
-            {textContent && textContent.length !== 0 && (
-                <View style={[styles.messageBubble, isCurrentUser ? styles.sent : styles.received]}>
-
-                    <Text style={[styles.messageText, { color: isCurrentUser ? 'white' : 'black' }]}>
-                        {textContent}
-                    </Text>
-                </View>
-            )}
-
-            <Modal
-                visible={showZoomModal}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setShowZoomModal(false)}>
-                <TouchableOpacity
-                    style={styles.closeButton}
-                    onPress={() => setShowZoomModal(false)}
-                >
-                    <X size={32} color='white' weight='bold' />
-                    <Text style={styles.closeButtonText}>X</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.modalContainer}
-                    activeOpacity={1}
-                    onPress={() => setShowZoomModal(false)}
-                >
-                    <Image
-                        source={{ uri: imageUri }}
-                        style={styles.fullScreenImage}
-                        resizeMode="contain"
-                    />
-                </TouchableOpacity>
-            </Modal>
-        </View>
-    )
-}
 
 
 const Conversation = ({ navigation, route }) => {
@@ -162,29 +36,49 @@ const Conversation = ({ navigation, route }) => {
     }, [messages]);
 
     useEffect(() => {
-        console.log(otherUserDetails)
-    }, [])
-
-    // load messages from firebase
-    useEffect(() => {
-        const messagesRef = collection(db, 'conversations', conversationID, 'messages')
-
-        // same as convs, we grab the snapshot and unsubscribe when we are done with it
-        const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
-            const fetchedMessages = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-            // most recent first, since we are using inverted flatlist
+        const unsubscribe = onSnapshot(collection(db, 'conversations', conversationID, 'messages'), (snapshot) => {
+            const fetchedMessages = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
             setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
         });
+        return unsubscribe;
+    }, [conversationID]);
 
-        // unsub on unmount
-        return () => unsubscribe();
-    }, [])
+
+    // // load messages from firebase
+    // const fetchMessages = () => {
+    //     setIsLoadingMessages(true)
+    //     const messagesRef = collection(db, 'conversations', conversationID, 'messages')
+
+    //     // same as convs, we grab the snapshot and unsubscribe when we are done with it
+    //     const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
+    //         const fetchedMessages = snapshot.docs.map((doc) => ({
+    //             id: doc.id,
+    //             ...doc.data(),
+    //         }));
+    //         // most recent first, since we are using inverted flatlist
+    //         setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
+    //     });
+
+    //     // unsub on unmount
+    //     setIsLoadingMessages(false)
+    //     return () => unsubscribe();
+    // }
+
+
+
+
+    // useEffect(() => {
+
+    //     try {
+
+    //     } catch (e) {
+
+    //     } finally {
+
+    //     }
+    // }, [])
 
     useEffect(() => {
-        console.log(otherUserDetails)
         navigation.setOptions({
             headerTitle: () => (
                 <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { userID: otherUserDetails.id })}
@@ -333,17 +227,23 @@ const Conversation = ({ navigation, route }) => {
                         paddingHorizontal: 10,
                         paddingTop: 10,
                         flexGrow: 1,
-                        justifyContent: 'flex-end', // This is key for inverted lists
+                        justifyContent: 'flex-end', // this is key for inverted lists to put nonfull at top
                         padding: 10,
                     }}
                 />) : inputListing || img ? (
-                    <Text>
-                        We have something here, change the styling lol
-                    </Text>
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
+                            Start a conversation!
+                        </Text>
+                    </View>
+
                 ) : (
-                    <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
-                        Start a conversation!
-                    </Text>
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
+                            Start a conversation!
+                        </Text>
+                    </View>
+
                 )}
 
                 <View style={styles.lowerContainer}>
@@ -372,7 +272,7 @@ const Conversation = ({ navigation, route }) => {
                     )}
 
                     {/* input bar at the bottom */}
-                    <View style={styles.inputBar}>
+                    <View style={[styles.inputBar, { paddingBottom: Keyboard.isVisible() ? 16 : 30 }]}>
                         <TouchableOpacity onPress={() => handleAddImage()}
                             style={{
                                 width: 35, height: 35, borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: 'rgba(0, 0, 0, 0.25)',
@@ -395,7 +295,7 @@ const Conversation = ({ navigation, route }) => {
                             placeholderTextColor={colors.placeholder}
                             value={input}
                             onChangeText={setInput}
-                            style={[styles.input, { height: inputHeight, textAlignVertical: 'top', }]}
+                            style={[styles.input, { height: inputHeight, textAlignVertical: 'top', fontSize: 18 }]}
                             onSubmitEditing={() => handleSendMessage(input, img, inputListing, clearInputs)}
                             multiline={true}
                             onContentSizeChange={(contentWidth, contentHeight) => {
@@ -425,28 +325,12 @@ export default Conversation;
 
 
 const styles = StyleSheet.create({
-    messageBubble: {
-        maxWidth: '75%',
-        borderRadius: 12,
-        padding: 10,
-        marginVertical: 0,
-        alignSelf: 'flex-start'
-    },
-    sent: {
-        // backgroundColor: '#007aff',
-        backgroundColor: colors.loginBlue,
-        alignSelf: 'flex-end',
-    },
-    received: {
-        backgroundColor: '#e5e5ea',
-    },
     inputBar: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
         paddingTop: 5,
         marginBottom: 4,
-        paddingBottom: 40,
     },
     input: {
         height: 40,
@@ -461,18 +345,10 @@ const styles = StyleSheet.create({
     sendButton: {
         marginLeft: 10,
         paddingVertical: 10,
-        paddingHorizontal: 12,
-        backgroundColor: '#007aff',
-        borderRadius: 20,
+        paddingHorizontal: 10,
+        backgroundColor: colors.neonBlue,
+        borderRadius: 50,
         alignSelf: 'flex-end',
-    },
-    sendButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    messageText: {
-        fontFamily: 'inter'
     },
     previewImageContainer: {
         flexDirection: 'row',
@@ -522,35 +398,4 @@ const styles = StyleSheet.create({
         top: -53,
         left: -28
     },
-
-
-    // modal styles: 
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'black'
-    },
-    closeButtonText: {
-        fontSize: 30,
-        color: colors.white,
-        fontWeight: 'bold',
-    },
-    zoomContainer: {
-        width: '100%',
-        height: '100%',
-    },
-    fullScreenImage: {
-        width: '100%',
-        height: '100%',
-    },
-    closeButton: {
-        position: 'absolute',
-        top: 50,
-        left: 10,
-        zIndex: 9999,
-        padding: 10,
-    },
-
-
 })
