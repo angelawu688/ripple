@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where, deleteDoc } from "firebase/firestore";
 import { db, storage } from "../../firebaseConfig"
 import { getDownloadURL, ref, uploadBytesResumable, refFromURL, deleteObject } from 'firebase/storage'
 import { useContext } from "react";
@@ -268,16 +268,38 @@ export const deleteFromSavedPosts = async (listingID) => {
     await Promise.all(deletePromises)
 }
 
-// deletes the users account and references to it
-export const deleteAccount = async (userID) => {
-    const { user, setUser } = useContext(userContext)
+// UPDATE functions
 
-    // delete all images from storage
-    // delete all saved posts
-    // delete all messages ? 
-    // delete the actual user profile document
-
-    // basically like they dissapeared without a trace
-    console.log('account (not) deleted')
-    setUser(null)
+// given a user id and profile image url, will update all listings with it
+export const updateAllListingsPfp = async (userId, pfpLink) => {
+    const q = query(collection(db, 'listings'), where('userId', '==', userId))
+    const querySnapshot = await getDocs(q);
+    const updatePromises = [];
+    querySnapshot.forEach((docSnap) => {
+        updatePromises.push(updateDoc(docSnap.ref, { userPfp: pfpLink }))
+    })
+    await Promise.all(updatePromises)
 }
+
+// given a user id and new name, will update all listings with it
+export const updateAllListingsName = async (userId, userName) => {
+    const q = query(collection(db, 'listings'), where('userId', '==', userId))
+    const querySnapshot = await getDocs(q);
+    const updatePromises = [];
+    querySnapshot.forEach((docSnap) => {
+        updatePromises.push(updateDoc(docSnap.ref, { userName: userName }))
+    })
+    await Promise.all(updatePromises)
+}
+
+// update saved posts with listing changes
+export const updateAllSaved = async (listingID, listingTitle, listingPrice) => {
+    const q = query(collection(db, 'savedPosts'), where('listing_id', '==', listingID))
+    const querySnapshot = await getDocs(q);
+    const updatePromises = [];
+    querySnapshot.forEach((docSnap) => {
+        updatePromises.push(updateDoc(docSnap.ref, { title: listingTitle, price: listingPrice }))
+    })
+    await Promise.all(updatePromises)
+}
+

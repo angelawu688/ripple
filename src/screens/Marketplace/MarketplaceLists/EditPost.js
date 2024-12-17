@@ -9,7 +9,7 @@ import { colors } from "../../../colors";
 import { userContext } from "../../../context/UserContext";
 import { MinusCircle, PlusCircle, UploadSimple } from "phosphor-react-native";
 import CurrencyInput from 'react-native-currency-input'
-import { uploadListingImage, deleteImageFromDB } from "../../../utils/firebaseUtils";
+import { uploadListingImage, deleteImageFromDB, updateAllSaved } from "../../../utils/firebaseUtils";
 import { ImagePreview, TagPreview, uploadNewPhotos, validateListing } from "../../../utils/createEdit";
 import { GeneratedIdentifierFlags } from "typescript";
 import { generateKeywords } from "../../../utils/search";
@@ -197,6 +197,8 @@ const EditListing = ({ navigation, route }) => {
 
             // frontend and backend change
             const editDoc = await updateDoc(doc(db, "listings", listingID), listingData);
+
+            await updateAllSaved(listingID, title, price);
 
             // update local state
             setUserListings(prevUserListings =>
