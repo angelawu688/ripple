@@ -25,6 +25,8 @@ import { getConversation } from '../../utils/firebaseUtils'
 import { sendProfile } from "../../utils/socialUtils";
 import QRCode from "react-native-qrcode-svg";
 import * as Linking from 'expo-linking'
+import ShareModal from "../../components/ShareModal";
+import { useFocusEffect } from "@react-navigation/native";
 
 
 
@@ -52,6 +54,7 @@ const testUserPosts = [
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
     const { user, userData, userListings, userFollowing, setUserFollowing } = useContext(userContext)
+
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
@@ -161,13 +164,13 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
             } finally {
                 setIsLoading(false);
             }
-            // setting the socials for testing
-            // TODO CHANGE TESTING
-            setUserProfile(prevProfile => ({
-                ...prevProfile,
-                // instagram: 'williamhuntt',
-                // linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
-            }));
+            // // setting the socials for testing
+            // // TODO CHANGE TESTING
+            // setUserProfile(prevProfile => ({
+            //     ...prevProfile,
+            //     // instagram: 'williamhuntt',
+            //     // linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
+            // }));
         };
         if (user.uid !== userID) {
             getProfile();
@@ -436,7 +439,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                                 />
                                 <Text numberOfLines={1}
                                     style={styles.socialText}>
-                                    {'@' + userProfile.linkedin}
+                                    {userProfile.linkedin}
                                 </Text>
                             </TouchableOpacity>}
 
@@ -481,73 +484,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 </TouchableOpacity>
             )}
 
-            <Modal
-                transparent={true}
-                visible={shareModalVisible}
-                onRequestClose={() => setShareModalVisible(false)}
-                animationType="fade"
-            >
-                <TouchableOpacity
-                    style={{
-                        flex: 1,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                    activeOpacity={1}
-                    onPress={() => setShareModalVisible(false)}
-                >
-                    <TouchableOpacity
-                        activeOpacity={1}
-                        style={{
-                            width: '80%',
-                            backgroundColor: 'white',
-                            borderRadius: 20,
-                            padding: 25,
-                            alignItems: 'center',
-                            shadowColor: "#000",
-                            shadowOffset: {
-                                width: 0,
-                                height: 2
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 4,
-                            elevation: 5
-                        }}
-                    >
-                        <Text style={{
-                            fontSize: 20,
-                            fontFamily: 'inter',
-                            fontWeight: '600',
-                            marginBottom: 20
-                        }}>
-                            Scan to share your account!
-                        </Text>
-
-                        <QRCode
-                            value={profileLink}
-                            size={200}
-                            color={colors.black}
-                            backgroundColor="white"
-                        />
-
-                        <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'flex-start', paddingTop: 24 }}>
-                            {/* socials container */}
-                            <TouchableOpacity
-                                style={styles.modalSocialButton}
-                            >
-                                <Link size={20} />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-
-                                onPress={() => sendProfile(user?.uid)}
-                                style={styles.modalSocialButton}>
-                                <ChatCircleDots size={20} />
-                            </TouchableOpacity>
-                        </View>
-                    </TouchableOpacity>
-                </TouchableOpacity>
-            </Modal>
+            <ShareModal isVisible={shareModalVisible} setShareModalVisible={setShareModalVisible} qrCode={profileLink} />
         </View >
     )
 
@@ -650,12 +587,4 @@ const styles = StyleSheet.create({
         color: colors.loginBlue,
         maxWidth: '80%',
     },
-    // modals
-    modalSocialButton: {
-        borderRadius: 50,
-        padding: 10,
-        borderColor: colors.neonBlue,
-        borderWidth: 1,
-        marginRight: 10
-    }
 })

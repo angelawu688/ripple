@@ -3,14 +3,14 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, FlatList, Keyboard, Modal } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
 import ListingCard from '../../components/ListingCard';
-import { ArrowBendRightUp, CaretRight, User, XCircle } from 'phosphor-react-native';
+import { ArrowBendRightUp, CaretRight, Plus, User, X, XCircle } from 'phosphor-react-native';
 import { colors } from '../../colors';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { getListingFromID, sendMessage } from '../../utils/firebaseUtils';
 import { db } from '../../../firebaseConfig';
 import { userContext } from '../../context/UserContext';
 import { ZoomableView } from 'react-native-zoom-toolkit';
-import { formatDate } from '../../utils/formatDate';
+import { formatDate, formatDateForMessages } from '../../utils/formatDate';
 
 
 
@@ -39,8 +39,6 @@ const MessageBubble = ({ navigation, message, activeUserID, formattedDate = unde
     if (!textContent && !imageUri && !postID) {
         return;
     }
-
-
 
     // TODO make look cleaner
     return (
@@ -84,9 +82,9 @@ const MessageBubble = ({ navigation, message, activeUserID, formattedDate = unde
                     source={{ uri: imageUri }}
                 />
             )} */}
+
             {imageUri && (
                 <TouchableOpacity onPress={() => {
-                    console.log('first')
                     setShowZoomModal(true)
                 }}>
                     <Image
@@ -120,6 +118,13 @@ const MessageBubble = ({ navigation, message, activeUserID, formattedDate = unde
                 animationType="fade"
                 onRequestClose={() => setShowZoomModal(false)}>
                 <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setShowZoomModal(false)}
+                >
+                    <X size={32} color='white' weight='bold' />
+                    <Text style={styles.closeButtonText}>X</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                     style={styles.modalContainer}
                     activeOpacity={1}
                     onPress={() => setShowZoomModal(false)}
@@ -131,8 +136,6 @@ const MessageBubble = ({ navigation, message, activeUserID, formattedDate = unde
                     />
                 </TouchableOpacity>
             </Modal>
-
-
         </View>
     )
 }
@@ -278,16 +281,23 @@ const Conversation = ({ navigation, route }) => {
 
     return (
         <KeyboardAvoidingView // make sure that we can see input and keyboard
-            style={{ flex: 1 }}
+            style={{ flex: 1, justifyContent: 'space-between' }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={90}
             onPress={() => Keyboard.dismiss()}
         >
-            <View style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%', }}>
+            <View style={{
+                // display: 'flex',
+                // justifyContent: 'flex-start',
+                // width: '100%',
+                // height: '100%',
+                flex: 1
+            }}>
                 {messages?.length > 0 ? (<FlatList
+                    onScrollBeginDrag={() => Keyboard.dismiss()}
                     data={messages}
                     renderItem={({ item, index }) => {
-                        const previousMessage = messages[index + 1];
+                        const previousMessage = messages[index + 1]; // seems backwards, most recent is last
                         let showDate = false;
 
                         if (!previousMessage) {
@@ -304,7 +314,7 @@ const Conversation = ({ navigation, route }) => {
                         }
 
                         // todo some sort of formatting. We only get a formatted date if we show the date
-                        const formattedDate = showDate ? formatDate(item.timestamp / 1000) : null;
+                        const formattedDate = showDate ? formatDateForMessages(item.timestamp / 1000) : null;
 
                         return (
                             <MessageBubble
@@ -320,83 +330,92 @@ const Conversation = ({ navigation, route }) => {
                     keyboardShouldPersistTaps='handled'
                     inverted={true}// This inverts the list
                     contentContainerStyle={{
-                        flexGrow: 1,
                         paddingHorizontal: 10,
                         paddingTop: 10,
-                        paddingBottom: 50,
+                        flexGrow: 1,
+                        justifyContent: 'flex-end', // This is key for inverted lists
+                        padding: 10,
                     }}
-                />) : (
+                />) : inputListing || img ? (
+                    <Text>
+                        We have something here, change the styling lol
+                    </Text>
+                ) : (
                     <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
                         Start a conversation!
                     </Text>
                 )}
-                {/* preview for listing  */}
-                {inputListing && (
-                    <View style={styles.previewImageContainer}>
-                        <View style={{ alignSelf: 'center', width: 150, height: 150, marginBottom: 45 }}>
-                            <ListingCard listing={inputListing} />
+
+                <View style={styles.lowerContainer}>
+                    {/* preview for listing  */}
+                    {inputListing && (
+                        <View style={styles.previewImageContainer}>
+                            <View style={{ alignSelf: 'center', width: 150, height: 150, marginBottom: 45 }}>
+                                <ListingCard listing={inputListing} />
+                            </View>
+
+                            <TouchableOpacity onPress={() => setInputListing(null)} style={styles.removePreviewButtonListing}>
+                                <XCircle weight='fill' size={30} color={colors.loginGray} />
+
+                            </TouchableOpacity>
                         </View>
+                    )}
 
-                        <TouchableOpacity onPress={() => setInputListing(null)} style={styles.removePreviewButtonListing}>
-                            <XCircle weight='fill' size={30} color={colors.loginGray} />
+                    {/* Preview for Image */}
+                    {img && (
+                        <View style={styles.previewImageContainer}>
+                            <Image source={{ uri: img }} style={styles.previewImage} />
+                            <TouchableOpacity onPress={() => setImg(null)} style={styles.removePreviewButton}>
+                                <XCircle weight='fill' size={30} color={colors.loginGray} />
+                            </TouchableOpacity>
+                        </View>
+                    )}
 
+                    {/* input bar at the bottom */}
+                    <View style={styles.inputBar}>
+                        <TouchableOpacity onPress={() => handleAddImage()}
+                            style={{
+                                width: 35, height: 35, borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: 'rgba(0, 0, 0, 0.25)',
+                                // shadowOffset: { width: 5, height: 5 },
+                                shadowOpacity: 0.5,
+                                shadowRadius: 10,
+                                shadowColor: colors.loginBlue,
+                                shadowOpacity: 0.3,
+                                backgroundColor: 'white',
+                                marginRight: 10,
+                                alignSelf: 'flex-end',
+                                marginBottom: 4,
+
+                            }}>
+                            {openingImagePicker ? <ActivityIndicator color='#767676' size={'small'} /> : <Plus size={16} color={colors.accentGray} weight='bold' />}
+                        </TouchableOpacity>
+
+                        <TextInput
+                            placeholder='Message'
+                            placeholderTextColor={colors.placeholder}
+                            value={input}
+                            onChangeText={setInput}
+                            style={[styles.input, { height: inputHeight, textAlignVertical: 'top', }]}
+                            onSubmitEditing={() => handleSendMessage(input, img, inputListing, clearInputs)}
+                            multiline={true}
+                            onContentSizeChange={(contentWidth, contentHeight) => {
+                                const minHeight = 35;
+                                const maxHeight = 100; // optional max
+                                if (contentHeight < minHeight) {
+                                    setInputHeight(minHeight);
+                                } else if (contentHeight > maxHeight) {
+                                    setInputHeight(maxHeight);
+                                } else {
+                                    setInputHeight(contentHeight);
+                                }
+                            }}
+                        />
+                        <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() || img || inputListing ? colors.neonBlue : colors.loginGray }]} onPress={() => handleSendMessage(input, img, inputListing, clearInputs)}>
+                            <ArrowBendRightUp size={20} color='white' />
                         </TouchableOpacity>
                     </View>
-                )}
-
-                {/* Preview for Image */}
-                {/* {img && (
-                    <View style={styles.previewImageContainer}>
-                        <Image source={{ uri: img }} style={styles.previewImage} />
-                        <TouchableOpacity onPress={() => setImg(null)} style={styles.removePreviewButton}>
-                            <XCircle weight='fill' size={30} color={colors.loginGray} />
-                        </TouchableOpacity>
-                    </View>
-                )} */}
-
-                {/* input bar at the bottom */}
-                <View style={styles.inputBar}>
-                    <TouchableOpacity onPress={() => handleAddImage()}
-                        style={{
-                            width: 35, height: 35, borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: 'rgba(0, 0, 0, 0.25)',
-                            shadowOffset: { width: 5, height: 5 },
-                            shadowOpacity: 0.5,
-                            shadowRadius: 10,
-                            backgroundColor: 'white',
-                            marginRight: 10,
-                            alignSelf: 'flex-end',
-                            marginBottom: 4
-
-                        }}>
-                        {openingImagePicker ? <ActivityIndicator color='#767676' /> : <Ionicons name='add-outline' size={20} color='#767676' />}
-                    </TouchableOpacity>
-
-
-                    <TextInput
-                        placeholder='Message'
-                        value={input}
-                        onChangeText={setInput}
-                        style={[styles.input, { height: inputHeight, textAlignVertical: 'top', }]}
-                        onSubmitEditing={() => handleSendMessage(input, img, inputListing, clearInputs)}
-                        multiline={true}
-                        onContentSizeChange={(contentWidth, contentHeight) => {
-                            const minHeight = 35;
-                            const maxHeight = 100; // optional max
-                            if (contentHeight < minHeight) {
-                                setInputHeight(minHeight);
-                            } else if (contentHeight > maxHeight) {
-                                setInputHeight(maxHeight);
-                            } else {
-                                setInputHeight(contentHeight);
-                            }
-                        }}
-                    />
-
-                    <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() || img || inputListing ? colors.neonBlue : colors.loginGray }]} onPress={() => handleSendMessage(input, img, inputListing, clearInputs)}>
-                        <ArrowBendRightUp size={20} color='white' />
-                    </TouchableOpacity>
-
                 </View>
+
             </View>
         </KeyboardAvoidingView >
     )
@@ -414,7 +433,8 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start'
     },
     sent: {
-        backgroundColor: '#007aff',
+        // backgroundColor: '#007aff',
+        backgroundColor: colors.loginBlue,
         alignSelf: 'flex-end',
     },
     received: {
@@ -424,11 +444,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
-        borderTopWidth: 1,
-        borderColor: '#ccc',
-        backgroundColor: '#f9f9f9',
         paddingTop: 5,
-        marginBottom: 4
+        marginBottom: 4,
+        paddingBottom: 40,
     },
     input: {
         height: 40,
@@ -446,7 +464,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         backgroundColor: '#007aff',
         borderRadius: 20,
-        alignSelf: 'flex-end'
+        alignSelf: 'flex-end',
     },
     sendButtonText: {
         color: '#fff',
@@ -513,13 +531,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'black'
     },
-    closeButton: {
-        position: 'absolute',
-        top: 100,
-        right: 50,
-        zIndex: 9999,
-        backgroundColor: colors.black
-    },
     closeButtonText: {
         fontSize: 30,
         color: colors.white,
@@ -533,5 +544,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
+    closeButton: {
+        position: 'absolute',
+        top: 50,
+        left: 10,
+        zIndex: 9999,
+        padding: 10,
+    },
+
 
 })
