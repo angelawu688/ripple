@@ -60,6 +60,13 @@ export const MessageBubble = ({ navigation, message, activeUserID, formattedDate
                 </TouchableOpacity>
             )}
 
+            {postID && !listing && (
+                <View style={{ marginVertical: 4 }}>
+                    <View style={{ backgroundColor: colors.loginGray, width: 150, height: 150, borderRadius: 12 }} />
+                    <View style={{ marginTop: 4, backgroundColor: colors.loginGray, width: 150, height: 30, borderRadius: 12 }} />
+                </View>
+            )}
+
             {/* {imageUri && (
                 <Image
                     style={{

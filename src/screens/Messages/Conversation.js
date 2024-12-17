@@ -12,6 +12,7 @@ import { userContext } from '../../context/UserContext';
 import { ZoomableView } from 'react-native-zoom-toolkit';
 import { formatDate, formatDateForMessages } from '../../utils/formatDate';
 import { MessageBubble } from '../../components/MessageBubble';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 
 
@@ -26,8 +27,10 @@ const Conversation = ({ navigation, route }) => {
     const [img, setImg] = useState(undefined)
     const [openingImagePicker, setOpeningImagePicker] = useState(false)
     const [inputHeight, setInputHeight] = useState(50)
+    const [sendingMessage, setSendingMessage] = useState(false)
+    const [loadingMessages, setLoadingMessages] = useState(true)
 
-    // auto-scroll to the bottom. Animated asf too 😮‍💨
+    // auto-scroll to the bottom
     const scrollRef = useRef(null)
     useEffect(() => {
         if (scrollRef.current) {
@@ -35,48 +38,25 @@ const Conversation = ({ navigation, route }) => {
         }
     }, [messages]);
 
+    // load messages from fb
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, 'conversations', conversationID, 'messages'), (snapshot) => {
-            const fetchedMessages = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setLoadingMessages(true)
+        const messagesRef = collection(db, 'conversations', conversationID, 'messages')
+
+        // same as convs, we grab the snapshot and unsubscribe when we are done with it
+        const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
+            const fetchedMessages = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            // most recent first, since we are using inverted flatlist
             setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
         });
-        return unsubscribe;
+
+        // unsub on unmount
+        setLoadingMessages(false)
+        return () => unsubscribe();
     }, [conversationID]);
-
-
-    // // load messages from firebase
-    // const fetchMessages = () => {
-    //     setIsLoadingMessages(true)
-    //     const messagesRef = collection(db, 'conversations', conversationID, 'messages')
-
-    //     // same as convs, we grab the snapshot and unsubscribe when we are done with it
-    //     const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
-    //         const fetchedMessages = snapshot.docs.map((doc) => ({
-    //             id: doc.id,
-    //             ...doc.data(),
-    //         }));
-    //         // most recent first, since we are using inverted flatlist
-    //         setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
-    //     });
-
-    //     // unsub on unmount
-    //     setIsLoadingMessages(false)
-    //     return () => unsubscribe();
-    // }
-
-
-
-
-    // useEffect(() => {
-
-    //     try {
-
-    //     } catch (e) {
-
-    //     } finally {
-
-    //     }
-    // }, [])
 
     useEffect(() => {
         navigation.setOptions({
@@ -114,6 +94,8 @@ const Conversation = ({ navigation, route }) => {
             return
         }
 
+        setSendingMessage(true)
+
         // send it away to our lovely database
         try {
             // convID, senderID, textContent = undefined, postID = undefined, imageUri = undefined
@@ -124,11 +106,11 @@ const Conversation = ({ navigation, route }) => {
                 post?.id,
                 img,
             )
-
         } catch (e) {
             console.log('handlesend', e)
         } finally {
             clearInputs();
+            setSendingMessage(false)
         }
     }
 
@@ -187,7 +169,8 @@ const Conversation = ({ navigation, route }) => {
                 // height: '100%',
                 flex: 1
             }}>
-                {messages?.length > 0 ? (<FlatList
+                {loadingMessages && <LoadingSpinner />}
+                {messages?.length > 0 && !loadingMessages ? (<FlatList
                     onScrollBeginDrag={() => Keyboard.dismiss()}
                     data={messages}
                     renderItem={({ item, index }) => {
