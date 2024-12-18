@@ -272,6 +272,7 @@ const ListingScreen = ({ navigation, route }) => {
                     listing_id: listingID,
                     price: listing.price,
                     title: listing.title,
+                    photos: listing.photos
                 };
                 // add it
                 await setDoc(listingRef, newSaved);

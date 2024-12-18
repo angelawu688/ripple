@@ -291,12 +291,12 @@ export const updateAllListingsName = async (userId, userName) => {
 }
 
 // update saved posts with listing changes
-export const updateAllSaved = async (listingID, listingTitle, listingPrice) => {
+export const updateAllSaved = async (listingID, listingTitle, listingPrice, photoURLs) => {
     const q = query(collection(db, 'savedPosts'), where('listing_id', '==', listingID))
     const querySnapshot = await getDocs(q);
     const updatePromises = [];
     querySnapshot.forEach((docSnap) => {
-        updatePromises.push(updateDoc(docSnap.ref, { title: listingTitle, price: listingPrice }))
+        updatePromises.push(updateDoc(docSnap.ref, { title: listingTitle, price: listingPrice, photos: photoURLs }))
     })
     await Promise.all(updatePromises)
 }
