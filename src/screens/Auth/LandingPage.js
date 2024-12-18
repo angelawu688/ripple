@@ -95,7 +95,6 @@ const LandingPage = ({ navigation }) => {
                     }} />
             </View>
 
-
             {/* Bottom waves */}
             <View style={styles.bottomWaves}>
 
@@ -141,7 +140,6 @@ const LandingPage = ({ navigation }) => {
     )
 }
 
-
 export default LandingPage;
 
 const styles = StyleSheet.create({
@@ -181,20 +179,21 @@ const styles = StyleSheet.create({
         top: 0,
         width: '100%',
         alignItems: 'center',
-        zIndex: 2, // Ensure top waves are above bottom waves,
+        zIndex: 2,
+        pointerEvents: 'none', // this prevents overlap over the create account button
     },
     bottomWaves: {
         position: 'absolute',
         top: '40%',
         width: '100%',
         alignItems: 'center',
-        zIndex: 1, // Lower zIndex than top waves
+        zIndex: 1,
+        pointerEvents: 'none', // this prevents overlap over the create account button
     },
     logoContainer: {
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
         top: '35%'
-        // marginVertical: 40, // Space between waves and logo
     },
 })

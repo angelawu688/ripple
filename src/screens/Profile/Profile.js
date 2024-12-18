@@ -4,6 +4,7 @@ import { userContext } from "../../context/UserContext";
 import { Ionicons } from '@expo/vector-icons';
 
 import { ChatTeardropText, User, Storefront, Bookmark, BookmarkSimple, ShoppingCart, ShareFat } from 'phosphor-react-native';
+import { deleteAccount } from "../../utils/firebaseUtils";
 
 
 
@@ -20,17 +21,6 @@ const Profile = ({ navigation }) => {
         } finally {
             setLoading(false)
         }
-    }
-
-    // will have to not only setUser(null)
-    // will delete 
-    const deleteAccount = () => {
-        // will move this into the firebase utils file, it is here for visibility atm
-
-        console.log('womp womp')
-        // a bunch of other actions that we want to make sure work
-        //  ...
-        setUser(null)
     }
 
     const openURL = async (url) => {
@@ -58,7 +48,7 @@ const Profile = ({ navigation }) => {
                 },
                 {
                     text: 'Delete Account',
-                    onPress: () => deleteAccount(),
+                    onPress: () => deleteAccount(user.uid),
                     style: 'destructive'
                 }
             ]

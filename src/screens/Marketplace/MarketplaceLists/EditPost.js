@@ -198,7 +198,7 @@ const EditListing = ({ navigation, route }) => {
             // frontend and backend change
             const editDoc = await updateDoc(doc(db, "listings", listingID), listingData);
 
-            await updateAllSaved(listingID, title, price);
+            await updateAllSaved(listingID, title, price, finalPhotoURLs);
 
             // update local state
             setUserListings(prevUserListings =>

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
@@ -28,8 +28,19 @@ const SavedItems = ({ navigation }) => {
         }
     }, [savedPosts])
 
-    if (isLoading) {
+    if (isLoading || !savedPosts) {
         return <FullLoadingScreen />
+    } else if (savedPosts.length === 0) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={[styles.text, { fontWeight: '600', fontSize: 20 }]}>
+                    No saved posts!
+                </Text>
+                <Text style={[styles.text, { fontWeight: '400', fontSize: 16 }]}>
+                    Saved posts will appear here
+                </Text>
+            </View>
+        )
     }
 
     return (
@@ -74,3 +85,10 @@ const SavedItems = ({ navigation }) => {
 }
 
 export default SavedItems;
+
+const styles = StyleSheet.create({
+    text: {
+        fontFamily: 'inter',
+        color: 'black'
+    }
+})
