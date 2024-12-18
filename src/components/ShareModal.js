@@ -5,10 +5,10 @@ import { colors } from '../colors'
 import { ChatCircleDots, Export, Link, X } from 'phosphor-react-native'
 import { View } from 'react-native'
 import { BlurView } from 'expo-blur'
-import { sendProfile } from '../utils/socialUtils'
+import { copyLink, sendProfile } from '../utils/socialUtils'
 import { userContext } from '../context/UserContext'
 
-export default function ShareModal({ isVisible, qrCode, setShareModalVisible }) {
+export default function ShareModal({ isVisible, profileLink, setShareModalVisible }) {
     const { user, userData } = useContext(userContext)
 
 
@@ -143,7 +143,7 @@ export default function ShareModal({ isVisible, qrCode, setShareModalVisible }) 
                         </Text>
                         <View style={styles.qrCodeContainer}>
                             <QRCode
-                                value={qrCode}
+                                value={profileLink}
                                 size={150}
                                 color={colors.black}
                                 backgroundColor="white"
@@ -175,6 +175,7 @@ export default function ShareModal({ isVisible, qrCode, setShareModalVisible }) 
 
                         <View style={[styles.socialButtonContainer]}>
                             <TouchableOpacity
+                                onPress={() => copyLink(profileLink)}
                                 style={[styles.modalSocialButton]}
                             >
                                 <Link size={24} color={colors.loginBlue}

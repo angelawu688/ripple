@@ -1,6 +1,8 @@
 import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where, deleteDoc } from "firebase/firestore";
 import { db, storage } from "../../firebaseConfig"
 import { getDownloadURL, ref, uploadBytesResumable, refFromURL, deleteObject } from 'firebase/storage'
+import { useContext } from "react";
+import { userContext } from "../context/UserContext";
 
 
 
@@ -301,3 +303,16 @@ export const updateAllSaved = async (listingID, listingTitle, listingPrice, phot
     await Promise.all(updatePromises)
 }
 
+// deletes the users account and references to it
+export const deleteAccount = async (userID) => {
+    const { user, setUser } = useContext(userContext)
+
+    // delete all images from storage
+    // delete all saved posts
+    // delete all messages ? 
+    // delete the actual user profile document
+
+    // basically like they dissapeared without a trace
+    console.log('account (not) deleted')
+    setUser(null)
+}

@@ -1,3 +1,4 @@
+import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking'
 
 export const sendProfile = (userID) => {
@@ -18,4 +19,11 @@ export const sendProfile = (userID) => {
     // example dev URL: exp://10.155.102.135:8081/--/user/RsYuNgUxSUTm0xdD0CMi6Yhkjc73 
     // prod urls will look different, testflight urls look different, etc.
     // we will need to use firebase dynamic URLs so that people without the app will be prompted to go download
+}
+
+export const copyLink = async (link) => {
+    // copy the link
+    // send a toast
+    Clipboard.setStringAsync(link);
+    console.log('link copied')
 }

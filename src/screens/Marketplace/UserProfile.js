@@ -23,26 +23,9 @@ import { userContext } from "../../context/UserContext";
 import ListingCard from "../../components/ListingCard";
 import { getConversation } from '../../utils/firebaseUtils'
 import { sendProfile } from "../../utils/socialUtils";
-import QRCode from "react-native-qrcode-svg";
 import * as Linking from 'expo-linking'
 import ShareModal from "../../components/ShareModal";
 import { useFocusEffect } from "@react-navigation/native";
-
-
-
-
-
-
-/* 
-If on ownProfile stack, we will disable the header 
-If !profileScreen:
-    if is own profile
-        change the behavior of 3 dots in top left accordingly
-    else (other profile)
-        change the behavior of the 3 dots
-
-**/
-
 
 const testUserPosts = [
     { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
@@ -183,9 +166,12 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 
     if (!userProfile) {
         return (
-            <View>
-                <Text>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 20 }}>
                     User not found!
+                </Text>
+                <Text style={{ fontFamily: 'inter', fontWeight: '400', fontSize: 14 }}>
+                    This account may have been deleted
                 </Text>
             </View>
         )
@@ -447,7 +433,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         </View>)}
                         {userPosts && userPosts.length > 0 && (
                             // <View>
-                            <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 0 }}>
+                            <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 20 }}>
                                 Listings
                             </Text>
                             // </View>
@@ -484,7 +470,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 </TouchableOpacity>
             )}
 
-            <ShareModal isVisible={shareModalVisible} setShareModalVisible={setShareModalVisible} qrCode={profileLink} />
+            <ShareModal isVisible={shareModalVisible} setShareModalVisible={setShareModalVisible} profileLink={profileLink} />
         </View >
     )
 
@@ -544,7 +530,6 @@ const styles = StyleSheet.create({
         marginTop: 16,
         width: '100%',
         justifyContent: 'space-between',
-        marginBottom: 20,
         height: 60
     },
     followText: {
