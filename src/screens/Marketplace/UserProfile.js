@@ -210,7 +210,12 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         try {
             await setDoc(doc(db, "following", user.uid + userID), {
                 follower_id: user.uid,
-                following_id: userID
+                following_id: userID,
+                // TODO: adding more info to DB for easier loading later
+                // follower_name: userData.name || "no name",
+                // follower_pfp: userData.pfp || "no pfp",
+                // following_name: userProfile?.name || "no user name",
+                // following_pfp: userProfile?.pfp || "no user pfp"
             });
         } catch (error) {
             console.error("Error following user", error);
