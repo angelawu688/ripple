@@ -17,7 +17,6 @@ const Friends = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true)
 
     // grab the friends listings on component mount
-    // query following collection?
     const db = getFirestore();
 
     useFocusEffect(
