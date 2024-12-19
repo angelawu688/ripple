@@ -133,6 +133,8 @@ const PersonalInformation = () => {
                 const userRef = doc(db, "users", user.uid);
                 await updateDoc(userRef, { pfp: downloadLink });
 
+                await updateAllListingsPfp(user.uid, downloadLink);
+
                 const userDoc = await getDoc(userRef);
                 setUserData(userDoc.data());
             } else {
