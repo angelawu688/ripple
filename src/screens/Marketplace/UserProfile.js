@@ -214,11 +214,10 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         try {
             await updateDoc(userRef, {
                 following: arrayUnion(newFollowing),
-            });
+            })
             await updateDoc(followingRef, {
                 followers: arrayUnion(newFollower),
             })
-
             const userDoc = await getDoc(userRef);
             setUserData(userDoc.data());
 

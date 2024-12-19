@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="added friends feature">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/Profile/PersonalInformation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/PersonalInformation.js" afterDir="false" />
-    </list>
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="git history alignment" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -35,21 +30,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/Users/angelawu/CSE_all/uw-marketplace/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;angela&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/angelawu/CSE_all/uw-marketplace/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
@@ -340,7 +335,55 @@
       <option name="project" value="LOCAL" />
       <updated>1733301167319</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="updated followers/following">
+      <option name="closed" value="true" />
+      <created>1734583582447</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1734583582460</updated>
+    </task>
+    <task id="LOCAL-00034" summary="change pfp updates across">
+      <option name="closed" value="true" />
+      <created>1734583787479</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1734583787480</updated>
+    </task>
+    <task id="LOCAL-00035" summary="merge updates">
+      <option name="closed" value="true" />
+      <created>1734587300465</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1734587300465</updated>
+    </task>
+    <task id="LOCAL-00036" summary="updated context with followers/following">
+      <option name="closed" value="true" />
+      <created>1734588036499</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1734588036500</updated>
+    </task>
+    <task id="LOCAL-00037" summary="git history alignment">
+      <option name="closed" value="true" />
+      <created>1734588089320</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1734588089320</updated>
+    </task>
+    <task id="LOCAL-00038" summary="updates friends listings">
+      <option name="closed" value="true" />
+      <created>1734476494070</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1734476494070</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -358,11 +401,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="saving posts with usercontext" />
-    <MESSAGE value="saved items update when changed" />
-    <MESSAGE value="fixed typo with saved items (need to consolidate)" />
-    <MESSAGE value="fixed duplicate key bug" />
-    <MESSAGE value="can edit post and save it" />
     <MESSAGE value="removed auth" />
     <MESSAGE value="determine if it's own post, fetch seller profile" />
     <MESSAGE value="limit to grabbing 32 listings" />
@@ -383,6 +421,15 @@
     <MESSAGE value="fixed up some duplicates in styling" />
     <MESSAGE value="merged from master" />
     <MESSAGE value="added friends feature" />
-    <option name="LAST_COMMIT_MESSAGE" value="added friends feature" />
+    <MESSAGE value="updates pfp and profile changes everywhere (listings and profile)" />
+    <MESSAGE value="updates profile name change for all listings" />
+    <MESSAGE value="updates listing changes in savedPosts" />
+    <MESSAGE value="updates friends listings" />
+    <MESSAGE value="updated followers/following" />
+    <MESSAGE value="change pfp updates across" />
+    <MESSAGE value="merge updates" />
+    <MESSAGE value="updated context with followers/following" />
+    <MESSAGE value="git history alignment" />
+    <option name="LAST_COMMIT_MESSAGE" value="git history alignment" />
   </component>
 </project>
