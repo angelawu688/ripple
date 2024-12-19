@@ -3,12 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityInd
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
-import { getAuth } from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../colors'
 import { isLoading } from 'expo-font';
 import { PencilSimple } from 'phosphor-react-native';
-import { uploadPFP, updateAllListingsPfp, updateAllListingsName } from '../../utils/firebaseUtils';
+import {
+    uploadPFP,
+    updateAllListingsPfp,
+    updateAllListingsName,
+    updateAllFollowPfp,
+    updateAllFollowName
+} from '../../utils/firebaseUtils';
 
 
 
@@ -91,6 +96,7 @@ const PersonalInformation = () => {
             await updateDoc(userRef, updatedInfo);
             if (currentField.key === 'name') {
                 await updateAllListingsName(user.uid, input)
+                await updateAllFollowName(user.uid, input, userData.name, userData.pfp)
             }
             const userDoc = await getDoc(userRef);
 
@@ -132,6 +138,9 @@ const PersonalInformation = () => {
                 const db = getFirestore();
                 const userRef = doc(db, "users", user.uid);
                 await updateDoc(userRef, { pfp: downloadLink });
+
+                await updateAllListingsPfp(user.uid, downloadLink);
+                await updateAllFollowPfp(user.uid, downloadLink, userData.pfp, userData.name);
 
                 const userDoc = await getDoc(userRef);
                 setUserData(userDoc.data());
