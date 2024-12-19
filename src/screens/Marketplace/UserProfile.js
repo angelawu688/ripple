@@ -214,20 +214,10 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         try {
             await updateDoc(userRef, {
                 following: arrayUnion(newFollowing),
-        try {
-            await setDoc(doc(db, "following", user.uid + userID), {
-                follower_id: user.uid,
-                following_id: userID,
-                // TODO: adding more info to DB for easier loading later
-                // follower_name: userData.name || "no name",
-                // follower_pfp: userData.pfp || "no pfp",
-                // following_name: userProfile?.name || "no user name",
-                // following_pfp: userProfile?.pfp || "no user pfp"
-            });
+            })
             await updateDoc(followingRef, {
                 followers: arrayUnion(newFollower),
             })
-
             const userDoc = await getDoc(userRef);
             setUserData(userDoc.data());
 
