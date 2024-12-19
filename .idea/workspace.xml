@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="updates friends listings">
-    </list>
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="change pfp updates across">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/EditPost.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/EditPost.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/UserProfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/UserProfile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/firebaseUtils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/firebaseUtils.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/Profile/PersonalInformation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/PersonalInformation.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/firebaseUtils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/firebaseUtils.js" afterDir="false" />
-    </list>
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="merge updates" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,21 +30,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "angela",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/Users/angelawu/CSE_all/uw-marketplace/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;angela&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/angelawu/CSE_all/uw-marketplace/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
@@ -346,29 +335,29 @@
       <option name="project" value="LOCAL" />
       <updated>1733301167319</updated>
     </task>
-    <task id="LOCAL-00033" summary="updates pfp and profile changes everywhere (listings and profile)">
+    <task id="LOCAL-00033" summary="updated followers/following">
       <option name="closed" value="true" />
-      <created>1734410714550</created>
+      <created>1734583582447</created>
       <option name="number" value="00033" />
       <option name="presentableId" value="LOCAL-00033" />
       <option name="project" value="LOCAL" />
-      <updated>1734410714553</updated>
+      <updated>1734583582460</updated>
     </task>
-    <task id="LOCAL-00034" summary="updates profile name change for all listings">
+    <task id="LOCAL-00034" summary="change pfp updates across">
       <option name="closed" value="true" />
-      <created>1734458339947</created>
+      <created>1734583787479</created>
       <option name="number" value="00034" />
       <option name="presentableId" value="LOCAL-00034" />
       <option name="project" value="LOCAL" />
-      <updated>1734458340032</updated>
+      <updated>1734583787480</updated>
     </task>
-    <task id="LOCAL-00035" summary="updates listing changes in savedPosts">
+    <task id="LOCAL-00035" summary="merge updates">
       <option name="closed" value="true" />
-      <created>1734459575488</created>
+      <created>1734587300465</created>
       <option name="number" value="00035" />
       <option name="presentableId" value="LOCAL-00035" />
       <option name="project" value="LOCAL" />
-      <updated>1734459575490</updated>
+      <updated>1734587300465</updated>
     </task>
     <task id="LOCAL-00036" summary="updates friends listings">
       <option name="closed" value="true" />
@@ -394,24 +383,7 @@
       <option name="project" value="LOCAL" />
       <updated>1734476494070</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
-    <task id="LOCAL-00033" summary="updated followers/following">
-      <option name="closed" value="true" />
-      <created>1734583582447</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1734583582460</updated>
-    </task>
-    <task id="LOCAL-00034" summary="change pfp updates across">
-      <option name="closed" value="true" />
-      <created>1734583787479</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1734583787480</updated>
-    </task>
-    <option name="localTasksCounter" value="35" />
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -429,7 +401,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed typo with saved items (need to consolidate)" />
     <MESSAGE value="fixed duplicate key bug" />
     <MESSAGE value="can edit post and save it" />
     <MESSAGE value="removed auth" />
@@ -456,9 +427,9 @@
     <MESSAGE value="updates profile name change for all listings" />
     <MESSAGE value="updates listing changes in savedPosts" />
     <MESSAGE value="updates friends listings" />
-    <option name="LAST_COMMIT_MESSAGE" value="updates friends listings" />
     <MESSAGE value="updated followers/following" />
     <MESSAGE value="change pfp updates across" />
-    <option name="LAST_COMMIT_MESSAGE" value="change pfp updates across" />
+    <MESSAGE value="merge updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="merge updates" />
   </component>
 </project>
