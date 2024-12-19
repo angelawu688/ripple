@@ -12,6 +12,8 @@ export const UserProvider = ({ children }) => {
   const [savedPosts, setSavedPosts] = useState([]);
   const [userListings, setUserListings] = useState([]);
   const [userFollowingIds, setUserFollowingIds] = useState([]);
+  const [userFollowing, setUserFollowing] = useState([]);
+  const [userFollowers, setUserFollowers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState(null)
 
@@ -32,10 +34,6 @@ export const UserProvider = ({ children }) => {
       const queryPosts = query(collection(db, "listings"), where("userId", "==", firebaseUser.uid));
       const queryPostsSnapshot = await getDocs(queryPosts);
 
-      // grab followers
-      // const followingQuery = query(collection(db, 'following'), where('follower_id', '==', firebaseUser.uid));
-      // const followingData = await getDocs(followingQuery);
-
 
       // update our state
       if (userDoc.exists()) {
@@ -47,18 +45,25 @@ export const UserProvider = ({ children }) => {
           id: doc.id,
           ...doc.data()
         }));
+
+        // grab user following ids
         const followingInfo = userDoc.data().following || [];
         const followingIds = followingInfo.map((item) => item.following_id)
+
         setUserData(userDoc.data());
         setSavedPosts(savedListings || []);
         setUserListings(listings || []);
         setUserFollowingIds(followingIds || []);
+        setUserFollowing(userDoc.data().following || []);
+        setUserFollowers(userDoc.data().followers || []);
 
         // store all in async storage
         await AsyncStorage.setItem('userData', JSON.stringify(userDoc.data()));
         await AsyncStorage.setItem('savedPosts', JSON.stringify(savedListings));
         await AsyncStorage.setItem('userListings', JSON.stringify(listings));
         await AsyncStorage.setItem('userFollowingIds', JSON.stringify(followingIds));
+        await AsyncStorage.setItem('userFollowing', JSON.stringify(userDoc.data().following));
+        await AsyncStorage.setItem('userFollowers', JSON.stringify(userDoc.data().followers));
       } else {
         // do nothing
       }
@@ -114,6 +119,8 @@ export const UserProvider = ({ children }) => {
       setSavedPosts([]);
       setUserListings([]);
       setUserFollowingIds([]);
+      setUserFollowing([]);
+      setUserFollowers([]);
       setAuthError(null);
     } catch (e) {
       console.log('Error clearing states: ', e)
@@ -131,11 +138,15 @@ export const UserProvider = ({ children }) => {
         const storedSavedPosts = await AsyncStorage.getItem('savedPosts');
         const storedUserListings = await AsyncStorage.getItem('userListings');
         const storedUserFollowingIds = await AsyncStorage.getItem('userFollowingIds');
+        const storedUserFollowing = await AsyncStorage.getItem('userFollowing');
+        const storedUserFollowers = await AsyncStorage.getItem('userFollowers');
 
         if (storedUserData) setUserData(JSON.parse(storedUserData));
         if (storedSavedPosts) setSavedPosts(JSON.parse(storedSavedPosts));
         if (storedUserListings) setUserListings(JSON.parse(storedUserListings));
-        if (storedUserFollowingIds) setUserListings(JSON.parse(storedUserFollowingIds));
+        if (storedUserFollowingIds) setUserFollowingIds(JSON.parse(storedUserFollowingIds));
+        if (storedUserFollowing) setUserFollowing(JSON.parse(storedUserFollowing));
+        if (storedUserFollowers) setUserFollowers(JSON.parse(storedUserFollowers));
       } catch (error) {
         console.error("Error loading stored auth state:", error);
         throw new Error(`Error loading stored auth state: ${error.message}`)
@@ -160,8 +171,6 @@ export const UserProvider = ({ children }) => {
           const querySavedSnapshot = await getDocs(querySaved);
           const queryPosts = query(collection(db, "listings"), where("userId", "==", firebaseUser.uid));
           const queryPostsSnapshot = await getDocs(queryPosts);
-          // const followingQuery = query(collection(db, 'following'), where('follower_id', '==', firebaseUser.uid));
-          // const followingData = await getDocs(followingQuery);
           if (userDoc.exists()) {
             const savedListings = querySavedSnapshot.docs.map(doc => ({
               id: doc.id,
@@ -177,6 +186,8 @@ export const UserProvider = ({ children }) => {
             setSavedPosts(savedListings || []);
             setUserListings(listings || []);
             setUserFollowingIds(followingIds || []);
+            setUserFollowing(userDoc.data().following || []);
+            setUserFollowers(userDoc.data().followers || []);
           } else {
             console.warn("No such document!");
             setUserData(null);
@@ -211,7 +222,11 @@ export const UserProvider = ({ children }) => {
       setUserData,
       setUserListings,
       userFollowingIds,
-      setUserFollowingIds
+      setUserFollowingIds,
+      userFollowing,
+      setUserFollowing,
+      userFollowers,
+      setUserFollowers
     }}>
       {children}
     </userContext.Provider>
