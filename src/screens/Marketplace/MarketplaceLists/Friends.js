@@ -12,7 +12,7 @@ import { useFocusEffect } from "@react-navigation/native"
 
 
 const Friends = ({ navigation }) => {
-    const { user, userData, userFollowing } = useContext(userContext)
+    const { user, userData, userFollowingIds } = useContext(userContext)
     const [friendsListings, setFriendsListings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
 
@@ -36,9 +36,10 @@ const Friends = ({ navigation }) => {
             // );
             // const followingData = await getDocs(followingQuery);
             // const followingIds = followingData.docs.map(doc => doc.data().following_id);
+            console.log("userFollowingIds length is", userFollowingIds.length)
 
             // not following anyone
-            if (userFollowing.length === 0) {
+            if (userFollowingIds.length === 0) {
                 setFriendsListings([]);
                 return;
             }
@@ -48,7 +49,7 @@ const Friends = ({ navigation }) => {
             // TODO: fix this so we can get more than 10
             const listingsQuery = query(
                 collection(db, 'listings'),
-                where('userId', 'in', userFollowing),
+                where('userId', 'in', userFollowingIds),
                 where("sold", "==", false),
                 orderBy("createdAt", "desc"),
                 limit(32)
@@ -66,7 +67,7 @@ const Friends = ({ navigation }) => {
             // TODO: need to handle when isLoading is true
             setIsLoading(false);
         }
-    }, [userFollowing, db]);
+    }, [userFollowingIds, db]);
 
     const shareProfile = () => {
         if (!userData?.uid) {

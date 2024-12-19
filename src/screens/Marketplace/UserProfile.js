@@ -13,7 +13,9 @@ import {
     setDoc,
     updateDoc,
     addDoc,
-    where
+    where,
+    arrayUnion,
+    arrayRemove,
 } from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
 import ListingsList from '../../components/ListingsList'
@@ -36,7 +38,7 @@ const testUserPosts = [
 ]
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
-    const { user, userData, userListings, userFollowing, setUserFollowing } = useContext(userContext)
+    const { user, userData, setUserData, userListings, userFollowingIds, setUserFollowingIds } = useContext(userContext)
 
     const [followingUser, setFollowingUser] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
@@ -125,8 +127,8 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                     setUserPosts(sortedListings);
 
                     // check if following user already
-                    if (userFollowing && userFollowing.length !== 0) {
-                        const followStatus = userFollowing.includes(userID);
+                    if (userFollowingIds && userFollowingIds.length !== 0) {
+                        const followStatus = userFollowingIds.includes(userID);
                         if (followStatus) {
                             setFollowingUser(true)
                             console.log("user is followed");
@@ -148,7 +150,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 setIsLoading(false);
             }
             // // setting the socials for testing
-            // // TODO CHANGE TESTING
+            // // TODO CHANGE TESTING (can we delete this)
             // setUserProfile(prevProfile => ({
             //     ...prevProfile,
             //     // instagram: 'williamhuntt',
@@ -191,8 +193,27 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         }
     }
 
+    // TODO: go through and make sure error checking is fine
+    // TODO: see if it can be cleaner
     const markAsFollowed = async () => {
         console.log('following user')
+        // add other user to following
+        const newFollowing = {
+            following_id: userID,
+            following_name: userProfile.name,
+            following_pfp: userProfile.pfp,
+        };
+        // add curr user to their followers
+        const newFollower = {
+            follower_id: user.uid,
+            follower_name: userData.name,
+            follower_pfp: userData.pfp,
+        }
+        const userRef = doc(db, "users", user.uid);
+        const followingRef = doc(db, "users", userID)
+        try {
+            await updateDoc(userRef, {
+                following: arrayUnion(newFollowing),
         try {
             await setDoc(doc(db, "following", user.uid + userID), {
                 follower_id: user.uid,
@@ -203,28 +224,51 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 // following_name: userProfile?.name || "no user name",
                 // following_pfp: userProfile?.pfp || "no user pfp"
             });
+            await updateDoc(followingRef, {
+                followers: arrayUnion(newFollower),
+            })
+
+            const userDoc = await getDoc(userRef);
+            setUserData(userDoc.data());
+
+            const followingUserDoc = await getDoc(followingRef);
+            setUserProfile(followingUserDoc.data())
         } catch (error) {
             console.error("Error following user", error);
         } finally {
             // frontend update
-            setUserFollowing((prevUserFollowing) => [...prevUserFollowing, userID]);
-            console.log("now following user");
+            setUserFollowingIds((prevUserFollowingIds) => [...prevUserFollowingIds, userID]);
         }
     }
 
     const markAsUnfollowed = async () => {
         console.log('unfollow user')
-        const docRef = doc(db, "following", user.uid + userID);
+        const userRef = doc(db, "users", user.uid);
+        const userToUnfollow = userData.following.find((item) => item.following_id === userID);
+
+        const followingRef = doc(db, "users", userID);
+        const userToRemove = userProfile.followers.find((item) => item.follower_id === user.uid);
         try {
-            await deleteDoc(docRef);
+            await updateDoc(userRef, {
+                following: arrayRemove(userToUnfollow),
+            });
+
+            await updateDoc(followingRef, {
+                followers: arrayRemove(userToRemove),
+            })
+
+            const userDoc = await getDoc(userRef);
+            setUserData(userDoc.data());
+
+            const followingUserDoc = await getDoc(followingRef);
+            setUserProfile(followingUserDoc.data())
         } catch (error) {
             console.error("Error unfollowing error:", error);
         } finally {
             // frontend update
-            setUserFollowing((prevUserFollowing) =>
-                prevUserFollowing.filter((id) => id !== userID)
+            setUserFollowingIds((prev) =>
+                prev.filter((id) => id !== userID)
             );
-            console.log("user is unfollowed")
         }
     }
 
