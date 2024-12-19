@@ -35,7 +35,7 @@ const InfoOnboarding = ({ navigation, route }) => {
     const [isLoadingSave, setIsLoadingSave] = useState(false)
     const [inputError, setInputError] = useState('')
     const [bioHeight, setBioHeight] = useState(50)
-    const { setUser, setUserData, setSavedPosts, setUserListings } = useContext(userContext);
+    const { setUser, setUserData, setSavedPosts, setUserListings, setUserFollowingIds } = useContext(userContext);
 
     // focus the top text field on component mount
     const inputRef = useRef(null);
@@ -103,6 +103,8 @@ const InfoOnboarding = ({ navigation, route }) => {
                 concentration: concentration,
                 gradYear: gradYear,
                 name: name,
+                following: [],
+                followers: [],
                 instagram: ig,
                 linkedin: li,
                 pfp: pfpURL, // stores a reference to our storage :)
@@ -111,6 +113,7 @@ const InfoOnboarding = ({ navigation, route }) => {
             setUserData(userDoc.data());
             setSavedPosts([]);
             setUserListings([]);
+            setUserFollowingIds([]);
             setUser(user); // this will navigate to the home page
         } catch (error) {
             let errorMsg = 'An error occurred. Please try again later.';
