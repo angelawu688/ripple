@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="added friends feature">
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="change pfp updates across">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/Profile/PersonalInformation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/PersonalInformation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/firebaseUtils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/firebaseUtils.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +38,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "angela",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -340,7 +339,23 @@
       <option name="project" value="LOCAL" />
       <updated>1733301167319</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="updated followers/following">
+      <option name="closed" value="true" />
+      <created>1734583582447</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1734583582460</updated>
+    </task>
+    <task id="LOCAL-00034" summary="change pfp updates across">
+      <option name="closed" value="true" />
+      <created>1734583787479</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1734583787480</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -358,8 +373,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="saving posts with usercontext" />
-    <MESSAGE value="saved items update when changed" />
     <MESSAGE value="fixed typo with saved items (need to consolidate)" />
     <MESSAGE value="fixed duplicate key bug" />
     <MESSAGE value="can edit post and save it" />
@@ -383,6 +396,8 @@
     <MESSAGE value="fixed up some duplicates in styling" />
     <MESSAGE value="merged from master" />
     <MESSAGE value="added friends feature" />
-    <option name="LAST_COMMIT_MESSAGE" value="added friends feature" />
+    <MESSAGE value="updated followers/following" />
+    <MESSAGE value="change pfp updates across" />
+    <option name="LAST_COMMIT_MESSAGE" value="change pfp updates across" />
   </component>
 </project>
