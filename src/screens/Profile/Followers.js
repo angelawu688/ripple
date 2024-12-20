@@ -15,7 +15,7 @@ export default function Followers({ navigation, route }) {
 
     useEffect(() => {
         const data = isFollowers ? userData.followers : userData.following;
-        setUsers(data);
+        setUsers(data || []);
         setLoading(false);
     }, [isFollowers]);
 

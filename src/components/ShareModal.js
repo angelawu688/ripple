@@ -7,9 +7,14 @@ import { View } from 'react-native'
 import { BlurView } from 'expo-blur'
 import { copyLink, sendProfile } from '../utils/socialUtils'
 import { userContext } from '../context/UserContext'
+import { ToastContext } from '../context/ToastContext'
+import Toast from './toasts/CustomToast';
+
+
 
 export default function ShareModal({ isVisible, profileLink, setShareModalVisible }) {
     const { user, userData } = useContext(userContext)
+    const { showToast } = useContext(ToastContext)
 
 
     const topCircleAnim = new Animated.ValueXY({ x: -10, y: -10 })
@@ -79,6 +84,7 @@ export default function ShareModal({ isVisible, profileLink, setShareModalVisibl
                 intensity={50}
                 style={StyleSheet.absoluteFill} // did not know this was a thing until now lol
             >
+                <Toast />
 
                 <TouchableOpacity
                     style={styles.closeButton}
@@ -175,7 +181,10 @@ export default function ShareModal({ isVisible, profileLink, setShareModalVisibl
 
                         <View style={[styles.socialButtonContainer]}>
                             <TouchableOpacity
-                                onPress={() => copyLink(profileLink)}
+                                onPress={() => {
+                                    copyLink(profileLink)
+                                    showToast('Share link copied!')
+                                }}
                                 style={[styles.modalSocialButton]}
                             >
                                 <Link size={24} color={colors.loginBlue}

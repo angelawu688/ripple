@@ -7,6 +7,8 @@ import { collection, addDoc, getFirestore, updateDoc, doc } from 'firebase/fires
 import { getAuth } from 'firebase/auth';
 import { colors } from "../../../colors";
 import { userContext } from "../../../context/UserContext";
+import { ToastContext } from "../../../context/ToastContext";
+
 import { MinusCircle, PlusCircle, UploadSimple } from "phosphor-react-native";
 import CurrencyInput from 'react-native-currency-input'
 import { uploadListingImage, deleteImageFromDB, updateAllSaved } from "../../../utils/firebaseUtils";
@@ -21,7 +23,7 @@ const imageSize = 0.16 * screenWidth;
 const EditListing = ({ navigation, route }) => {
     const { listing, listingID } = route.params
     const { user, userData, setUserListings } = useContext(userContext);
-
+    const { showToast } = useContext(ToastContext)
     // all of these are grabbed from the route params, not a database read. Also is immediate
     // cheaper, but if we are having issues with initialaztion that might be why
     const [photos, setPhotos] = useState(listing.photos || []) // array of photos
@@ -197,7 +199,6 @@ const EditListing = ({ navigation, route }) => {
 
             // frontend and backend change
             const editDoc = await updateDoc(doc(db, "listings", listingID), listingData);
-
             await updateAllSaved(listingID, title, price, finalPhotoURLs);
 
             // update local state
@@ -207,10 +208,11 @@ const EditListing = ({ navigation, route }) => {
                 )
             );
 
+            showToast('Listing edited!')
             navigation.goBack();
-            // SOME SORT OF TOAST HERE
         } catch (e) {
             setErrorMessage(e.message)
+            showToast('Error with editing. Please try again')
             console.log(e);
         } finally {
             setIsLoading(false)

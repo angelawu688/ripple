@@ -158,13 +158,13 @@ const CreateListing = ({ navigation }) => {
             setUserListings((prevUserListings) => [...prevUserListings, { ...listingData, id: listingID }]);
 
             // 6. post completed message
-            // can we use something like chakraUI toast?
             navigation.reset({
                 index: 0,
                 routes: [{ name: 'Marketplace' }],
             });
 
             // COMPLETED TOAST HERE
+            showToast('Listing edited!')
         } catch (e) {
             setErrorMessage(e.message)
             console.log(e);
