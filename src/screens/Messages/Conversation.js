@@ -59,6 +59,7 @@ const Conversation = ({ navigation, route }) => {
     }, [conversationID]);
 
     useEffect(() => {
+        console.log(otherUserDetails)
         navigation.setOptions({
             headerTitle: () => (
                 <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { userID: otherUserDetails.id })}
@@ -66,7 +67,7 @@ const Conversation = ({ navigation, route }) => {
                 >
                     {otherUserDetails?.pfp ? (
                         <Image
-                            source={otherUserDetails.pfp}
+                            source={{ uri: otherUserDetails.pfp }}
                             style={{ borderRadius: 50, width: 35, height: 35, marginRight: 8 }}
                             resizeMethod='cover'
                         />
@@ -77,12 +78,12 @@ const Conversation = ({ navigation, route }) => {
                             <User size={18} />
                         </View>
                     )}
+                    {/* <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}> */}
                     <Text style={{ fontSize: 18, fontWeight: '500', fontFamily: 'inter', marginRight: 10 }}>
-                        {otherUserDetails?.name}
+                        {otherUserDetails?.name.split(' ')[0]}
                     </Text>
                     <CaretRight size={14} weight='bold' color={colors.accentGray} />
-
-
+                    {/* </View> */}
                 </TouchableOpacity>
             )
         })
@@ -159,7 +160,7 @@ const Conversation = ({ navigation, route }) => {
         <KeyboardAvoidingView // make sure that we can see input and keyboard
             style={{ flex: 1, justifyContent: 'space-between' }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={90}
+            keyboardVerticalOffset={150} // increased for the new header
             onPress={() => Keyboard.dismiss()}
         >
             <View style={{
@@ -169,8 +170,8 @@ const Conversation = ({ navigation, route }) => {
                 // height: '100%',
                 flex: 1
             }}>
-                {loadingMessages && <LoadingSpinner />}
-                {messages?.length > 0 && !loadingMessages ? (<FlatList
+                {loadingMessages || !messages && <LoadingSpinner />}
+                {messages.length > 0 && !loadingMessages ? (<FlatList
                     onScrollBeginDrag={() => Keyboard.dismiss()}
                     data={messages}
                     renderItem={({ item, index }) => {

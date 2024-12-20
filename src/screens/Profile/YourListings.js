@@ -74,7 +74,7 @@ const YourListings = ({ navigation }) => {
 
             {/* <View style={styles.listingContainer}> */}
             <Text style={styles.text}>
-                Past Listings
+                Sold Listings
             </Text>
             {pastListings?.length !== 0 ? (<ListingsList
                 scrollEnabled={false}

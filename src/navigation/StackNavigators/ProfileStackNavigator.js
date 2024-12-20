@@ -14,6 +14,7 @@ import UserProfile from '../../screens/Marketplace/UserProfile'
 import Conversation from "../../screens/Messages/Conversation";
 import OwnUserProfile from "../../screens/Profile/OwnUserProfile";
 import { DotsThree, Gear } from "phosphor-react-native";
+import Followers from "../../screens/Profile/Followers";
 
 
 const ProfileStack = createNativeStackNavigator();
@@ -196,6 +197,21 @@ const ProfileStackNavigator = () => {
             <ProfileStack.Screen
                 name="Conversation"
                 component={Conversation}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
+
+            <ProfileStack.Screen
+                name="Followers"
+                component={Followers}
                 options={({ navigation }) => ({
                     headerTitle: () => (
                         <Logo />

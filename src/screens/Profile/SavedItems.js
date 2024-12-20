@@ -34,10 +34,10 @@ const SavedItems = ({ navigation }) => {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text style={[styles.text, { fontWeight: '600', fontSize: 20 }]}>
-                    No saved posts!
+                    No saved listings!
                 </Text>
                 <Text style={[styles.text, { fontWeight: '400', fontSize: 16 }]}>
-                    Saved posts will appear here
+                    Saved listings will appear here
                 </Text>
             </View>
         )

@@ -65,7 +65,7 @@ const TabNavigator = () => {
                                     opacity: focused ? 1.0 : 0.7
                                 }}
                             >
-                                <User />
+                                <User size={20} />
                             </View>
                         )
                         // icon = focused
@@ -120,8 +120,10 @@ const TabNavigator = () => {
                             paddingTop: 12,
                             borderTopWidth: 0.5,
                         }
+
                     })(route),
                 })}
+
             />
         </Tab.Navigator>
     )

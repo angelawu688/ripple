@@ -86,7 +86,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     useEffect(() => {
         if (isOwnProfileInProfileStack) {
             navigation.setOptions({
-
+                // set options here, might not be needed anymore
             })
         } else {
             // is own profile 
@@ -268,17 +268,34 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         const conversationID = await getConversation(user.uid, userID)
         navigation.navigate('MessagesStack', {
             screen: 'Conversation',
-            params: { conversationID }
+            params: {
+                conversationID,
+                otherUserDetails: {
+                    id: userID,
+                    name: userProfile.name,
+                    pfp: userProfile.pfp
+                }
+            }
         });
     }
 
     // just navigation here
     const handleFollowers = () => {
-
+        const followers = userData.followers
+        console.log(userData.followers)
+        navigation.navigate('Followers', {
+            followers: followers,
+            isFollowers: true,
+        })
     }
 
     const handleFollowing = () => {
-
+        const following = userData.following
+        console.log(userData.following)
+        navigation.navigate('Followers', {
+            following: following,
+            isFollowers: false
+        })
     }
 
     // todo maybe handle as error messages instead of alerts
