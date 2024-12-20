@@ -223,8 +223,6 @@ const ProfileStackNavigator = () => {
                     )
                 })}
             />
-
-
         </ProfileStack.Navigator>
     )
 }

@@ -28,6 +28,8 @@ import { sendProfile } from "../../utils/socialUtils";
 import * as Linking from 'expo-linking'
 import ShareModal from "../../components/ShareModal";
 import { useFocusEffect } from "@react-navigation/native";
+import { ToastContext } from "../../context/ToastContext";
+
 
 const testUserPosts = [
     { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
@@ -38,6 +40,7 @@ const testUserPosts = [
 ]
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
+    const { showToast } = useContext(ToastContext);
     const { user, userData, setUserData, userListings, userFollowingIds, setUserFollowingIds } = useContext(userContext)
 
     const [followingUser, setFollowingUser] = useState(false)
@@ -430,9 +433,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                             </Text>
                         </TouchableOpacity>)}
                     </View>
-
-
-
 
                     <View style={styles.bioContainer}>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
