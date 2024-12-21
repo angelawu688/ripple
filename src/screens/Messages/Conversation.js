@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import ListingCard from '../../components/ListingCard';
 import { ArrowBendRightUp, CaretRight, Plus, User, X, XCircle } from 'phosphor-react-native';
 import { colors } from '../../colors';
-import { collection, doc, onSnapshot } from 'firebase/firestore';
+import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { getListingFromID, sendMessage } from '../../utils/firebaseUtils';
 import { db } from '../../../firebaseConfig';
 import { userContext } from '../../context/UserContext';
@@ -19,7 +19,6 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 const Conversation = ({ navigation, route }) => {
     // pass in the listing from the route
     const { listing, conversationID, otherUserDetails } = route.params
-
     const [inputListing, setInputListing] = useState(listing || null)
     const { user } = useContext(userContext)
     const [messages, setMessages] = useState([])
@@ -38,26 +37,7 @@ const Conversation = ({ navigation, route }) => {
         }
     }, [messages]);
 
-    // load messages from fb
-    useEffect(() => {
-        setLoadingMessages(true)
-        const messagesRef = collection(db, 'conversations', conversationID, 'messages')
-
-        // same as convs, we grab the snapshot and unsubscribe when we are done with it
-        const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
-            const fetchedMessages = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-            // most recent first, since we are using inverted flatlist
-            setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
-        });
-
-        // unsub on unmount
-        setLoadingMessages(false)
-        return () => unsubscribe();
-    }, [conversationID]);
-
+    // update the top nav bar
     useEffect(() => {
         navigation.setOptions({
             headerTitle: () => (
@@ -88,23 +68,38 @@ const Conversation = ({ navigation, route }) => {
         })
     }, [])
 
-
-    // listener for the keyboard
-    const [keyboardStatus, setKeyboardStatus] = useState('Keyboard Hidden');
+    // load messages from fb
     useEffect(() => {
-        const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-            setKeyboardStatus('Keyboard Shown');
-        });
-        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-            setKeyboardStatus('Keyboard Hidden');
+        setLoadingMessages(true)
+        const messagesRef = collection(db, 'conversations', conversationID, 'messages')
+
+        // same as convs, we grab the snapshot and unsubscribe when we are done with it
+        const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
+            const fetchedMessages = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            // most recent first, since we are using inverted flatlist
+            setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
         });
 
-        return () => {
-            showSubscription.remove();
-            hideSubscription.remove();
-        };
-    }, []);
+        // unsub on unmount
+        setLoadingMessages(false)
+        return () => unsubscribe();
+    }, [conversationID]);
 
+
+
+
+    // mark the messages as read
+    useEffect(() => {
+        if (conversationID && user?.uid) {
+            const conversationRef = doc(db, "conversations", conversationID);
+            updateDoc(conversationRef, {
+                lastMessageReadBy: user.uid
+            });
+        }
+    }, [conversationID, user?.uid]);
 
     const handleSendMessage = async (text, image, post, clearInputs) => {
         // if we arent sending anything, return
@@ -275,7 +270,6 @@ const Conversation = ({ navigation, route }) => {
                     {/* input bar at the bottom */}
                     <View style={[styles.inputBar, {
                         paddingBottom: 16
-
                     }]}>
                         <TouchableOpacity onPress={() => handleAddImage()}
                             style={{
@@ -293,6 +287,9 @@ const Conversation = ({ navigation, route }) => {
                             }}>
                             {openingImagePicker ? <ActivityIndicator color='#767676' size={'small'} /> : <Plus size={16} color={colors.accentGray} weight='bold' />}
                         </TouchableOpacity>
+
+                        {/* <View></View> */}
+                        {/* to put them in the same box, will have to wrap them in a view and go crazy w the CSS */}
 
                         <TextInput
                             placeholder='Message'

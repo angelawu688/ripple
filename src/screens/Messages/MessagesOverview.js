@@ -131,6 +131,7 @@ const MessagesOverview = ({ navigation }) => {
                                     name={otherUserDetails?.name || "User"}
                                     lastMessage={item.lastMessage}
                                     lastSentAt={item.timestamp}
+                                    isUnread={!item.lastMessageReadBy || item.lastMessageReadBy !== user.uid} // style conditionally based on if its unread
                                 />
                             </TouchableOpacity>
                         )
@@ -152,4 +153,5 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%'
     },
+
 })

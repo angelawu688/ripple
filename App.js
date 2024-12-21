@@ -17,6 +17,7 @@ import { registerForPushNotificationsAsync } from './src/utils/notifications';
 import { handleUrlParams } from 'expo-router/build/fork/getStateFromPath-forks';
 import { ToastProvider } from './src/context/ToastContext';
 import Toast from './src/components/toasts/CustomToast';
+import { UnreadProvider } from './src/context/UnreadContext';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -41,10 +42,11 @@ export default function App() {
   return (
     <UserProvider>
       <ToastProvider>
-        <RootComponent />
+        <UnreadProvider>
+          <RootComponent />
+        </UnreadProvider>
       </ToastProvider>
-
-    </UserProvider>
+    </UserProvider >
   );
 }
 

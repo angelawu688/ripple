@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import ProfileStackNavigator from './StackNavigators/ProfileStackNavigator';
@@ -9,9 +9,10 @@ import MessagesStackNavigator from './StackNavigators/MessagesStackNavigator';
 import Logo from '../components/Logo'
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../colors'
-import { ChatTeardropText, User, Storefront } from 'phosphor-react-native';
+import { ChatTeardropText, User, Storefront, ChatCircle } from 'phosphor-react-native';
 import { userContext } from '../context/UserContext';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { UnreadContext } from '../context/UnreadContext';
 
 
 
@@ -21,19 +22,30 @@ const Tab = createBottomTabNavigator();
 // dont show headers on the stackNavigators, do that at a screen level
 const TabNavigator = () => {
     const { userData } = useContext(userContext)
+    const { unreadCount } = useContext(UnreadContext);
 
     return (
         <Tab.Navigator initialRouteName="MarketplaceStack"
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let icon;
-                    // TODO
-                    // modify this code to have custom icons, right now these are ionicons
-
                     if (route.name === 'MessagesStack') {
-                        icon = focused
-                            ? <ChatTeardropText size={28} color={colors.loginBlue} weight="fill" />
-                            : <ChatTeardropText size={28} color={colors.loginBlue} />;
+                        return (
+                            <View style={{ width: 35, height: 35 }}>
+                                {focused ? (
+                                    <ChatCircle size={28} color={colors.loginBlue} weight="fill" />
+                                ) : (
+                                    <ChatCircle size={28} color={colors.loginBlue} />
+                                )}
+                                {unreadCount > 0 && (
+                                    <View style={styles.badge}>
+                                        <Text style={styles.badgeText}>
+                                            {unreadCount > 99 ? '99+' : unreadCount}
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+                        )
                     } else if (route.name === 'MarketplaceStack') {
                         icon = focused
                             ? <Storefront size={28} color={colors.loginBlue} weight="fill" />
@@ -134,3 +146,25 @@ const TabNavigator = () => {
 }
 
 export default TabNavigator;
+
+
+const styles = StyleSheet.create({
+    badge: {
+        position: 'absolute',
+        top: -2,
+        right: 2,
+        backgroundColor: 'red',
+        borderRadius: 4,
+        minWidth: 17,
+        height: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 4,
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: '800',
+        fontFamily: 'inter',
+    }
+})

@@ -136,6 +136,7 @@ export const sendMessage = async (convID, senderID, textContent = undefined, pos
             postID: postID ? postID : '',
             imageUri: downloadURL ? downloadURL : '',
             timestamp: Date.now(),
+
         })
 
         // update the conversation data
@@ -144,9 +145,9 @@ export const sendMessage = async (convID, senderID, textContent = undefined, pos
         if (textContent) {
             lastMessage = textContent
         } else if (postID) {
-            lastMessage = 'Attachment: 1 post'
+            lastMessage = '📦 Shared a listing'
         } else if (imageUri) {
-            lastMessage = 'Attachment: 1 image'
+            lastMessage = '📸 Shared a photo'
         } else {
             // this shouldnt happen
             lastMessage = 'Message'
@@ -156,7 +157,9 @@ export const sendMessage = async (convID, senderID, textContent = undefined, pos
         await updateDoc(conversationRef, {
             lastMessage: lastMessage,
             timestamp: Date.now(),
-            lastMessageReadBy: senderID,
+            // track who sent and read the last message
+            lastMessageBy: senderID,
+            lastMessageReadBy: senderID
         })
     } catch (e) {
         console.log(e)
@@ -302,7 +305,7 @@ export const updateAllFollowPfp = async (userId, pfpLinkNew, pfpLinkOld, userNam
         const followers = docSnap.data().followers;
         const updatedFollowers = followers.map((followerUser) => {
             if (followerUser.follower_id === userId) {
-                return {...followerUser, follower_pfp: pfpLinkNew};
+                return { ...followerUser, follower_pfp: pfpLinkNew };
             }
             return followerUser
         });
@@ -316,7 +319,7 @@ export const updateAllFollowPfp = async (userId, pfpLinkNew, pfpLinkOld, userNam
         const following = docSnap.data().following;
         const updatedFollowing = following.map((followingUser) => {
             if (followingUser.following_id === userId) {
-                return {...followingUser, following_pfp: pfpLinkNew};
+                return { ...followingUser, following_pfp: pfpLinkNew };
             }
             return followingUser
         });
@@ -335,7 +338,7 @@ export const updateAllFollowName = async (userId, userNameNew, userNameOld, user
         const followers = docSnap.data().followers;
         const updatedFollowers = followers.map((followerUser) => {
             if (followerUser.follower_id === userId) {
-                return {...followerUser, follower_name: userNameNew};
+                return { ...followerUser, follower_name: userNameNew };
             }
             return followerUser
         });
@@ -349,7 +352,7 @@ export const updateAllFollowName = async (userId, userNameNew, userNameOld, user
         const following = docSnap.data().following;
         const updatedFollowing = following.map((followingUser) => {
             if (followingUser.following_id === userId) {
-                return {...followingUser, following_name: userNameNew};
+                return { ...followingUser, following_name: userNameNew };
             }
             return followingUser
         });

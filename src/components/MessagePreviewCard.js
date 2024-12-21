@@ -22,7 +22,7 @@ const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt, unread = false
 
     return (
         <View
-            style={styles.container}
+            style={[styles.container]}
         >
             <View style={{ width: '14%' }}>
                 {pfp ? (
@@ -34,17 +34,18 @@ const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt, unread = false
                         <User size={18} />
                     </View>
                 )}
+                {unread && <View style={styles.badge} />}
             </View>
+
 
 
             {/* rightside container */}
             <View style={styles.rightSideContainer}>
-
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <Text style={styles.upperText}>
+                    <Text style={[styles.upperText, { color: unread ? colors.loginBlue : 'black' }]}>
                         {name + ''}
                     </Text>
-                    <Text style={styles.lastSentText}>
+                    <Text style={[styles.lastSentText, { color: unread ? colors.loginBlue : colors.accentGray }]}>
                         {/*  */}
                         {formatDate(lastSentAt / 1000)}
                     </Text>
@@ -115,5 +116,23 @@ const styles = StyleSheet.create({
         fontFamily: 'inter',
         color: colors.accentGray,
         fontSize: 16
+    },
+    badge: {
+        position: 'absolute',
+        top: -5,
+        right: 5,
+        backgroundColor: 'red',
+        borderRadius: 4,
+        minWidth: 17,
+        height: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 4,
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: '800',
+        fontFamily: 'inter',
     }
 })
