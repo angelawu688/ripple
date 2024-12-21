@@ -106,8 +106,13 @@ const Conversation = ({ navigation, route }) => {
         if (!text.trim() && !image && !post) {
             return
         }
-
         setSendingMessage(true)
+
+        // optimistic update, makes it more responsive
+        // for post and image, it makes more sense and looks cleaner to just keep them for a bit
+        if (text) {
+            clearInputs();
+        }
 
         // send it away to our lovely database
         try {
@@ -121,8 +126,8 @@ const Conversation = ({ navigation, route }) => {
             )
         } catch (e) {
             console.log('handlesend', e)
+            // rollback if we want
         } finally {
-            clearInputs();
             setSendingMessage(false)
         }
     }

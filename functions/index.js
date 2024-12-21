@@ -36,24 +36,47 @@ exports.sendNotificationOnNewMessage = onDocumentCreated(
         const convSnap = await convRef.get();
         const conv = convSnap.data();
 
-        // find who received the message
+        // find ids 
         const receiverID = conv.users.find(uid => uid !== messageData.sentBy)
+        const senderID = messageData.sentBy;
 
-        // find thier userToken
-        const userRef = admin.firestore().collection('users').doc(receiverID)
-        const userSnap = await userRef.get()
-        const userData = userSnap.data()
+        // get data in parallel
+        const [receiverSnap, senderSnap] = await Promise.all([
+            admin.firestore().collection('users').doc(receiverID).get(),
+            admin.firestore().collection('users').doc(senderID).get()
+        ]);
+
+        // get data
+        const userData = receiverSnap.data();
+        const senderData = senderSnap.data();
+        const senderName = senderData.name
 
         // get their push token from their userData
-        const expoPushToken = userData.expoPushToken
-        const expoPushTokenString = expoPushToken?.data
+        const expoPushToken = userData.expoPushToken;
+        const expoPushTokenString = expoPushToken?.data;
+
+        // const senderName = userData?.name || 'You have a new message!'
+        // const expoPushTokenString = expoPushToken?.data
+
+
+
+
+        // // find thier userTokn
+        // const userRef = admin.firestore().collection('users').doc(receiverID)
+        // const userSnap = await userRef.get()
+        // const userData = userSnap.data()
+
+        // // get their push token from their userData
+        // const expoPushToken = userData.expoPushToken
+        // const name = userData.name || 'You have a new message!'
+        // const expoPushTokenString = expoPushToken?.data
 
         // data for the notification
 
-        // TODO make this better, to include actual data
-        // TODO limit the text content to some # of characters
-        const title = `Message from ${'SENDER NAME HERE'}`
-        const body = messageData.textContent ? messageData.textContent : '1 attachment'
+
+
+        const title = senderName ? senderName.substring(0, 100) + (senderName.length > 50 ? "..." : '') : 'You received a message!'
+        const body = messageData.textContent ? messageData.textContent.substring(0, 100) + (messageData.textContent.length > 100 ? "..." : "") : '1 attachment'
 
         // use Expo's push API
         if (expoPushTokenString) {
