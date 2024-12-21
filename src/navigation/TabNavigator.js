@@ -109,7 +109,7 @@ const TabNavigator = () => {
                     headerShown: false,
                     // remove the tab bar if we are in a conversation
                     tabBarStyle: ((route) => {
-                        const routeName = getFocusedRouteNameFromRoute(route) ?? ''
+                        const routeName = getFocusedRouteNameFromRoute(route)
                         if (routeName === 'Conversation') {
                             return {
                                 display: 'none'
@@ -119,6 +119,10 @@ const TabNavigator = () => {
                             backgroundColor: colors.white,
                             paddingTop: 12,
                             borderTopWidth: 0.5,
+
+                            // helps with the transition
+                            transition: 'all 0.2s',
+                            position: 'absolute'
                         }
 
                     })(route),

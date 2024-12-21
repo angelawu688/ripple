@@ -7,6 +7,7 @@ import { userContext } from "../../context/UserContext"
 import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../../../firebaseConfig"
 import LoadingSpinner from '../../components/LoadingSpinner'
+import { colors } from "../../colors"
 
 
 const MessagesOverview = ({ navigation }) => {
@@ -96,6 +97,9 @@ const MessagesOverview = ({ navigation }) => {
                     ListHeaderComponent={null} // blank for now, this is where a header would go 
 
                     data={conversations}
+                    ItemSeparatorComponent={() => (
+                        <View style={{ height: 1, backgroundColor: colors.loginGray, width: '85%', alignSelf: 'flex-end' }} />
+                    )}
                     renderItem={({ item }) => { // note: need to keep items, we are just renaming it to be clear
                         if (!item || !item.id || !item.users || !item.userDetails) {
                             return null
@@ -108,13 +112,19 @@ const MessagesOverview = ({ navigation }) => {
 
                         return (
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('Conversation', {
-                                    conversationID: conversationID,
-                                    otherUserDetails: {
-                                        ...otherUserDetails,
-                                        id: otherUserId
-                                    }
-                                })}
+                                onPress={() => {
+                                    navigation.navigate('Conversation', {
+                                        conversationID: conversationID,
+                                        otherUserDetails: {
+                                            ...otherUserDetails,
+                                            id: otherUserId
+                                        }
+                                    })
+                                    navigation.setOptions({
+                                        tabBarStyle: { display: 'none' }
+                                    })
+                                }
+                                }
                             >
                                 <MessagePreviewCard
                                     pfp={otherUserDetails?.pfp}

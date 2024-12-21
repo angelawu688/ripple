@@ -3,7 +3,7 @@ export default () => ({
     name: "ripple",
     slug: "uw-marketplace",
     owner: 'phunt22',
-    version: "1.0.0",
+    version: "1.0.1",
     orientation: "portrait",
     icon: "./assets/images/favicon.png",
     scheme: "myapp",
@@ -32,7 +32,7 @@ export default () => ({
       [
         "expo-splash-screen",
         {
-          backgroundColor: "white",
+          backgroundColor: "#FFFFFF",
           // resizeMode: "contain",
           image: "./assets/images/ripple_splashicon3.png",
           imageWidth: "600" // todo play with this

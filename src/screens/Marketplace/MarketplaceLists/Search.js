@@ -163,6 +163,7 @@ const Search = ({ navigation }) => {
                 }}
                 style={[styles.input, styles.shadow]}
                 placeholder="What are you looking for?"
+                placeholderTextColor={colors.accentGray}
                 onSubmitEditing={() => handleSearch(query)}
                 returnKeyType="search" // gives us the blue button on keyboard
                 autoComplete="off" // i feel like these are really annoying as a user

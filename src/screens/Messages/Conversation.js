@@ -59,7 +59,6 @@ const Conversation = ({ navigation, route }) => {
     }, [conversationID]);
 
     useEffect(() => {
-        console.log(otherUserDetails)
         navigation.setOptions({
             headerTitle: () => (
                 <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { userID: otherUserDetails.id })}
@@ -88,6 +87,24 @@ const Conversation = ({ navigation, route }) => {
             )
         })
     }, [])
+
+
+    // listener for the keyboard
+    const [keyboardStatus, setKeyboardStatus] = useState('Keyboard Hidden');
+    useEffect(() => {
+        const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardStatus('Keyboard Shown');
+        });
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardStatus('Keyboard Hidden');
+        });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
+    }, []);
+
 
     const handleSendMessage = async (text, image, post, clearInputs) => {
         // if we arent sending anything, return
@@ -158,9 +175,9 @@ const Conversation = ({ navigation, route }) => {
 
     return (
         <KeyboardAvoidingView // make sure that we can see input and keyboard
-            style={{ flex: 1, justifyContent: 'space-between' }}
+            style={{ height: '98%', justifyContent: 'space-between' }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={150} // increased for the new header
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
             onPress={() => Keyboard.dismiss()}
         >
             <View style={{
@@ -256,7 +273,10 @@ const Conversation = ({ navigation, route }) => {
                     )}
 
                     {/* input bar at the bottom */}
-                    <View style={[styles.inputBar, { paddingBottom: Keyboard.isVisible() ? 16 : 30 }]}>
+                    <View style={[styles.inputBar, {
+                        paddingBottom: 16
+
+                    }]}>
                         <TouchableOpacity onPress={() => handleAddImage()}
                             style={{
                                 width: 35, height: 35, borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: 'rgba(0, 0, 0, 0.25)',

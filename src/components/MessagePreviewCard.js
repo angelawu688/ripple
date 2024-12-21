@@ -8,7 +8,7 @@ import { colors } from '../colors';
 
 
 
-const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt }) => {
+const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt, unread = false }) => {
     // const otherUserID = conversationIDToOtherUserID(conversationID); // to be implemented. Current placeholder is. 
     // not sure if we need this here
     useEffect(() => {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 4
+        paddingHorizontal: 4,
     },
     upperText: {
         fontSize: 18,
@@ -108,7 +108,8 @@ const styles = StyleSheet.create({
         marginLeft: 14,
         width: 32,
         height: 32,
-        marginRight: 21
+        marginRight: 21,
+        borderRadius: 50
     },
     lastSentText: {
         fontFamily: 'inter',

@@ -704,6 +704,7 @@ const PhotoCarousel = ({ photos, sold }) => {
                                     width: "100%",
                                     height: "100%",
                                     borderRadius: 0,
+                                    backgroundColor: colors.loginGray
                                 }}
                                 contentFit="cover"
                             />
