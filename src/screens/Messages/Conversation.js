@@ -29,6 +29,12 @@ const Conversation = ({ navigation, route }) => {
     const [sendingMessage, setSendingMessage] = useState(false)
     const [loadingMessages, setLoadingMessages] = useState(true)
 
+    useEffect(() => {
+        if (!otherUserDetails) {
+            console.error('no other user details')
+        }
+    }, [otherUserDetails])
+
     // auto-scroll to the bottom
     const scrollRef = useRef(null)
     useEffect(() => {
@@ -36,6 +42,8 @@ const Conversation = ({ navigation, route }) => {
             scrollRef.current.scrollToEnd({ animated: true });
         }
     }, [messages]);
+
+
 
     // update the top nav bar
     useEffect(() => {
@@ -97,6 +105,8 @@ const Conversation = ({ navigation, route }) => {
             });
         }
     }, [conversationID, user?.uid]);
+
+
 
     const handleSendMessage = async (text, image, post, clearInputs) => {
         // if we arent sending anything, return

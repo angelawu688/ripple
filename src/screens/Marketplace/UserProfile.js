@@ -258,15 +258,16 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     const handleMessage = async () => {
         // active user ID and the other user's ID
         const conversationID = await getConversation(user.uid, userID)
+        const otherUserDetails = {
+            id: userID,
+            name: userProfile.name,
+            pfp: userProfile.pfp
+        }
         navigation.navigate('MessagesStack', {
             screen: 'Conversation',
             params: {
-                conversationID,
-                otherUserDetails: {
-                    id: userID,
-                    name: userProfile.name,
-                    pfp: userProfile.pfp
-                }
+                conversationID: conversationID,
+                otherUserDetails: otherUserDetails
             }
         });
     }

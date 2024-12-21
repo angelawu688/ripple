@@ -8,22 +8,18 @@ import {
 import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { userContext } from "../../context/UserContext";
 import { colors } from '../../colors'
-import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, Tag, SmileySad } from 'phosphor-react-native';
+import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, Tag, SmileySad, DotsThree } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
 import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 import * as Linking from 'expo-linking'
 import { formatDate } from '../../utils/formatDate'
 import { useFocusEffect } from '@react-navigation/native';
 import { deleteFromSavedPosts, deleteImages, getConversation } from '../../utils/firebaseUtils';
+import { db } from '../../../firebaseConfig';
 
 
 
 const ListingScreen = ({ navigation, route }) => {
-    const [width, setWidth] = useState(0);
-    const handleLayout = (event) => {
-        const { width } = event.nativeEvent.layout;
-        setWidth(width);
-    };
     const [listing, setListing] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     // when you onboard, need to know if listing is saved or not by the user
@@ -41,16 +37,16 @@ const ListingScreen = ({ navigation, route }) => {
 
     // 3 dots 
     const [modalVisible, setModalVisible] = useState(false)
-    const toggleModal = () => {
-        setModalVisible(!modalVisible);
-    };
-
-    // pass in the toggle modal function
     useEffect(() => {
-        navigation.setParams({ toggleModal });
-    }, [modalVisible]);
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity onPress={() => setModalVisible(prev => !prev)}>
+                    <DotsThree size={32} />
+                </TouchableOpacity>
+            )
+        });
+    }, [navigation]);
 
-    const db = getFirestore();
 
     // fetches a listing from the DB
     const fetchListing = async () => {
@@ -307,7 +303,13 @@ const ListingScreen = ({ navigation, route }) => {
         // this will navigate with the 
         navigation.navigate('MessagesStack', {
             screen: 'Conversation',
-            params: { listing, conversationID },
+            params: {
+                listing, conversationID, otherUserDetails: {
+                    id: sellerID,
+                    name: listing.userName,
+                    pfp: listing.userPfp
+                }
+            },
         });
     }
 
