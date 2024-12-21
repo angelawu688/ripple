@@ -81,7 +81,7 @@ export const UserProvider = ({ children }) => {
       // clear async
       await clearAllData();
     } catch (e) {
-      console.log('Sign out error: ', e)
+      console.error('Sign out error: ', e)
       throw e
     }
   }
@@ -89,7 +89,6 @@ export const UserProvider = ({ children }) => {
   // signs in the user
   // also fetches the user data
   const handleSignIn = async (email, password) => {
-    console.log('called')
     try {
       setAuthError(null)
       // make sure we have uw email
@@ -123,7 +122,7 @@ export const UserProvider = ({ children }) => {
       setUserFollowers([]);
       setAuthError(null);
     } catch (e) {
-      console.log('Error clearing states: ', e)
+      console.error('Error clearing states: ', e)
       throw e
     }
   }

@@ -169,7 +169,7 @@ const InfoOnboarding = ({ navigation, route }) => {
                 // user cancelled, do nothing
             }
         } catch (e) {
-            console.log(e);
+            console.error(e);
         } finally {
             setLoadingImage(false)
         }

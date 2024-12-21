@@ -63,7 +63,6 @@ const SavedItems = ({ navigation }) => {
             data={savedListings}
             renderItem={({ item: listing }) => { // note: need to keep as "items", we are just renaming it to be clear
                 if (!listing) {
-                    console.log("Found an undefined listing in savedPosts.");
                     return null;
                 }
                 const listingID = listing.listing_id

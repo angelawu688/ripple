@@ -54,7 +54,6 @@ const MessagesOverview = ({ navigation }) => {
                     fetchedConversations.sort((a, b) => b.timestamp - a.timestamp)
                 );
 
-                console.log(fetchedConversations)
                 setIsLoading(false);
             }, (error) => {
                 console.error("Error fetching conversations:", error);
@@ -107,7 +106,6 @@ const MessagesOverview = ({ navigation }) => {
                         const conversationID = item.id
                         const otherUserId = item.users.find(id => id !== user.uid); // extract otheruserID from array
                         const otherUserDetails = item.userDetails[otherUserId]; // grab the userdetails that we store there
-                        console.log('userdetails', otherUserDetails)
 
 
                         return (

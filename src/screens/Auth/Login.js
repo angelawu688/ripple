@@ -54,7 +54,6 @@ const Login = ({ navigation }) => {
       }
       const auth = getAuth();
       await sendPasswordResetEmail(auth, email);
-      console.log('sent')
       setForgotPasswordSent(true)
     } catch (error) {
       if (error.message.indexOf('missing-email') > 0) {

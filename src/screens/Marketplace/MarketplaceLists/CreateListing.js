@@ -105,7 +105,7 @@ const CreateListing = ({ navigation }) => {
                 setIsLoadingPhotoPicker(false)
             }
         } catch (e) {
-            console.log(e);
+            console.error(e);
             setImageErrorMessage('Failed to read  image')
             setIsLoadingPhotoPicker(false)
         } finally {
@@ -170,7 +170,7 @@ const CreateListing = ({ navigation }) => {
             showToast('Listing uploaded!')
         } catch (e) {
             setErrorMessage(e.message)
-            console.log(e);
+            console.error(e);
         } finally {
             setIsLoading(false)
         }

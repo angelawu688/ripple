@@ -53,7 +53,7 @@ const Search = ({ navigation }) => {
                     setRecentSearches(recentSearches || []);
 
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 } finally {
                     setLoadingRecentSearches(false)
                 }
@@ -87,7 +87,7 @@ const Search = ({ navigation }) => {
             setRecentSearches((prevSearches) =>
                 prevSearches.filter((prevSearch) => prevSearch.toLowerCase() !== searchQuery.toLowerCase())
             );
-            console.log(e)
+            console.error(e)
         }
     };
 
@@ -119,7 +119,6 @@ const Search = ({ navigation }) => {
             // if uncomment the second part, it will do both and do the selecte one first
             if (listingsSelected) {
                 await handleSearchListings(query)
-                console.log('finished searching listings')
                 // await handleSearchUsers(query)
             } else {
 
@@ -223,7 +222,6 @@ const Search = ({ navigation }) => {
     // also would include the tags
     const handleSearchListings = async (searchQuery, reset = true) => {
         if (searchQuery.trim() === '') {
-            console.log('returned early');
             return;
         }
 
@@ -274,7 +272,7 @@ const Search = ({ navigation }) => {
             await saveRecentSearch(searchQuery);
         } catch (e) {
             setErrorMessage(e.message);
-            console.log(e);
+            console.error(e);
         } finally {
             setIsLoading(false);
         }
@@ -294,7 +292,7 @@ const Search = ({ navigation }) => {
             setSearchResults(prevResults => [...prevResults, ...results])
             setLastVisible(newLastVisible)
         } catch (e) {
-            console.log(e)
+            console.error(e)
         } finally {
             setIsFetchingMore(false)
         }

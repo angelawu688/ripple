@@ -44,7 +44,7 @@ export const searchByKeyword = async (searchQuery, limitNum = 20, startAfterList
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
         return { results, lastVisible };
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw e
     }
 }
@@ -74,7 +74,7 @@ export const saveRecentSearchFirebase = async (searchQuery, userID) => {
             recentSearches: arrayUnion(searchQuery)
         });
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw e
     }
 }

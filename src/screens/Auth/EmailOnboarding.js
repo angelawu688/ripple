@@ -100,7 +100,7 @@ const EmailOnboarding = ({ navigation }) => {
             setEmailSent(true)
             setIsModalVisible(true)
         } catch (e) {
-            console.log(e)
+            console.error(e)
             // if the email is already in use tell them to just log in!
             if (e.message.indexOf('already-in-use') > 0) {
                 setErrorMessage('Email in use! Log in to your account')
@@ -250,7 +250,6 @@ const EmailOnboarding = ({ navigation }) => {
                         setErrorMessage('Enter an email ending in @uw.edu')
                         return;
                     } else if (!isValidPassword()) {
-                        // console.log(isValidPassword())
                         // setErrorMessage('Passswords must be 6 characters, contain a number, and a special character')
                         return;
                     }

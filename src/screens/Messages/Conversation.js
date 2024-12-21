@@ -122,7 +122,7 @@ const Conversation = ({ navigation, route }) => {
                 img,
             )
         } catch (e) {
-            console.log('handlesend', e)
+            console.error('handlesend', e)
             // rollback if we want
         } finally {
             setSendingMessage(false)
@@ -164,7 +164,7 @@ const Conversation = ({ navigation, route }) => {
                 // user cancelled, do nothing
             }
         } catch (e) {
-            console.log('addimage', e);
+            console.error(e);
             setOpeningImagePicker(false)
         }
     }

@@ -42,7 +42,6 @@ const ListingScreen = ({ navigation, route }) => {
     // 3 dots 
     const [modalVisible, setModalVisible] = useState(false)
     const toggleModal = () => {
-        console.log('wahaawe')
         setModalVisible(!modalVisible);
     };
 
@@ -80,10 +79,10 @@ const ListingScreen = ({ navigation, route }) => {
                 setIsSaved(!!alreadySaved)
 
             } else {
-                console.log("No such listing!");
+                console.error("No such listing!");
             }
         } catch (error) {
-            console.log("Error fetching listing:", error);
+            console.error("Error fetching listing:", error);
             // could we use toasts here?
         } finally {
             setIsLoading(false);
@@ -134,7 +133,6 @@ const ListingScreen = ({ navigation, route }) => {
 
 
     const handleReportUser = () => {
-        console.log('reporting user')
         try {
 
         } catch (e) {
@@ -153,7 +151,7 @@ const ListingScreen = ({ navigation, route }) => {
             [
                 {
                     text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
+                    onPress: () => { return },
                     style: "cancel",
                 },
                 {
@@ -176,7 +174,6 @@ const ListingScreen = ({ navigation, route }) => {
     }
 
     const deleteListing = async () => {
-        console.log('DELETE POST')
         const docRef = doc(db, "listings", listingID);
         try {
             if (listing.photos && listing.photos.length > 0) {
@@ -204,7 +201,7 @@ const ListingScreen = ({ navigation, route }) => {
                 [
                     {
                         text: "Cancel",
-                        onPress: () => console.log("Cancel Pressed"),
+                        onPress: () => { return },
                         style: "cancel",
                     },
                     {
@@ -295,7 +292,7 @@ const ListingScreen = ({ navigation, route }) => {
             // toggle the value of saved
             setIsSaved(!isSaved);
         } catch (e) {
-            console.log(e)
+            console.error(e)
         } finally {
             setIsLoadingSave(false)
         }
@@ -303,7 +300,6 @@ const ListingScreen = ({ navigation, route }) => {
 
     const handleSendHi = async () => {
         if (!user.uid || !sellerID) {
-            console.log('ids undefined')
             return
         }
         const conversationID = await getConversation(user.uid, sellerID)
@@ -324,7 +320,7 @@ const ListingScreen = ({ navigation, route }) => {
         try {
             Linking.openURL(smsURL)
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 
@@ -479,7 +475,6 @@ const ListingScreen = ({ navigation, route }) => {
                 <TouchableWithoutFeedback
                     style={styles.modalBackdrop}
                     onPress={() => {
-                        console.log('dismiss')
                         setModalVisible(false)
                     } // Dismiss modal on backdrop press
                     }

@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         width: '90%',
         flexDirection: 'row',
         marginBottom: 12,
-        marginTop: 8,
+        marginTop: 12,
     },
     iconPlaceholder: {
         width: 30,

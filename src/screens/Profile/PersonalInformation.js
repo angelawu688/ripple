@@ -114,7 +114,7 @@ const PersonalInformation = () => {
             const userDoc = await getDoc(userRef);
             setUserData(userDoc.data());
         } catch (e) {
-            console.log(e)
+            console.error(e)
         } finally {
             setModalVisible(false)
             setIsLoadingSave(false)
@@ -159,7 +159,7 @@ const PersonalInformation = () => {
                 setIsLoadingImagePicker(false)
             }
         } catch (e) {
-            console.log(e);
+            console.error(e);
         } finally {
             setIsLoadingImagePicker(false)
         }

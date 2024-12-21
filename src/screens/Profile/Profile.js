@@ -18,7 +18,7 @@ const Profile = ({ navigation }) => {
             setLoading(true)
             await handleSignOut()
         } catch (e) {
-            console.log(e)
+            console.error(e)
         } finally {
             setLoading(false)
         }
@@ -33,12 +33,11 @@ const Profile = ({ navigation }) => {
                 Alert.alert('Error', "Can't open URL")
             }
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 
     const handleDeleteAccount = () => {
-        console.log('deleted user (not actually)')
         Alert.alert('Delete Account',
             'Are you sure? This action cannot be undone',
             [

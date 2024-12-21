@@ -96,7 +96,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     // grab the profile from the backend by the userID
     useEffect(() => {
         const getProfile = async () => {
-            console.log('userID', userID)
             try {
                 const db = getFirestore();
                 const userRef = doc(db, "users", userID);
@@ -127,10 +126,8 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         const followStatus = userFollowingIds.includes(userID);
                         if (followStatus) {
                             setFollowingUser(true)
-                            console.log("user is followed");
                         } else {
                             setFollowingUser(false);
-                            console.log("user is not followed");
                         }
                     }
                     else {
@@ -185,14 +182,13 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
             }
             setFollowingUser(!followingUser)
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 
     // TODO: go through and make sure error checking is fine
     // TODO: see if it can be cleaner
     const markAsFollowed = async () => {
-        console.log('following user')
         // add other user to following
         const newFollowing = {
             following_id: userID,
@@ -230,7 +226,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     }
 
     const markAsUnfollowed = async () => {
-        console.log('unfollow user')
         const userRef = doc(db, "users", user.uid);
         const userToUnfollow = userData.following.find((item) => item.following_id === userID);
 
@@ -261,7 +256,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     }
 
     const handleMessage = async () => {
-        console.log('gonna implement soon')
         // active user ID and the other user's ID
         const conversationID = await getConversation(user.uid, userID)
         navigation.navigate('MessagesStack', {
@@ -280,7 +274,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     // just navigation here
     const handleFollowers = () => {
         const followers = userData.followers
-        console.log(userData.followers)
         navigation.navigate('Followers', {
             followers: followers,
             isFollowers: true,
@@ -289,7 +282,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 
     const handleFollowing = () => {
         const following = userData.following
-        console.log(userData.following)
         navigation.navigate('Followers', {
             following: following,
             isFollowers: false
@@ -304,7 +296,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 if (!userProfile.instagram) {
                     setLoadingIG(true)
                     Alert.alert('Error', 'No Instagram user found')
-                    console.log(userProfile.instagram)
                     return;
                 }
                 // works for now
@@ -517,7 +508,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 <TouchableOpacity style={{ backgroundColor: 'white', borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.35, shadowRadius: 5, position: 'absolute', bottom: 15, right: 15, shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 } }}
                     onPress={() => {
                         setShareModalVisible(true)
-                        console.log('clicked')
                     }}
                 >
                     <QrCode color={colors.darkblue} size={30} />

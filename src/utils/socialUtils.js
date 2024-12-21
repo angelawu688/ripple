@@ -3,7 +3,6 @@ import * as Linking from 'expo-linking'
 
 export const sendProfile = (userID) => {
     if (!userID) {
-        console.log('no user ID')
         return
     }
     const profileLink = Linking.createURL(`user/${userID}`)
@@ -13,7 +12,7 @@ export const sendProfile = (userID) => {
     try {
         Linking.openURL(smsURL)
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw e
     }
     // example dev URL: exp://10.155.102.135:8081/--/user/RsYuNgUxSUTm0xdD0CMi6Yhkjc73 
@@ -22,8 +21,5 @@ export const sendProfile = (userID) => {
 }
 
 export const copyLink = async (link) => {
-    // copy the link
-    // send a toast
     Clipboard.setStringAsync(link);
-    console.log('link copied')
 }

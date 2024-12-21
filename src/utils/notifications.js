@@ -24,7 +24,6 @@ export async function registerForPushNotificationsAsync(userID) {
         // if they have granted, grab their token
         if (finalStatus === 'granted') {
             token = (await Notifications.getExpoPushTokenAsync({ experienceId: '@phunt22/uw-marketplace' }))
-            console.log('Expo push token: ', token)
 
             // store the token under the firestore doc
             const userRef = doc(db, 'users', userID)

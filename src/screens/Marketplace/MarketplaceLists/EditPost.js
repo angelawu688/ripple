@@ -116,7 +116,7 @@ const EditListing = ({ navigation, route }) => {
                 setIsLoadingPhotoPicker(false)
             }
         } catch (e) {
-            console.log(e);
+            console.error(e);
             setImageErrorMessage('Failed to read  image')
             setIsLoadingPhotoPicker(false)
         } finally {
@@ -144,7 +144,7 @@ const EditListing = ({ navigation, route }) => {
                 setChanges(true);
 
             } else {
-                console.log('Error deleting photo:', e);
+                console.error('Error deleting photo:', e);
                 setErrorMessage('Failed to delete photo. Please try again.');
             }
 
@@ -213,7 +213,7 @@ const EditListing = ({ navigation, route }) => {
         } catch (e) {
             setErrorMessage(e.message)
             showToast('Error with editing. Please try again')
-            console.log(e);
+            console.error(e);
         } finally {
             setIsLoading(false)
         }

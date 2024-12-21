@@ -11,10 +11,6 @@ import { colors } from '../colors';
 const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt, unread = false }) => {
     // const otherUserID = conversationIDToOtherUserID(conversationID); // to be implemented. Current placeholder is. 
     // not sure if we need this here
-    useEffect(() => {
-        console.log('lsa', lastSentAt)
-    }, [])
-
     if (!lastMessage) {
         // nothing has been sent, we dont want to display that
         return null;

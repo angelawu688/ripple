@@ -1,7 +1,6 @@
 import { format, formatDistanceToNow } from 'date-fns';
 
 export const formatDate = (dateInSeconds) => {
-    console.log(dateInSeconds)
     if (!dateInSeconds || isNaN(dateInSeconds) || dateInSeconds < 0) {
         return "";
     }
@@ -11,7 +10,6 @@ export const formatDate = (dateInSeconds) => {
 
     // date.now is in ms, we are passing in as seconds
     // const seconds = (Date.now() / 1000) - dateInSeconds
-    console.log(Date.now())
     const minute = 60;
     const hour = 60 * minute;
     const day = 24 * hour;

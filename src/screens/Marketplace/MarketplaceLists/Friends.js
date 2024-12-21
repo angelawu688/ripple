@@ -27,6 +27,7 @@ const Friends = ({ navigation }) => {
 
     const fetchListings = useCallback(async () => {
         try {
+            // TODO PAGINATION
             // get following ids
             // TODO:
             // kinda expensive, use context to simplify this?
@@ -36,7 +37,6 @@ const Friends = ({ navigation }) => {
             // );
             // const followingData = await getDocs(followingQuery);
             // const followingIds = followingData.docs.map(doc => doc.data().following_id);
-            console.log("userFollowingIds length is", userFollowingIds.length)
 
             // not following anyone
             if (userFollowingIds.length === 0) {
@@ -44,15 +44,13 @@ const Friends = ({ navigation }) => {
                 return;
             }
 
-            // get listings from ppl we're following
-            // only gets 10 ids
-            // TODO: fix this so we can get more than 10
+            //    TODO PAGINATION
             const listingsQuery = query(
                 collection(db, 'listings'),
                 where('userId', 'in', userFollowingIds),
                 where("sold", "==", false),
                 orderBy("createdAt", "desc"),
-                limit(32)
+                limit(10)
             );
             const listingsSnapshot = await getDocs(listingsQuery);
             const friendsListingsData = listingsSnapshot.docs.map(doc => ({
