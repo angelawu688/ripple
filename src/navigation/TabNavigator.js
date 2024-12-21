@@ -102,18 +102,7 @@ const TabNavigator = () => {
 
             })}
         >
-            <Tab.Screen name="ProfileStack"
-                component={ProfileStackNavigator}
-                options={{
-                    headerShown: false
-                }}
-            />
-            <Tab.Screen name="MarketplaceStack"
-                component={MarketplaceStackNavigator}
-                options={{
-                    headerShown: false
-                }}
-            />
+
 
             <Tab.Screen name="MessagesStack"
                 component={MessagesStackNavigator}
@@ -141,6 +130,39 @@ const TabNavigator = () => {
                 })}
 
             />
+
+
+
+
+            <Tab.Screen name="MarketplaceStack"
+                component={MarketplaceStackNavigator}
+                options={({ route }) => ({
+                    headerShown: false,
+                    tabBarStyle: ((route) => {
+                        const routeName = getFocusedRouteNameFromRoute(route);
+                        if (routeName === 'CreateListing' || routeName === 'ListingScreen') {
+                            return {
+                                display: 'none'
+                            };
+                        }
+                        return {
+                            backgroundColor: colors.white,
+                            paddingTop: 12,
+                            borderTopWidth: 0.5,
+                            transition: 'all 0.2s'
+                        }
+                    })(route)
+                })}
+            />
+
+            <Tab.Screen name="ProfileStack"
+                component={ProfileStackNavigator}
+                options={{
+                    headerShown: false
+                }}
+            />
+
+
         </Tab.Navigator>
     )
 }

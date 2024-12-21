@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ChatTeardropText, User, Storefront, Bookmark, BookmarkSimple, ShoppingCart, ShareFat } from 'phosphor-react-native';
 import { deleteAccount } from "../../utils/firebaseUtils";
+import { colors } from "../../colors";
 
 
 
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         alignSelf: 'center',
-        paddingTop: 30
+        paddingTop: 20
     },
     profileCardContainer: {
         display: 'flex',
@@ -252,7 +253,8 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingRight: 5
+        paddingRight: 5,
+        backgroundColor: colors.mediumGray
     },
     icon: {
         marginLeft: 16,

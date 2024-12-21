@@ -18,6 +18,7 @@ import { handleUrlParams } from 'expo-router/build/fork/getStateFromPath-forks';
 import { ToastProvider } from './src/context/ToastContext';
 import Toast from './src/components/toasts/CustomToast';
 import { UnreadProvider } from './src/context/UnreadContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -47,6 +48,7 @@ export default function App() {
         </UnreadProvider>
       </ToastProvider>
     </UserProvider >
+
   );
 }
 
@@ -99,11 +101,13 @@ const RootComponent = () => {
   };
 
   return (
-    <NavigationContainer linking={linking}>
-      <Toast />
-      <MainNavigator />
-      <StatusBar style='dark' />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer linking={linking}>
+        <Toast />
+        <MainNavigator />
+        <StatusBar style='dark' />
+      </NavigationContainer>
+    </SafeAreaProvider>
   )
 }
 

@@ -3,7 +3,7 @@ import { FlatList, Keyboard, StyleSheet, TouchableOpacity } from "react-native";
 import { Text, TextInput, View } from "react-native"
 import { Ionicons } from '@expo/vector-icons';
 import ForYou from "./ForYou";
-import { collection, query as firestoreQuery, where, getDocs, getFirestore, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
+import { collection, query as firestoreQuery, where, getDocs, getFirestore, doc, updateDoc, arrayUnion, arrayRemove, getDoc, limit } from 'firebase/firestore';
 import { userContext } from '../../../context/UserContext.js';
 import { colors } from "../../../colors";
 import ListingsList from '../../../components/ListingsList'
@@ -11,6 +11,8 @@ import { MotiView } from 'moti';
 import ListingsListSkeletonLoaderFull from '../../../components/ListingsListSkeletonLoaderFull'
 import { EmptyMessage, fetchRecentSearches, RecentSearchItem, RecentSearchSkeletonLoader, removeItemFromRecentSearchesFirebase, saveRecentSearchFirebase, searchByKeyword } from '../../../utils/search.js'
 import LoadingSpinner from "../../../components/LoadingSpinner.js";
+import UserSearch from "../../../components/Search/UserSearch.js";
+import ListingSearch from "../../../components/Search/ListingSearch.js";
 
 const Search = ({ navigation }) => {
     const [recentSearches, setRecentSearches] = useState([]);
@@ -26,6 +28,14 @@ const Search = ({ navigation }) => {
     const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const { user } = useContext(userContext);
+
+    // toggle and user search
+    const [listingsSelected, setListingsSelected] = useState(true)
+    const [loadingUserSearch, setLoadingUserSearch] = useState(false)
+    const [userSearchResults, setUserSearchResults] = useState([])
+    const [displayUserSearchResults, setDisplayUserSearchResults] = useState(false)
+    const [userRecommendations, setUserRecommendations] = useState([])
+
 
     const db = getFirestore();
 
@@ -98,13 +108,90 @@ const Search = ({ navigation }) => {
     }
 
     const handleSearchSelect = async (item) => {
+        // pass directly, so that we can search
         setQuery(item)
-        // pass directly, so that we can search. This is just how state works in react
         await handleSearch(item)
     }
 
-    const handleSearch = async (searchQuery = query, reset = true) => {
-        if (isLoading || searchQuery.trim() === '') { // prevent duplicate requests
+    const handleSearch = async (query) => {
+        try {
+            // do the one thats selected. 
+            // if uncomment the second part, it will do both and do the selecte one first
+            if (listingsSelected) {
+                await handleSearchListings(query)
+                console.log('finished searching listings')
+                // await handleSearchUsers(query)
+            } else {
+
+                await handleSearchUsers(query)
+                // await handleSearchListings(query)
+            }
+        } catch (e) {
+            console.error(e)
+        } finally {
+            // nothing to do 
+        }
+    }
+
+    const handleSearchUsers = async (searchTerm) => {
+        console.log('saerchTerm', searchTerm)
+        if (!searchTerm || searchTerm.trim() === '') {
+            return [];
+        }
+        setLoadingUserSearch(true)
+
+        const usersRef = collection(db, 'users');
+        const searchTermLower = searchTerm.toLowerCase();
+
+        //   query on both name and email
+        const nameQuery = firestoreQuery(
+            usersRef,
+            where('searchKeywords', 'array-contains', searchTermLower),
+            limit(5)
+        );
+
+        const emailQuery = firestoreQuery(
+            usersRef,
+            where('email', '>=', searchTermLower),
+            where('email', '<=', searchTermLower + '\uf8ff'),
+            limit(5)
+        );
+        try {
+            // exececute queries
+            const [nameSnapshot, emailSnapshot] = await Promise.all([
+                getDocs(nameQuery),
+                getDocs(emailQuery)
+            ]);
+
+
+            const results = new Map();
+
+            nameSnapshot.forEach((doc) => {
+                results.set(doc.id, { id: doc.id, ...doc.data() });
+            });
+
+            emailSnapshot.forEach((doc) => {
+                results.set(doc.id, { id: doc.id, ...doc.data() });
+            });
+
+            const combinedResults = Array.from(results.values())
+            // .slice(0, 5); // commented out, this would be limiting after the fact
+            console.log('combres', combinedResults)
+
+            // return combinedResults;
+            setUserSearchResults(combinedResults)
+            setDisplayUserSearchResults(true)
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLoadingUserSearch(false)
+        }
+    }
+
+
+    const handleSearchListings = async (searchQuery, reset = true) => {
+        if (searchQuery.trim() === '') { // prevent duplicate requests
+            console.log('returned early')
             return
         }
 
@@ -119,20 +206,19 @@ const Search = ({ navigation }) => {
 
         try {
             const { results, lastVisible: newLastVisible } = await searchByKeyword(searchQuery, 20, reset ? null : lastVisible);
-            setSearchResults(prevResults => [...prevResults, ...results]);
+            setSearchResults(prevResults => reset ? results : [...prevResults, ...results]);
             setLastVisible(newLastVisible);
             await saveRecentSearch(searchQuery);
         } catch (e) {
             setErrorMessage(e.message)
             console.log(e)
         } finally {
-            setTimeout(() => {
-                setIsLoading(false)
-            }, [1000])
-
+            // why? I forget
+            setIsLoading(false)
         }
     }
 
+    // not called 
     const fetchMoreResults = async () => {
         if (isFetchingMore || !lastVisible) {
             // initial fetch or we are currently fecthing more––prevent duplicate requests
@@ -171,13 +257,32 @@ const Search = ({ navigation }) => {
                 autoCapitalize="none"
             />
 
-            {/* icons */}
+            <View style={{ dispaly: 'flex', width: '100%', flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10 }}>
+                <TouchableOpacity onPress={() => setListingsSelected(!listingsSelected)}
+
+                    style={{ width: '50%', alignItems: 'center', display: 'flex' }}>
+                    <Text style={[{ marginBottom: 6, fontSize: 14 }, { fontWeight: listingsSelected ? '600' : '400' }]}>
+                        Listings
+                    </Text>
+                    {listingsSelected && <View style={{ width: '100%', height: 1, backgroundColor: 'black' }} />}
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setListingsSelected(!listingsSelected)}
+
+                    style={{ width: '50%', alignItems: 'center', display: 'flex' }}>
+                    <Text style={[{ marginBottom: 6, fontSize: 14 }, { fontWeight: !listingsSelected ? '600' : '400' }]}>
+                        Users
+                    </Text>
+                    {!listingsSelected && <View style={{ width: '100%', height: 1, backgroundColor: 'black' }} />}
+                </TouchableOpacity>
+            </View>
+
+
             <View style={styles.iconContainer}>
                 {!displayResults && query && (
                     <TouchableOpacity
                         hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
-                        onPress={() => handleSearch()}>
-                        <Ionicons name="search" size={20} color={colors.loginGray} />
+                        onPress={() => handleSearch(query)}>
+                        <Ionicons name="search" size={20} color={colors.loginBlue} />
                     </TouchableOpacity>
                 )}
 
@@ -190,60 +295,27 @@ const Search = ({ navigation }) => {
                             setQuery('')
                             setDisplayResults(false)
                         }}>
-                        <Ionicons name='close-circle-outline' size={20} color={colors.loginGray} />
+                        <Ionicons name='close-circle-outline' size={20} color={colors.accentGray} />
                     </TouchableOpacity>
                 )}
             </View>
 
-            {/* Lower container */}
-            {displayResults ? (
-                isLoading ? (
-                    <ListingsListSkeletonLoaderFull />
-                ) : (
-                    searchResults?.length > 0 ? (
-                        <ListingsList
-                            listings={searchResults}
-                            navigation={navigation}
 
-                        />
-                    ) : (
-                        <EmptyMessage message={'No results found'} />
-                    )
-                )
-            ) : (
-                <View style={{ alignSelf: 'center', width: '95%' }}>
-                    {query ? (
-                        // Autocomplete
-                        <Text>Autocomplete for {query}</Text>
-                    ) : (
-                        // Recent Searches
-                        <>
-                            <Text style={styles.sectionHeader}>Recent searches</Text>
-                            {loadingRecentSearches ? (
-                                <RecentSearchSkeletonLoader />
-                            ) : (
-                                recentSearches.length > 0 ? (
-                                    <FlatList
-                                        data={[...recentSearches].reverse().slice(0, 8)}
-                                        keyExtractor={(item) => item}
-                                        renderItem={({ item }) => (
-                                            <RecentSearchItem
-                                                item={item}
-                                                onSelect={handleSearchSelect}
-                                                onRemove={handleRemoveItemFromRecentSearches}
-                                            />
-                                        )}
-                                        style={{ paddingBottom: 50 }} // this prevents clipping on bottom scroll
-                                    />
-                                ) : (
-                                    <Text style={{ alignSelf: 'flex-start', fontFamily: 'inter', marginTop: 8 }}>
-                                        Your recent searches will pop up here!
-                                    </Text>
-                                )
-                            )}
-                        </>
-                    )}
-                </View>
+            {!listingsSelected && (
+                <UserSearch navigation={navigation} query={query}
+                    loadingUserSearch={loadingUserSearch}
+                    userSearchResults={userSearchResults || []}
+                    displayUserSearchResults={displayUserSearchResults}
+                    userRecommendations={userRecommendations}
+                />
+            )}
+
+            {listingsSelected && (
+                <ListingSearch
+                    isLoading={isLoading} query={query} searchResults={searchResults}
+                    navigation={navigation} displayResults={displayResults} handleSearchSelect={handleSearchSelect} handleRemoveItemFromRecentSearches={handleRemoveItemFromRecentSearches}
+                    loadingRecentSearches={loadingRecentSearches} recentSearches={recentSearches}
+                />
             )}
         </View >
     );

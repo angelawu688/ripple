@@ -15,6 +15,7 @@ import { ImagePreview, TagPreview, uploadNewPhotos, validateListing } from "../.
 import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
 import { generateKeywords } from "../../../utils/search";
 import LoadingSpinner from '../../../components/LoadingSpinner'
+import { ToastContext } from "../../../context/ToastContext";
 
 const screenWidth = Dimensions.get('window').width;
 const imageSize = 0.16 * screenWidth;
@@ -32,6 +33,7 @@ const CreateListing = ({ navigation }) => {
     const [isLoadingPhotoPicker, setIsLoadingPhotoPicker] = useState(false)
     const [imageErrorMessage, setImageErrorMessage] = useState('')
     const { user, userData, setUserListings } = useContext(userContext)
+    const { showToast } = useContext(ToastContext)
 
     // AUTO SCROLLING
     const scrollViewRef = useRef(null)
@@ -157,6 +159,7 @@ const CreateListing = ({ navigation }) => {
             // append to the users listing
             setUserListings((prevUserListings) => [...prevUserListings, { ...listingData, id: listingID }]);
 
+
             // 6. post completed message
             navigation.reset({
                 index: 0,
@@ -164,7 +167,7 @@ const CreateListing = ({ navigation }) => {
             });
 
             // COMPLETED TOAST HERE
-            showToast('Listing edited!')
+            showToast('Listing uploaded!')
         } catch (e) {
             setErrorMessage(e.message)
             console.log(e);

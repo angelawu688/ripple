@@ -88,9 +88,6 @@ const Conversation = ({ navigation, route }) => {
         return () => unsubscribe();
     }, [conversationID]);
 
-
-
-
     // mark the messages as read
     useEffect(() => {
         if (conversationID && user?.uid) {

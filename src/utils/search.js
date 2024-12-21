@@ -129,6 +129,30 @@ export const RecentSearchSkeletonLoader = () => {
     );
 };
 
+
+// generates keywords for a user
+export const generateUserKeywords = (name) => {
+    const nameArray = name.toLowerCase().split(' ');
+    const keywords = new Set();
+
+    // full name
+    keywords.add(name.toLowerCase());
+
+    // each word
+    nameArray.forEach(word => keywords.add(word));
+
+    // partial matching
+    nameArray.forEach(word => {
+        let partial = '';
+        word.split('').forEach(letter => {
+            partial += letter;
+            keywords.add(partial);
+        });
+    });
+
+    return Array.from(keywords);
+};
+
 const styles = StyleSheet.create({
     recentSearchItem: {
         flexDirection: "row",

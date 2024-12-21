@@ -16,6 +16,7 @@ import Asterisk from '../shared/Asterisk';
 import { UploadSimple } from 'phosphor-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { uploadPFP } from '../../utils/firebaseUtils'
+import { generateUserKeywords } from '../../utils/search'
 
 
 const InfoOnboarding = ({ navigation, route }) => {
@@ -90,6 +91,7 @@ const InfoOnboarding = ({ navigation, route }) => {
             const db = getFirestore();
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+            const keywords = generateUserKeywords(name)
 
             let pfpURL = ''
             if (pfp) {
@@ -108,6 +110,8 @@ const InfoOnboarding = ({ navigation, route }) => {
                 instagram: ig,
                 linkedin: li,
                 pfp: pfpURL, // stores a reference to our storage :)
+                searchKeywords: keywords,
+
             });
             const userDoc = await getDoc(doc(db, "users", user.uid))
             setUserData(userDoc.data());

@@ -18,7 +18,6 @@ const MarketplaceStackNavigator = () => {
     return (
         <MarketplaceStack.Navigator
             initialRouteName="Marketplace"
-            options={{ headerShown: false }}
             screenOptions={{
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false, // applied here

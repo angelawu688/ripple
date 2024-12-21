@@ -212,7 +212,7 @@ export default Marketplace
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        display: 'flex',
         backgroundColor: 'white',
         display: 'flex',
         justifyContent: 'flex-start',
@@ -226,7 +226,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '90%',
         flexDirection: 'row',
-        marginVertical: 12
     },
     iconPlaceholder: {
         width: 30,

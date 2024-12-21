@@ -24,10 +24,11 @@ const ProfileStackNavigator = () => {
 
         <ProfileStack.Navigator
             initialRouteName="OwnUserProfile"
-            options={{ headerShown: false }}
+            // options={{ headerShown: true }}
             screenOptions={{
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false,
+
             }}
         >
 
@@ -36,6 +37,9 @@ const ProfileStackNavigator = () => {
                 component={OwnUserProfile}
                 options={({ navigation }) => ({
                     headerShown: false
+                    // headerStyle: {
+                    //     height: 60, // Standard header height
+                    // },
                     // headerTitle: () => (
                     //     <></>
                     // ),
@@ -182,7 +186,7 @@ const ProfileStackNavigator = () => {
                 name="UserProfile"
                 component={UserProfile}
                 options={({ navigation }) => ({
-                    headerShown: false
+                    // headerShown: false
                     // headerTitle: () => (
                     //     <Logo />
                     // ),

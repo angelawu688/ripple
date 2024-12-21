@@ -31,13 +31,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { ToastContext } from "../../context/ToastContext";
 
 
-const testUserPosts = [
-    { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-    { id: 2, img: undefined, title: 'Street Bike', price: 50, sold: false },
-    { id: 3, img: undefined, title: 'Nintendo Switch', price: 80, sold: false },
-    { id: 4, img: undefined, title: 'Airpod Pros', price: 50, sold: true },
-    { id: 5, img: undefined, title: 'Catan Set', price: 10, sold: true },
-]
+
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
     const { showToast } = useContext(ToastContext);
@@ -74,8 +68,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 if (a.sold !== b.sold) {
                     return a.sold ? 1 : -1;
                 }
-                // convert to ms so that we can compare with subtraction
-                return b.createdAt.toMillis() - a.createdAt.toMillis();
+                return b.createdAt - a.createdAt;
 
             });
             setUserPosts(sortedListings);
@@ -205,12 +198,14 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
             following_id: userID,
             following_name: userProfile.name,
             following_pfp: userProfile.pfp,
+            following_major: userProfile.major
         };
         // add curr user to their followers
         const newFollower = {
             follower_id: user.uid,
             follower_name: userData.name,
             follower_pfp: userData.pfp,
+            follower_major: userProfile.major
         }
         const userRef = doc(db, "users", user.uid);
         const followingRef = doc(db, "users", userID)
@@ -349,7 +344,10 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     }
 
     return (
-        <View style={[styles.container, { marginTop: isOwnProfileInProfileStack ? 80 : 0 }]}>
+        <View style={[styles.container]}>
+            {/* , { marginTop: isOwnProfileInProfileStack ? 80 : 0 } */}
+
+            {isOwnProfileInProfileStack && <View style={{ height: 80, width: '100%' }} />}
             <View style={styles.topContainer}>
                 {userProfile.pfp ? (<Image
                     // pfp would go here
@@ -505,9 +503,9 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 
 
                     ) : (
-                        <View style={{ marginTop: 30 }}>
-                            <Text style={{ fontFamily: 'inter', fontSize: 16 }}>
-                                User has no listings!
+                        <View style={{ marginTop: 20, }}>
+                            <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '500' }}>
+                                User has no listings
                             </Text>
                         </View>
                     )

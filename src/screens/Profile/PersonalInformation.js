@@ -2,7 +2,7 @@ import { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Image } from 'react-native'
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
-import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../colors'
 import { isLoading } from 'expo-font';
@@ -14,6 +14,7 @@ import {
     updateAllFollowPfp,
     updateAllFollowName
 } from '../../utils/firebaseUtils';
+import { generateUserKeywords } from '../../utils/search';
 
 
 
@@ -97,6 +98,13 @@ const PersonalInformation = () => {
             if (currentField.key === 'name') {
                 await updateAllListingsName(user.uid, input)
                 await updateAllFollowName(user.uid, input, userData.name, userData.pfp)
+
+                // update the keywords for the new name
+                const keywords = generateUserKeywords(userData.name);
+                await setDoc(userRef, {
+                    ...userData,
+                    searchKeywords: keywords
+                }, { merge: true });
             }
             const userDoc = await getDoc(userRef);
 

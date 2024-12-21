@@ -16,7 +16,6 @@ const MessagesStackNavigator = () => {
     return (
         <MessagesStack.Navigator
             initialRouteName="MessagesOverview"
-            options={{ headerShown: false }}
             screenOptions={{
                 contentStyle: { backgroundColor: 'white' },
                 headerShadowVisible: false,
