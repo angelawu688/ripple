@@ -20,7 +20,7 @@ export const UnreadProvider = ({ children }) => {
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const totalUnread = snapshot.docs.reduce((count, doc) => {
                 const data = doc.data();
-                // If the last message was sent by the other user and hasn't been read
+                // if the last message was send by the user and hasnt been read
                 if (data.lastMessageBy !== user.uid && data.lastMessageReadBy !== user.uid) {
                     return count + 1;
                 }

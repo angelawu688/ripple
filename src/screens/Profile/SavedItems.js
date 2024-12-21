@@ -5,6 +5,7 @@ import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
 import ListingCard from '../../components/ListingCard'
 import { getFirestore, query, where, collection, getDocs, orderBy } from "firebase/firestore";
+import { BookmarkSimple } from 'phosphor-react-native'
 
 
 const SavedItems = ({ navigation }) => {
@@ -33,12 +34,19 @@ const SavedItems = ({ navigation }) => {
     } else if (savedPosts.length === 0) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={[styles.text, { fontWeight: '600', fontSize: 20 }]}>
+                <Text style={{ fontSize: 16, fontFamily: 'inter', fontWeight: '600' }}>
+                    See anything you like?
+                </Text>
+                <Text style={{ fontSize: 16, fontFamily: 'inter', fontWeight: '400', marginVertical: 8 }}>
+                    Your saved items will appear here.
+                </Text>
+                <BookmarkSimple size={24} weight='regular' />
+                {/* <Text style={[styles.text, { fontWeight: '600', fontSize: 20 }]}>
                     No saved listings!
                 </Text>
                 <Text style={[styles.text, { fontWeight: '400', fontSize: 16 }]}>
                     Saved listings will appear here
-                </Text>
+                </Text> */}
             </View>
         )
     }

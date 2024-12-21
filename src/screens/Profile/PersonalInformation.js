@@ -57,6 +57,7 @@ const PersonalInformation = () => {
     const validateInput = (field, value) => {
         switch (field.key) {
             case 'instagram':
+                return /^@[a-zA-Z0-9_]+$/.test(value) || 'Must be a username starting with @';
             case 'twitter':
                 // Ensure the value is a valid username (alphanumeric and underscores, starting with @)
                 return /^@[a-zA-Z0-9_]+$/.test(value) || 'Must be a username starting with @';
@@ -78,20 +79,15 @@ const PersonalInformation = () => {
     const handleSave = async () => {
         if (!currentField) {
             return;
-        } else if (!validateInput(currentField, input)) {
+        }
+        setIsLoadingSave(true)
+
+        const validationResponse = validateInput(currentField, input);
+        if (validationResponse !== true) {
             setErrorMessage(validationResponse);
             setIsLoadingSave(false)
             return;
         }
-
-        setIsLoadingSave(true)
-
-        // const validationResponse = validateInput(currentField, input);
-        // if (validationResponse !== true) {
-        //     setErrorMessage(validationResponse);
-        //     setIsLoadingSave(false)
-        //     return;
-        // }
 
         try {
             const userRef = doc(db, "users", user.uid);
@@ -237,11 +233,11 @@ const PersonalInformation = () => {
                     <View style={styles.modalContent}>
                         <View style={styles.innerModalContainer}>
 
-                            <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 26, alignSelf: 'center', }}>
+                            <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 26, }}>
                                 Edit {currentField.label}
                             </Text>
                             {currentField.description && !errorMessage ? <Text
-                                style={{ fontFamily: 'Inter', fontSize: 14, color: colors.accentGray, marginVertical: 6 }}>
+                                style={{ fontFamily: 'Inter', fontSize: 14, color: colors.accentGray, }}>
                                 {currentField.description}
                             </Text> : <Text style={{ fontFamily: 'Inter', fontSize: 14, color: colors.errorMessage }}>
                                 {errorMessage}
@@ -263,16 +259,24 @@ const PersonalInformation = () => {
                                 style={[styles.modalCloseButton, { backgroundColor: colors.loginGray }]}
                                 onPress={() => setModalVisible(false)}
                             >
-                                <Text style={[styles.modalCloseButtonText, { color: 'black' }]}>Cancel</Text>
+                                <Text style={[styles.modalCloseButtonText, { color: 'black' }]}>
+                                    Cancel
+
+                                </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 disabled={input.length === 0 || !continueAvailable}
-                                style={[styles.modalCloseButton, { backgroundColor: input.length === 0 || !continueAvailable ? colors.loginGray : 'black' }]}
+                                style={[styles.modalCloseButton, { backgroundColor: input.length === 0 || !continueAvailable ? colors.loginGray : colors.neonBlue }]}
                                 onPress={() => handleSave()}
                             >
+
                                 {isLoadingSave ? (<ActivityIndicator size={'small'} color={'white'} />) : (
-                                    <Text style={[styles.modalCloseButtonText, { color: input.length === 0 || !continueAvailable ? "black" : 'white' }]}>Save</Text>
+                                    <Text style={[styles.modalCloseButtonText, { color: input.length === 0 || !continueAvailable ? 'black' : 'white' }]}>
+                                        Save
+                                    </Text>
                                 )}
+
+
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -329,7 +333,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 10,
         padding: 20,
-        alignItems: 'center',
+        alignItems: 'flex-start',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
@@ -337,16 +341,11 @@ const styles = StyleSheet.create({
         elevation: 5,
         width: '80%'
     },
-    modalText: {
-        fontSize: 18,
-        marginBottom: 15,
-        textAlign: 'center',
-    },
     modalCloseButton: {
         backgroundColor: 'black',
-        width: 75,
-        height: 50,
-        borderRadius: 5,
+        paddingHorizontal: 15,
+        height: 35,
+        borderRadius: 15,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
@@ -354,7 +353,8 @@ const styles = StyleSheet.create({
     modalCloseButtonText: {
         color: 'white',
         fontFamily: 'inter',
-        fontWeight: '600',
+        fontWeight: '500',
+        fontSize: 16,
         textAlign: 'center',
     },
     innerModalContainer: {
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        width: '90%',
+        width: '100%',
         alignSelf: 'center'
     },
     modalButtonContainer: {
