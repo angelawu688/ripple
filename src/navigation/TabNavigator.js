@@ -120,10 +120,10 @@ const TabNavigator = () => {
                             backgroundColor: colors.white,
                             paddingTop: 12,
                             borderTopWidth: 0.5,
-
-                            // helps with the transition
-                            transition: 'all 0.2s',
-                            position: 'absolute'
+                            // DO NOT UNCOMMMENT THIS
+                            // im leaving it in so we know to not do it lmao
+                            // this single line will cause all of the topbar issues
+                            // position: 'absolute'
                         }
 
                     })(route),

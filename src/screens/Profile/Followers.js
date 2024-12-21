@@ -4,21 +4,23 @@ import { colors } from '../../colors'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { DotsThree } from 'phosphor-react-native'
 import { userContext } from '../../context/UserContext'
+import { ToastContext } from '../../context/ToastContext'
 import { StyleSheet } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native'
 
 export default function Followers({ navigation, route }) {
     const { isFollowers: initIsFollowers } = route.params
     const { userData } = useContext(userContext)
+    const { showToast } = useContext(ToastContext)
     const [users, setUsers] = useState([])
     const [isFollowers, setIsFollowers] = useState(initIsFollowers)
     const [loading, setLoading] = useState(true)
 
-    // 3 dots 
-    const [modalVisible, setModalVisible] = useState(false)
-    const toggleModal = () => {
-        setModalVisible(!modalVisible);
+    const [activeModalId, setActiveModalId] = useState(null) // track which modal should be open
+    const toggleModal = (userId) => {
+        setActiveModalId(activeModalId === userId ? null : userId);
     };
+
 
     useEffect(() => {
         const data = isFollowers ? userData.followers : userData.following;
@@ -27,20 +29,42 @@ export default function Followers({ navigation, route }) {
     }, [isFollowers]);
 
     const handleRemoveFollower = () => {
-        console.log('handle remove follower')
+        try {
+            showToast('Follower removed!')
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setActiveModalId(null)
+        }
     }
 
     const handleReportUser = () => {
-        console.log('reporting user')
+        try {
+            showToast('User reported!')
+        } catch (e) {
+            console.error(e
+            )
+        } finally {
+            setActiveModalId(null)
+
+        }
     }
 
     const handleBlockUser = () => {
-        console.log('blocking user')
+        try {
+            showToast('User blocked!')
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setActiveModalId(null)
+
+        }
     }
 
     if (loading) {
         return <LoadingSpinner />
     }
+
 
     return (
         <View>
@@ -76,18 +100,18 @@ export default function Followers({ navigation, route }) {
                     const pfp = isFollowers ? item.follower_pfp : item.following_pfp
                     const name = isFollowers ? item.follower_name : item.following_name
                     const major = isFollowers ? item.follower_major : item.following_major
-
+                    const isModalVisible = activeModalId === userID
 
                     return (
                         <View
-                            onPress={() => setModalVisible(false)}
+                            key={`user-${userID}`}
                             style={{ height: 60, width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}
                         >
                             <TouchableOpacity
-                                activeOpacity={modalVisible ? 1 : 0.2}
+                                activeOpacity={isModalVisible ? 1 : 0.2}
                                 onPress={() => {
-                                    if (modalVisible) {
-                                        setModalVisible(false)
+                                    if (isModalVisible) {
+                                        setActiveModalId(null)
                                     } else {
                                         navigation.navigate('UserProfile', { userID: userID })
                                     }
@@ -114,19 +138,15 @@ export default function Followers({ navigation, route }) {
 
                             </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={() => toggleModal()}
+                                onPress={() => toggleModal(userID)}
                             >
                                 <DotsThree size={30} weight='bold' />
                             </TouchableOpacity>
                             {/* MODAL VIEW */}
-                            {modalVisible && (
+                            {isModalVisible && (
                                 <TouchableWithoutFeedback
                                     style={styles.modalBackdrop}
-                                    onPress={() => {
-                                        console.log('dismiss')
-                                        setModalVisible(false)
-                                    } // Dismiss modal on backdrop press
-                                    }
+                                    onPress={() => setActiveModalId(null)}
                                 >
                                     <View style={styles.modalContainer}>
                                         <TouchableOpacity
@@ -197,7 +217,7 @@ const styles = StyleSheet.create({
     modalContainer: {
         position: 'absolute',
         top: 50, // Adjust to position the modal just below the header
-        right: 10, // Align with the three dots
+        right: 0, // Align with the three dots
         backgroundColor: 'white',
         borderRadius: 15,
         padding: 12,
@@ -208,8 +228,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
         paddingHorizontal: 10,
-        paddingVertical: 6
+        paddingVertical: 6,
+        zIndex: 999,
     },
+
     modalOption: {
         // paddingVertical: 6,
         paddingVertical: 7,
