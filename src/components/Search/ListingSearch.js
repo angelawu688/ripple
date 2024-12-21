@@ -16,6 +16,10 @@ export default function ListingSearch({ isLoading, query, navigation, displayRes
                 ) : (
                     searchResults?.length > 0 ? (
                         <ListingsList
+
+                            style={{
+                                paddingHorizontal: 20
+                            }}
                             listings={searchResults}
                             navigation={navigation}
 
@@ -38,6 +42,7 @@ export default function ListingSearch({ isLoading, query, navigation, displayRes
                             ) : (
                                 recentSearches.length > 0 ? (
                                     <FlatList
+                                        keyboardDismissMode="on-drag"
                                         data={[...recentSearches].reverse().slice(0, 8)}
                                         keyExtractor={(item) => item}
                                         renderItem={({ item }) => (

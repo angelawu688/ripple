@@ -5,6 +5,8 @@ import { EmptyMessage, generateUserKeywords, RecentSearchSkeletonLoader } from '
 import RecommendationCard from './RecommendationCard'
 import { TouchableOpacity } from 'react-native'
 import UserResultCard from './UserResultCard'
+import { TouchableWithoutFeedback } from 'react-native'
+import { Keyboard } from 'react-native'
 
 const testRecs = [
     1, 2, 3, 4, 5, 6
@@ -26,6 +28,7 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                 ) : (
                     userSearchResults?.length > 0 ? (
                         <FlatList
+                            keyboardDismissMode="on-drag"
                             data={userSearchResults}
                             renderItem={({ item, index }) => (
                                 <UserResultCard
@@ -41,7 +44,11 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                     )
                 )
             ) : (
-                <View>
+                <TouchableWithoutFeedback
+                    style={{ backgroundColor: 'green', width: '100%', height: '100%' }}
+                    onPress={() => Keyboard.dismiss()
+                    }
+                >
                     {query ? (
                         <Text>
                             Autocomplete for {query}
@@ -52,6 +59,7 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                                 Recommended users
                             </Text>
                             <FlatList
+                                keyboardDismissMode="on-drag"
                                 data={testRecs}
                                 renderItem={(item, index) => (
                                     <RecommendationCard
@@ -62,9 +70,19 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                             />
                         </>
                     ) : (
-                        <EmptyMessage message={'No recommendations'} />
+                        <View style={{ width: '100%', height: '70%', justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ fontFamily: 'inter', fontSize: 18, fontWeight: '600' }}>
+                                No recommendations
+                            </Text>
+                            <Text style={{ fontFamily: 'inter', fontSize: 14, fontWeight: '400' }}>
+                                Follow users to get recommendations
+                            </Text>
+                        </View>
+
+                        // <EmptyMessage message={'No recommendations'} />
+
                     )}
-                </View>
+                </TouchableWithoutFeedback>
             )}
 
 

@@ -33,8 +33,9 @@ export default function UserResultCard({ navigation, user }) {
 
 const styles = StyleSheet.create({
     container: {
-        width: '100%',
+        width: '96%',
         flexDirection: 'row',
+        alignSelf: 'center'
 
     },
     textContainer: { flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', marginLeft: 10 },

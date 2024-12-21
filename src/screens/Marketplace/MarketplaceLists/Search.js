@@ -133,92 +133,155 @@ const Search = ({ navigation }) => {
         }
     }
 
+    // splits the search term so that we search on all results for all search terms 
+    // (i.e. "blue shirt" --> query(blue) + query(shirt))
     const handleSearchUsers = async (searchTerm) => {
-        console.log('saerchTerm', searchTerm)
         if (!searchTerm || searchTerm.trim() === '') {
             return [];
         }
         setLoadingUserSearch(true)
-
         const usersRef = collection(db, 'users');
-        const searchTermLower = searchTerm.toLowerCase();
+        // we split the query into search terms
+        const searchTerms = searchTerm.toLowerCase().split(/\s+/).filter(term => term.length > 0);
 
-        //   query on both name and email
-        const nameQuery = firestoreQuery(
-            usersRef,
-            where('searchKeywords', 'array-contains', searchTermLower),
-            limit(5)
-        );
-
-        const emailQuery = firestoreQuery(
-            usersRef,
-            where('email', '>=', searchTermLower),
-            where('email', '<=', searchTermLower + '\uf8ff'),
-            limit(5)
-        );
         try {
-            // exececute queries
-            const [nameSnapshot, emailSnapshot] = await Promise.all([
-                getDocs(nameQuery),
-                getDocs(emailQuery)
-            ]);
+            // create a query for each term
+            const queries = searchTerms.map(term => {
+                return Promise.all([
+                    // names and keywords
+                    getDocs(
+                        firestoreQuery(
+                            usersRef,
+                            where('searchKeywords', 'array-contains', term),
+                            limit(5)
+                        )
+                    ),
+                    // email
+                    getDocs(
+                        firestoreQuery(
+                            usersRef,
+                            where('email', '>=', term),
+                            where('email', '<=', term + '\uf8ff'),
+                            limit(5)
+                        )
+                    )
+                ]);
+            });
 
+            // wait for all of the queries
+            const queryResults = await Promise.all(queries);
 
             const results = new Map();
 
-            nameSnapshot.forEach((doc) => {
-                results.set(doc.id, { id: doc.id, ...doc.data() });
+
+            // go through all results to combine
+            queryResults.forEach(([nameSnapshot, emailSnapshot]) => {
+                // add the results from each query
+                nameSnapshot.forEach((doc) => {
+                    const data = { id: doc.id, ...doc.data() };
+                    if (results.has(doc.id)) {
+                        const existing = results.get(doc.id);
+                        existing.matchScore = (existing.matchScore || 1) + 1;
+                        results.set(doc.id, existing);
+                    } else {
+                        data.matchScore = 1;
+                        results.set(doc.id, data);
+                    }
+                });
+
+                // add results from email query
+                emailSnapshot.forEach((doc) => {
+                    const data = { id: doc.id, ...doc.data() };
+                    if (results.has(doc.id)) {
+                        const existing = results.get(doc.id);
+                        existing.matchScore = (existing.matchScore || 1) + 1;
+                        results.set(doc.id, existing);
+                    } else {
+                        data.matchScore = 1;
+                        results.set(doc.id, data);
+                    }
+                });
             });
 
-            emailSnapshot.forEach((doc) => {
-                results.set(doc.id, { id: doc.id, ...doc.data() });
-            });
-
+            //    convery to array, sort on how many appearances
+            // i.e. for q = "Will Hunt", "Patrick William Hunt" would score 2, 
+            //               "Caleb Hunt" or "Will Jones" would score 1
             const combinedResults = Array.from(results.values())
-            // .slice(0, 5); // commented out, this would be limiting after the fact
-            console.log('combres', combinedResults)
+                .sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
 
-            // return combinedResults;
-            setUserSearchResults(combinedResults)
-            setDisplayUserSearchResults(true)
+            setUserSearchResults(combinedResults);
+            setDisplayUserSearchResults(true);
         } catch (e) {
-            console.error(e)
+            console.error(e);
         } finally {
-            setLoadingUserSearch(false)
+            setLoadingUserSearch(false);
         }
-    }
+    };
 
-
+    // again, splits the query into search terms and performs a match search on items
+    // i.e. "big bag" would return "Cotapoxi 42 Allpa Liter Bag" and "Huge bag"
+    // also would include the tags
     const handleSearchListings = async (searchQuery, reset = true) => {
-        if (searchQuery.trim() === '') { // prevent duplicate requests
-            console.log('returned early')
-            return
+        if (searchQuery.trim() === '') {
+            console.log('returned early');
+            return;
         }
 
         if (reset) {
             setSearchResults([]);
-            setLastVisible(null); // Reset pagination
+            setLastVisible(null);
         }
 
-        setIsLoading(true)
+        setIsLoading(true);
         setDisplayResults(true);
-        Keyboard.dismiss()
+        Keyboard.dismiss();
 
         try {
-            const { results, lastVisible: newLastVisible } = await searchByKeyword(searchQuery, 20, reset ? null : lastVisible);
-            setSearchResults(prevResults => reset ? results : [...prevResults, ...results]);
+            // split query into terms
+            const searchTerms = searchQuery.toLowerCase().split(/\s+/).filter(term => term.length > 0);
+
+            // get results for each term. Searching by keyword 
+            const allResults = await Promise.all(
+                searchTerms.map(term => searchByKeyword(term, 20, reset ? null : lastVisible))
+            );
+
+            // map results to scores
+            const resultsMap = new Map();
+
+            // score all of the results
+            allResults.forEach(({ results }) => {
+                results.forEach(item => {
+                    if (resultsMap.has(item.id)) {
+                        const existing = resultsMap.get(item.id);
+                        existing.matchScore = (existing.matchScore || 1) + 1;
+                        resultsMap.set(item.id, existing);
+                    } else {
+                        item.matchScore = 1;
+                        resultsMap.set(item.id, item);
+                    }
+                });
+            });
+
+            // sort by match score and combine
+            const combinedResults = Array.from(resultsMap.values())
+                .sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+
+            // pagination, not really implemented yet but have support for it
+            const newLastVisible = allResults[0]?.lastVisible;
+
+            setSearchResults(prevResults => reset ? combinedResults : [...prevResults, ...combinedResults]);
             setLastVisible(newLastVisible);
             await saveRecentSearch(searchQuery);
         } catch (e) {
-            setErrorMessage(e.message)
-            console.log(e)
+            setErrorMessage(e.message);
+            console.log(e);
         } finally {
-            // why? I forget
-            setIsLoading(false)
+            setIsLoading(false);
         }
-    }
+    };
 
-    // not called 
+
+    // not called. Future for pagination
     const fetchMoreResults = async () => {
         if (isFetchingMore || !lastVisible) {
             // initial fetch or we are currently fecthing more––prevent duplicate requests
@@ -264,7 +327,7 @@ const Search = ({ navigation }) => {
                     <Text style={[{ marginBottom: 6, fontSize: 14 }, { fontWeight: listingsSelected ? '600' : '400' }]}>
                         Listings
                     </Text>
-                    {listingsSelected && <View style={{ width: '100%', height: 1, backgroundColor: 'black' }} />}
+                    <View style={{ width: '100%', height: 1, backgroundColor: !listingsSelected ? colors.loginGray : 'black' }} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setListingsSelected(!listingsSelected)}
 
@@ -272,7 +335,7 @@ const Search = ({ navigation }) => {
                     <Text style={[{ marginBottom: 6, fontSize: 14 }, { fontWeight: !listingsSelected ? '600' : '400' }]}>
                         Users
                     </Text>
-                    {!listingsSelected && <View style={{ width: '100%', height: 1, backgroundColor: 'black' }} />}
+                    <View style={{ width: '100%', height: 1, backgroundColor: listingsSelected ? colors.loginGray : 'black' }} />
                 </TouchableOpacity>
             </View>
 
