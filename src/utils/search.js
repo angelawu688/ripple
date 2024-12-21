@@ -132,25 +132,34 @@ export const RecentSearchSkeletonLoader = () => {
 
 // generates keywords for a user
 export const generateUserKeywords = (name) => {
-    const nameArray = name.toLowerCase().split(' ');
-    const keywords = new Set();
+    if (!name) {
+        return;
+    }
 
-    // full name
-    keywords.add(name.toLowerCase());
+    try {
+        const nameArray = name.toLowerCase().split(' ');
+        const keywords = new Set();
 
-    // each word
-    nameArray.forEach(word => keywords.add(word));
+        // full name
+        keywords.add(name.toLowerCase());
 
-    // partial matching
-    nameArray.forEach(word => {
-        let partial = '';
-        word.split('').forEach(letter => {
-            partial += letter;
-            keywords.add(partial);
+        // each word
+        nameArray.forEach(word => keywords.add(word));
+
+        // partial matching
+        nameArray.forEach(word => {
+            let partial = '';
+            word.split('').forEach(letter => {
+                partial += letter;
+                keywords.add(partial);
+            });
         });
-    });
 
-    return Array.from(keywords);
+        return Array.from(keywords);
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
 };
 
 const styles = StyleSheet.create({

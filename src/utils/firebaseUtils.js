@@ -238,138 +238,174 @@ export const getListingFromID = async (listingID) => {
 // given an array of photo urls, deletes them all from the db
 // regardless of collection/location
 export const deleteImages = async (photos) => {
-    const deletePromises = photos.map(async (photoURL) => {
-        const url = new URL(photoURL);
-        const fullPath = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
-        const imageRef = ref(storage, fullPath);
+    try {
+        const deletePromises = photos.map(async (photoURL) => {
+            const url = new URL(photoURL);
+            const fullPath = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
+            const imageRef = ref(storage, fullPath);
 
-        // handling errors if already deleted, ect,
-        // logs for debugging
-        try {
-            await deleteObject(imageRef);
-            console.log(`Successfully deleted: ${fullPath}`);
-        } catch (deleteError) {
-            if (deleteError.code === 'storage/object-not-found') {
-                console.log(`File already deleted or not found: ${fullPath}`);
-                return;
+            // handling errors if already deleted, ect,
+            // logs for debugging
+            try {
+                await deleteObject(imageRef);
+                console.log(`Successfully deleted: ${fullPath}`);
+            } catch (deleteError) {
+                if (deleteError.code === 'storage/object-not-found') {
+                    console.log(`File already deleted or not found: ${fullPath}`);
+                    return;
+                }
+                throw deleteError;
             }
-            throw deleteError;
-        }
 
-    })
-    await Promise.all(deletePromises)
+        })
+        await Promise.all(deletePromises)
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
 }
 
 // given a listingID, will delete all references to it in saved posts
 export const deleteFromSavedPosts = async (listingID) => {
-    const q = query(collection(db, 'savedPosts'), where('listing_id', '==', listingID))
-    const querySnapshot = await getDocs(q);
-    const deletePromises = [];
-    querySnapshot.forEach((docSnap) => {
-        deletePromises.push(deleteDoc(docSnap.ref))
-    })
-    await Promise.all(deletePromises)
+    try {
+        const q = query(collection(db, 'savedPosts'), where('listing_id', '==', listingID))
+        const querySnapshot = await getDocs(q);
+        const deletePromises = [];
+        querySnapshot.forEach((docSnap) => {
+            deletePromises.push(deleteDoc(docSnap.ref))
+        })
+        await Promise.all(deletePromises)
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
 }
 
 // UPDATE functions
 
 // given a user id and profile image url, will update all listings with it
 export const updateAllListingsPfp = async (userId, pfpLink) => {
-    const q = query(collection(db, 'listings'), where('userId', '==', userId))
-    const querySnapshot = await getDocs(q);
-    const updatePromises = [];
-    querySnapshot.forEach((docSnap) => {
-        updatePromises.push(updateDoc(docSnap.ref, { userPfp: pfpLink }))
-    })
-    await Promise.all(updatePromises)
+    try {
+        const q = query(collection(db, 'listings'), where('userId', '==', userId))
+        const querySnapshot = await getDocs(q);
+        const updatePromises = [];
+        querySnapshot.forEach((docSnap) => {
+            updatePromises.push(updateDoc(docSnap.ref, { userPfp: pfpLink }))
+        })
+        await Promise.all(updatePromises)
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
+
 }
 
 // given a user id and new name, will update all listings with it
 export const updateAllListingsName = async (userId, userName) => {
-    const q = query(collection(db, 'listings'), where('userId', '==', userId))
-    const querySnapshot = await getDocs(q);
-    const updatePromises = [];
-    querySnapshot.forEach((docSnap) => {
-        updatePromises.push(updateDoc(docSnap.ref, { userName: userName }))
-    })
-    await Promise.all(updatePromises)
+    try {
+        const q = query(collection(db, 'listings'), where('userId', '==', userId))
+        const querySnapshot = await getDocs(q);
+        const updatePromises = [];
+        querySnapshot.forEach((docSnap) => {
+            updatePromises.push(updateDoc(docSnap.ref, { userName: userName }))
+        })
+        await Promise.all(updatePromises)
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
 }
 
 // given a user id and profile image url, will update all followers and following with it
 export const updateAllFollowPfp = async (userId, pfpLinkNew, pfpLinkOld, userName) => {
-    const followersQuery = query(collection(db, 'users'),
-        where('followers', 'array-contains', { follower_id: userId, follower_name: userName, follower_pfp: pfpLinkOld }))
-    const followersQuerySnapshot = await getDocs(followersQuery);
-    const updatePromises = [];
-    followersQuerySnapshot.forEach((docSnap) => {
-        const followers = docSnap.data().followers;
-        const updatedFollowers = followers.map((followerUser) => {
-            if (followerUser.follower_id === userId) {
-                return { ...followerUser, follower_pfp: pfpLinkNew };
-            }
-            return followerUser
-        });
-        updatePromises.push(updateDoc(docSnap.ref, { followers: updatedFollowers }))
-    })
+    try {
+        const followersQuery = query(collection(db, 'users'),
+            where('followers', 'array-contains', { follower_id: userId, follower_name: userName, follower_pfp: pfpLinkOld }))
+        const followersQuerySnapshot = await getDocs(followersQuery);
+        const updatePromises = [];
+        followersQuerySnapshot.forEach((docSnap) => {
+            const followers = docSnap.data().followers;
+            const updatedFollowers = followers.map((followerUser) => {
+                if (followerUser.follower_id === userId) {
+                    return { ...followerUser, follower_pfp: pfpLinkNew };
+                }
+                return followerUser
+            });
+            updatePromises.push(updateDoc(docSnap.ref, { followers: updatedFollowers }))
+        })
 
-    const followingQuery = query(collection(db, 'users'),
-        where('following', 'array-contains', { following_id: userId, following_name: userName, following_pfp: pfpLinkOld }))
-    const followingQuerySnapshot = await getDocs(followingQuery);
-    followingQuerySnapshot.forEach((docSnap) => {
-        const following = docSnap.data().following;
-        const updatedFollowing = following.map((followingUser) => {
-            if (followingUser.following_id === userId) {
-                return { ...followingUser, following_pfp: pfpLinkNew };
-            }
-            return followingUser
-        });
-        updatePromises.push(updateDoc(docSnap.ref, { following: updatedFollowing }))
-    })
-    await Promise.all(updatePromises)
+        const followingQuery = query(collection(db, 'users'),
+            where('following', 'array-contains', { following_id: userId, following_name: userName, following_pfp: pfpLinkOld }))
+        const followingQuerySnapshot = await getDocs(followingQuery);
+        followingQuerySnapshot.forEach((docSnap) => {
+            const following = docSnap.data().following;
+            const updatedFollowing = following.map((followingUser) => {
+                if (followingUser.following_id === userId) {
+                    return { ...followingUser, following_pfp: pfpLinkNew };
+                }
+                return followingUser
+            });
+            updatePromises.push(updateDoc(docSnap.ref, { following: updatedFollowing }))
+        })
+        await Promise.all(updatePromises)
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
 }
 
 // given a user id and profile image url, will update all followers and following with it
 export const updateAllFollowName = async (userId, userNameNew, userNameOld, userPfp) => {
-    const followersQuery = query(collection(db, 'users'),
-        where('followers', 'array-contains', { follower_id: userId, follower_name: userNameOld, follower_pfp: userPfp }))
-    const followersQuerySnapshot = await getDocs(followersQuery);
-    const updatePromises = [];
-    followersQuerySnapshot.forEach((docSnap) => {
-        const followers = docSnap.data().followers;
-        const updatedFollowers = followers.map((followerUser) => {
-            if (followerUser.follower_id === userId) {
-                return { ...followerUser, follower_name: userNameNew };
-            }
-            return followerUser
-        });
-        updatePromises.push(updateDoc(docSnap.ref, { followers: updatedFollowers }))
-    })
+    try {
+        const followersQuery = query(collection(db, 'users'),
+            where('followers', 'array-contains', { follower_id: userId, follower_name: userNameOld, follower_pfp: userPfp }))
+        const followersQuerySnapshot = await getDocs(followersQuery);
+        const updatePromises = [];
+        followersQuerySnapshot.forEach((docSnap) => {
+            const followers = docSnap.data().followers;
+            const updatedFollowers = followers.map((followerUser) => {
+                if (followerUser.follower_id === userId) {
+                    return { ...followerUser, follower_name: userNameNew };
+                }
+                return followerUser
+            });
+            updatePromises.push(updateDoc(docSnap.ref, { followers: updatedFollowers }))
+        })
 
-    const followingQuery = query(collection(db, 'users'),
-        where('following', 'array-contains', { following_id: userId, following_name: userNameOld, following_pfp: userPfp }))
-    const followingQuerySnapshot = await getDocs(followingQuery);
-    followingQuerySnapshot.forEach((docSnap) => {
-        const following = docSnap.data().following;
-        const updatedFollowing = following.map((followingUser) => {
-            if (followingUser.following_id === userId) {
-                return { ...followingUser, following_name: userNameNew };
-            }
-            return followingUser
-        });
-        updatePromises.push(updateDoc(docSnap.ref, { following: updatedFollowing }))
-    })
-    await Promise.all(updatePromises)
+        const followingQuery = query(collection(db, 'users'),
+            where('following', 'array-contains', { following_id: userId, following_name: userNameOld, following_pfp: userPfp }))
+        const followingQuerySnapshot = await getDocs(followingQuery);
+        followingQuerySnapshot.forEach((docSnap) => {
+            const following = docSnap.data().following;
+            const updatedFollowing = following.map((followingUser) => {
+                if (followingUser.following_id === userId) {
+                    return { ...followingUser, following_name: userNameNew };
+                }
+                return followingUser
+            });
+            updatePromises.push(updateDoc(docSnap.ref, { following: updatedFollowing }))
+        })
+        await Promise.all(updatePromises)
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
 }
 
 // update saved posts with listing changes
 export const updateAllSaved = async (listingID, listingTitle, listingPrice, photoURLs) => {
-    const q = query(collection(db, 'savedPosts'), where('listing_id', '==', listingID))
-    const querySnapshot = await getDocs(q);
-    const updatePromises = [];
-    querySnapshot.forEach((docSnap) => {
-        updatePromises.push(updateDoc(docSnap.ref, { title: listingTitle, price: listingPrice, photos: photoURLs }))
-    })
-    await Promise.all(updatePromises)
+    try {
+        const q = query(collection(db, 'savedPosts'), where('listing_id', '==', listingID))
+        const querySnapshot = await getDocs(q);
+        const updatePromises = [];
+        querySnapshot.forEach((docSnap) => {
+            updatePromises.push(updateDoc(docSnap.ref, { title: listingTitle, price: listingPrice, photos: photoURLs }))
+        })
+        await Promise.all(updatePromises)
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
 }
 
 // deletes the users account and references to it

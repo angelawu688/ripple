@@ -15,6 +15,7 @@ import {
     updateAllFollowName
 } from '../../utils/firebaseUtils';
 import { generateUserKeywords } from '../../utils/search';
+import { db } from '../../../firebaseConfig';
 
 
 
@@ -77,39 +78,44 @@ const PersonalInformation = () => {
     const handleSave = async () => {
         if (!currentField) {
             return;
-        }
-
-        setIsLoadingSave(true)
-
-        const validationResponse = validateInput(currentField, input);
-        if (validationResponse !== true) {
+        } else if (!validateInput(currentField, input)) {
             setErrorMessage(validationResponse);
             setIsLoadingSave(false)
             return;
         }
 
+        setIsLoadingSave(true)
+
+        // const validationResponse = validateInput(currentField, input);
+        // if (validationResponse !== true) {
+        //     setErrorMessage(validationResponse);
+        //     setIsLoadingSave(false)
+        //     return;
+        // }
+
         try {
-            const updatedInfo = {
-                [currentField.key]: input,
-            }
-            const db = getFirestore();
             const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, updatedInfo);
             if (currentField.key === 'name') {
-                await updateAllListingsName(user.uid, input)
-                await updateAllFollowName(user.uid, input, userData.name, userData.pfp)
-
-                // update the keywords for the new name
-                const keywords = generateUserKeywords(userData.name);
-                await setDoc(userRef, {
-                    ...userData,
+                // for name updates, we update the name keywords and the name
+                const keywords = generateUserKeywords(input);
+                await updateDoc(userRef, {
+                    name: input,
                     searchKeywords: keywords
-                }, { merge: true });
+                });
+
+                await Promise.all([
+                    updateAllListingsName(user.uid, input),
+                    updateAllFollowName(user.uid, input, userData.name, userData.pfp)
+                ]);
+            } else {
+                // update the single field for all others
+                await updateDoc(userRef, {
+                    [currentField.key]: input
+                });
             }
+
+            // get fresh user data
             const userDoc = await getDoc(userRef);
-
-
-            // frontend change
             setUserData(userDoc.data());
         } catch (e) {
             console.log(e)
