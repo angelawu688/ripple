@@ -45,16 +45,25 @@ export default function Followers({ navigation, route }) {
     return (
         <View>
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 20 }}>
-                <TouchableOpacity onPress={() => setIsFollowers(!isFollowers)}>
+                <TouchableOpacity style={{ width: '50%', display: 'flex', alignItems: 'center' }}
+                    onPress={() => setIsFollowers(!isFollowers)}
+
+                >
                     <Text style={{ fontSize: 16, fontFamily: 'inter', color: isFollowers ? 'black' : colors.accentGray }}>
                         Followers
                     </Text>
+                    <View style={{ marginTop: 10, width: '100%', height: 1, backgroundColor: !isFollowers ? colors.loginGray : 'black' }} />
+
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => setIsFollowers(!isFollowers)}>
+
+                <TouchableOpacity style={{ width: '50%', display: 'flex', alignItems: 'center' }}
+                    onPress={() => setIsFollowers(!isFollowers)}>
                     <Text style={{ fontSize: 16, fontFamily: 'inter', color: isFollowers ? colors.accentGray : 'black' }}>
                         Following
                     </Text>
+                    <View style={{ marginTop: 10, width: '100%', height: 1, backgroundColor: isFollowers ? colors.loginGray : 'black' }} />
+
                 </TouchableOpacity>
             </View>
             {users && <FlatList

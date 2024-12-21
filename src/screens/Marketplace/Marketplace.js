@@ -10,14 +10,14 @@ import ForYou from './MarketplaceLists/ForYou'
 import Friends from './MarketplaceLists/Friends'
 import Sell from './MarketplaceLists/Sell'
 import Search from './MarketplaceLists/Search'
-import { MapPin, Plus } from "phosphor-react-native";
+import { Eyeglasses, MagnifyingGlass, MapPin, Plus } from "phosphor-react-native";
 import ListingsListSkeletonLoaderFull from "../../components/ListingsListSkeletonLoaderFull";
 import { useFocusEffect } from "@react-navigation/native";
 
 
 // how many items we fetch at a time
 // this is obviously terrible but makes it easy to see lol
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 10;
 
 const Marketplace = ({ navigation }) => {
     // TODO refactor for clarity
@@ -36,6 +36,7 @@ const Marketplace = ({ navigation }) => {
 
     const db = getFirestore();
 
+    // this is bad
     useFocusEffect(() => {
         fetchListings(true);
     }) // db shouldnt change but just in case
@@ -94,8 +95,6 @@ const Marketplace = ({ navigation }) => {
         }
     };
 
-
-
     const onRefresh = () => {
         fetchListings(true)
     }
@@ -112,11 +111,6 @@ const Marketplace = ({ navigation }) => {
     }
 
     const renderSelectedOption = () => {
-        // NOTE:
-        // just pass in undefined to test the empty case
-        // this will throw an error for now
-        // TODO: we should pass in empty listing for Friends?
-        //  querying here or querying on Friends screen and then passing it in?
         switch (selectedOption) {
             case 'foryou':
                 return <ForYou
@@ -131,8 +125,8 @@ const Marketplace = ({ navigation }) => {
                 return <Friends navigation={navigation} />
             case 'sell':
                 return <Sell activeListings={listings} navigation={navigation} />
-            case 'search':
-                return <Search navigation={navigation} />
+            // case 'search':
+            //     return <Search navigation={navigation} />
             default:
                 return <Text>Oops! Option not found.</Text>
         }
@@ -142,43 +136,53 @@ const Marketplace = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.upperContainer}>
+            <View style={styles.topBarContainer}>
 
-                {/* top menu bar */}
+                <View style={styles.topBarLeft}>
+                    {/* for you */}
+                    <TouchableOpacity style={[
+                        styles.titleContainer,
+                        selectedOption === 'foryou' && styles.selectedTitle
+                    ]}
+                        onPress={() => setSelectedOption('foryou')}
+
+                    >
+                        <Text style={[styles.titleText, { color: selectedOption === "foryou" ? 'black' : colors.accentGray }]} >
+                            For you
+                        </Text>
+                    </TouchableOpacity>
+
+                    {/* friends */}
+                    <TouchableOpacity style={[
+                        styles.titleContainer,
+                        selectedOption === 'friends' && styles.selectedTitle
+                    ]}
+                        onPress={() => setSelectedOption('friends')}
+                    >
+
+                        <Text style={[styles.titleText, { color: selectedOption === "friends" ? 'black' : colors.accentGray }]}>
+                            Friends
+                        </Text>
+                    </TouchableOpacity>
+
+                    {/* sell */}
+                    <TouchableOpacity style={[
+                        styles.titleContainer,
+                        selectedOption === 'sell' && styles.selectedTitle
+                    ]}
+                        onPress={() => setSelectedOption('sell')}
+                    >
+                        <Text style={[styles.titleText, { color: selectedOption === "sell" ? 'black' : colors.accentGray }]}>
+                            Sell
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
                 <TouchableOpacity
-                    onPress={() => setSelectedOption('foryou')}
-                    style={[selectedOption === 'foryou' && styles.shadow, styles.topTitle]}>
-
-                    {/* style={{ marginRight: 45, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, padding: 6, paddingHorizontal: 14, }}> */}
-                    <Text style={styles.tabTextStyle}>
-                        For you
-                    </Text>
+                    onPress={() => navigation.navigate('Search')}
+                >
+                    <MagnifyingGlass />
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setSelectedOption('friends')}
-                    style={[selectedOption === 'friends' && styles.shadow, styles.topTitle]}>
-                    <Text style={styles.tabTextStyle}>
-                        Friends
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setSelectedOption('sell')}
-                    style={[selectedOption === 'sell' && styles.shadow, styles.topTitle]}>
-                    <Text style={styles.tabTextStyle}>
-                        Sell
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => setSelectedOption('search')}
-                    style={[selectedOption === 'search' && styles.shadow, styles.topTitle]}>
-
-                    <Ionicons name="search" size={30} color="#000" />
-                </TouchableOpacity>
-
-
             </View>
 
 
@@ -226,6 +230,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '90%',
         flexDirection: 'row',
+        marginBottom: 12,
+        marginTop: 16,
     },
     iconPlaceholder: {
         width: 30,
@@ -236,15 +242,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'inter',
     },
-    upperContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '90%',
-        marginTop: 20,
-        marginBottom: 16,
-        justifyContent: 'space-between',
-    },
+
     shadow: {
         shadowColor: colors.loginBlue,
         shadowOffset: {
@@ -254,16 +252,55 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.4,
         shadowRadius: 8,
         elevation: 8,
-        paddingHorizontal: 16, // this is an expirement
+        paddingHorizontal: 16,
 
     },
     topTitle: {
         backgroundColor: 'white',
         height: 36,
-        // paddingHorizontal: 10,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15
+    },
+    topBarContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        height: 40,
+        paddingLeft: 20,
+        paddingRight: 16,
+        marginTop: 4,
+        marginBottom: 16,
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderColor: colors.loginGray
+    },
+    topBarLeft: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        width: '75%',
+        height: '100%',
+        alignItems: 'center'
+    },
+    titleContainer: {
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        position: 'relative'
+    },
+    selectedTitle: {
+        borderBottomWidth: 1,
+        borderBottomColor: 'black'
+    },
+    titleText: {
+        fontSize: 16,
+        fontFamily: 'inter',
+        fontWeight: '500',
+        textAlign: 'center'
     }
+
 })

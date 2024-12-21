@@ -311,7 +311,7 @@ const Search = ({ navigation }) => {
                     setDisplayResults(false); // will hide results
                 }}
                 style={[styles.input, styles.shadow]}
-                placeholder="What are you looking for?"
+                placeholder="Search"
                 placeholderTextColor={colors.accentGray}
                 onSubmitEditing={() => handleSearch(query)}
                 returnKeyType="search" // gives us the blue button on keyboard
@@ -341,25 +341,26 @@ const Search = ({ navigation }) => {
 
 
             <View style={styles.iconContainer}>
-                {!displayResults && query && (
-                    <TouchableOpacity
-                        hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
-                        onPress={() => handleSearch(query)}>
-                        <Ionicons name="search" size={20} color={colors.loginBlue} />
-                    </TouchableOpacity>
-                )}
-
-                {displayResults && query && (
-                    <TouchableOpacity
-                        hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
-                        onPress={() => {
-                            // clear everything
-                            setSearchResults([])
-                            setQuery('')
-                            setDisplayResults(false)
-                        }}>
-                        <Ionicons name='close-circle-outline' size={20} color={colors.accentGray} />
-                    </TouchableOpacity>
+                {query && (
+                    <>
+                        {(!displayResults && listingsSelected) || (!displayUserSearchResults && !listingsSelected) ? (
+                            <TouchableOpacity
+                                onPress={() => handleSearch(query)}>
+                                <Ionicons name="search" size={20} color={colors.loginBlue} />
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setQuery('')
+                                    setSearchResults([])
+                                    setUserSearchResults([])
+                                    setDisplayResults(false)
+                                    setDisplayUserSearchResults(false)
+                                }}>
+                                <Ionicons name='close-circle-outline' size={20} color={colors.accentGray} />
+                            </TouchableOpacity>
+                        )}
+                    </>
                 )}
             </View>
 
@@ -390,28 +391,32 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '98%',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        marginTop: 4
     },
     input: {
         height: 40,
         paddingHorizontal: 16,
         backgroundColor: "#fff",
-        borderRadius: 10,
+        borderRadius: 15,
         marginBottom: 16,
         width: '95%',
         alignSelf: 'center',
         paddingRight: 40, // space for the icon
+        borderWidth: 1,
+        backgroundColor: colors.mediumGray,
+        borderColor: colors.accentGray
     },
-    shadow: {
-        shadowColor: colors.loginBlue,
-        shadowOffset: {
-            width: 0,
-            height: 0,
-        },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 8,
-    },
+    // shadow: {
+    //     shadowColor: colors.loginBlue,
+    //     shadowOffset: {
+    //         width: 0,
+    //         height: 0,
+    //     },
+    //     shadowOpacity: 0.3,
+    //     shadowRadius: 4,
+    //     elevation: 8,
+    // },
     sectionHeader: {
         fontSize: 18,
         fontWeight: "500",

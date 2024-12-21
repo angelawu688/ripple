@@ -24,15 +24,12 @@ const Sell = ({ navigation }) => {
         }, [userListings])
     );
 
-
-
-
     return (
         <View style={styles.container}>
 
             <TouchableOpacity onPress={() => navigation.navigate('CreateListing')}
-                style={[styles.shadow, styles.topTitle]}>
-                <Text style={{ fontFamily: 'inter', fontSize: 16 }}>
+                style={styles.topTitle}>
+                <Text style={{ fontFamily: 'inter', fontSize: 18, color: 'white', fontWeight: '500' }}>
                     Create listing
                 </Text>
             </TouchableOpacity>
@@ -73,12 +70,12 @@ const styles = StyleSheet.create({
         elevation: 8,
     },
     topTitle: {
-        backgroundColor: 'white',
-        height: 36,
+        backgroundColor: colors.loginBlue,
+        height: 45,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 15,
+        borderRadius: 25,
         marginBottom: 12
     },
     textContainer: {

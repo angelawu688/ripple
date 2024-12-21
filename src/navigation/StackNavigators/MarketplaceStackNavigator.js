@@ -11,6 +11,7 @@ import CreateListing from "../../screens/Marketplace/MarketplaceLists/CreateList
 import UserProfile from "../../screens/Marketplace/UserProfile";
 import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
 import { DotsThree } from "phosphor-react-native";
+import Search from "../../screens/Marketplace/MarketplaceLists/Search";
 
 const MarketplaceStack = createNativeStackNavigator();
 
@@ -40,6 +41,22 @@ const MarketplaceStackNavigator = () => {
                     ),
 
                 }}
+            />
+
+            <MarketplaceStack.Screen
+                name="Search"
+                component={Search}
+                options={({ navigation }) => ({
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+
+                })}
             />
 
             {/* ensure that userID is passed in as a prop */}
@@ -106,7 +123,7 @@ const MarketplaceStackNavigator = () => {
                     )
                 })}
             />
-        </MarketplaceStack.Navigator>
+        </MarketplaceStack.Navigator >
     )
 }
 

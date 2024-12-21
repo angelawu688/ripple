@@ -364,7 +364,6 @@ const CreateListing = ({ navigation }) => {
                                 onPress={() => handleCreatePost()}
                                 style={[
                                     styles.publishButton,
-                                    styles.publishShadow,
                                     errorMessage && { borderWidth: 1, borderColor: 'red' },
                                     title && price && photos.length > 0 && styles.publishButtonReady]}
                             >
@@ -474,10 +473,13 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: colors.accentGray
     },
     publishButtonReady: {
-        backgroundColor: colors.neonBlue,
+        backgroundColor: colors.loginBlue,
+        borderWidth: 0,
     },
     errorContainer: {
         width: '100%',
