@@ -62,7 +62,6 @@ const RootComponent = () => {
     const handleRegisterForPushNotificationsAsync = async () => {
       if (!isLoading && user) {
         const token = await registerForPushNotificationsAsync(user.uid);
-        console.log(token)
       }
     }
     handleRegisterForPushNotificationsAsync()
