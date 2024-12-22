@@ -14,7 +14,14 @@ const Sell = ({ navigation }) => {
 
     useFocusEffect(
         useCallback(() => {
-            setActiveListings(userListings.filter((listing) => listing.sold !== true))
+            // setActiveListings(userListings.filter((listing) => listing.sold !== true))
+            const sortedListings = userListings
+                .filter((listing) => listing.sold !== true)
+                .sort((a, b) => {
+                    return b.createdAt - a.createdAt
+                });
+
+            setActiveListings(sortedListings);
 
 
             // empty cleanup function
