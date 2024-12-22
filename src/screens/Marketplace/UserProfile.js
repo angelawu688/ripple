@@ -30,8 +30,6 @@ import ShareModal from "../../components/ShareModal";
 import { useFocusEffect } from "@react-navigation/native";
 import { ToastContext } from "../../context/ToastContext";
 
-
-
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
     const { showToast } = useContext(ToastContext);
@@ -489,7 +487,9 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 {
                     userPosts && userPosts.length > 0 ? (userPosts.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
                         <ListingCard listing={userPosts[0]} />
-                    </View>) : (<View style={{ flex: 1 }}>
+                    </View>) : (<View style={{
+                        width: '100%',
+                    }}>
                         <ListingsList listings={userPosts} navigation={navigation} scrollEnabled={false} />
                     </View>)
 

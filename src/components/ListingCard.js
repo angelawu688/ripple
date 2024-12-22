@@ -18,6 +18,15 @@ const ListingCard = ({ listing }) => {
     }
     const { price, title, sold } = listing;
     const firstImage = listing?.photos[0]
+    const photoUrl = typeof firstImage === 'object'
+        ? {
+            uri: firstImage.card,
+            placeholder: firstImage.thumbnail // use the thumbnail
+        }
+        : { uri: firstImage }; // fallback to single image
+
+
+
     // const [img, setImg] = useState(undefined)
     // ensuring that we dont try to render images that are undefined
     // ie if photos is undefined, we cant get photos[0]
@@ -33,11 +42,11 @@ const ListingCard = ({ listing }) => {
             <View style={{ borderRadius: 12, width: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#F2F0F0' }}>
                 {listing?.photos[0] ? (
                     <Image
-                        source={{ uri: firstImage }}
+                        source={{ uri: firstImage.card ? firstImage.card : firstImage }}
                         recyclingKey={firstImage}
                         cachePolicy="memory-disk"
-                        thumbnailSource={{ uri: firstImage + '?w=50' }}
                         transition={200}
+                        placeholder={photoUrl.placeholder ? { uri: photoUrl.placeholder } : undefined}
                         style={{ width: '100%', aspectRatio: 1, borderRadius: 10 }}
                         // these two are used together
                         contentFit="cover"

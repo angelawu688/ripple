@@ -53,7 +53,7 @@ export default Sell
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: '94%',
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
@@ -76,7 +76,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 25,
-        marginBottom: 12
+        marginBottom: 12,
+        marginHorizontal: 12,
     },
     textContainer: {
         justifyContent: 'center',

@@ -7,18 +7,6 @@ import ListingCard from '../../components/ListingCard'
 import ListingsList from '../../components/ListingsList'
 
 const YourListings = ({ navigation }) => {
-    const testListings = [
-        // { id: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        // { id: 2, img: undefined, title: 'Notebook', price: 2, sold: true },
-        // { id: 7, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        // { id: 3, img: undefined, title: 'Notebook', price: 2, sold: true },
-        // { id: 8, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        // { id: 4, img: undefined, title: 'Notebook', price: 2, sold: true },
-        // { id: 9, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        // { id: 5, img: undefined, title: 'Notebook', price: 2, sold: true },
-        // { id: 10, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-        // { id: 6, img: undefined, title: 'Notebook', price: 2, sold: true },
-    ]
     const { userListings } = useContext(userContext)
     const [yourListings, setYourListings] = useState([])
     const [activeListings, setActiveListings] = useState([])
@@ -26,8 +14,6 @@ const YourListings = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true)
 
 
-    // uncomment for real
-    // TODO update user context when you post something 
     useEffect(() => {
         setIsLoading(true)
         try {
@@ -91,14 +77,6 @@ const YourListings = ({ navigation }) => {
 
         </ScrollView>
     )
-
-
-    return (
-        <ListingsList
-            navigation={navigation}
-            listings={yourListings}
-        />
-    )
 }
 
 export default YourListings;
@@ -109,7 +87,7 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     contentContainer: {
-        padding: 10,
+        paddingHorizontal: 1,
         alignItems: 'center',
     },
     text: {
@@ -119,7 +97,7 @@ const styles = StyleSheet.create({
         marginVertical: 16,
         textAlign: 'left',
         alignSelf: 'flex-start',
-        marginLeft: 8
+        marginLeft: 24
     },
     emptyContainer: {
         width: '100%',

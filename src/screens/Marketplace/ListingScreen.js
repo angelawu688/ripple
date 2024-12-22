@@ -331,14 +331,12 @@ const ListingScreen = ({ navigation, route }) => {
             contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
             style={{ width: '100%', paddingBottom: 50 }}
         >
-            <PhotoCarousel photos={listing.photos} sold={postSold} />
-
-
+            <PhotoCarousel photos={listing.photos} sold={postSold} isOwnPost={isOwnPost} />
             {/* name, price, date */}
             <View style={styles.sectionContainer}>
                 <View style={{ width: '100%', display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
                     <Text numberOfLines={1}
-                        style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 22, marginTop: 0 }}>
+                        style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 22, }}>
                         {listing.title}
                     </Text>
                     <Text style={{ fontSize: 22, fontFamily: 'inter', marginTop: 0, fontWeight: '500', color: colors.loginBlue }}>
@@ -357,9 +355,7 @@ const ListingScreen = ({ navigation, route }) => {
                 <TouchableOpacity onPress={() => {
                     navigation.navigate('UserProfile', { userID: sellerID })
                 }}
-
                     style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}>
-
                     {listing?.userPfp ? (
                         <Image
                             source={{ uri: listing.userPfp }}
@@ -633,11 +629,13 @@ const PhotoCarousel = ({ photos, sold }) => {
     const { width } = Dimensions.get("window");
     const [currentIndex, setCurrentIndex] = useState(0);
     const flatListRef = useRef(null);
+
     // styles up top to allow this to be moved if needed
     const carouselStyles = StyleSheet.create({
         container: {
-            flex: 1,
+            // flex: 1,
             justifyContent: "center",
+            height: width,
         },
         imageContainer: {
             width: width,
@@ -647,7 +645,7 @@ const PhotoCarousel = ({ photos, sold }) => {
         },
         indicatorContainer: {
             position: "absolute",
-            bottom: 35,
+            bottom: 15,
             flexDirection: "row",
             justifyContent: "center",
             alignSelf: "center",
@@ -691,12 +689,18 @@ const PhotoCarousel = ({ photos, sold }) => {
                 scrollEnabled={photos.length > 1} // wont scroll when only one photo
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => {
+                    let url = ''
+                    if (typeof item === 'object') {
+                        url = item.full
+                    } else {
+                        url = item
+                    }
                     return (
                         <View
                             style={{ height: width, width: width, alignSelf: 'center', justifyContent: 'center', }}
                         >
                             <Image
-                                source={{ uri: item }}
+                                source={{ uri: url }}
                                 style={{
                                     width: "100%",
                                     height: "100%",

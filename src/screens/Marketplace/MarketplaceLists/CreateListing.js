@@ -116,7 +116,7 @@ const CreateListing = ({ navigation }) => {
 
     const removePhoto = (uri) => {
         setPhotos(photos.filter(photoURI => photoURI !== uri));
-        // no backend update needed
+        // no backend update needed, havent been uploaded yet
     };
 
     const handleCreatePost = async () => {
@@ -144,7 +144,7 @@ const CreateListing = ({ navigation }) => {
                 description,
                 tags,
                 keywords: keywords,
-                photos: downloadURLS,
+                photos: downloadURLS, // now each one is {thumbnail, card, full}
                 userId: user.uid,
                 userName: userData.name,
                 userEmail: userData.email,
@@ -432,9 +432,9 @@ const styles = StyleSheet.create({
         borderColor: colors.accentGray
     },
     placeholderText: {
-        color: '#7E7E7E',
+        color: colors.accentGray,
         fontFamily: 'inter',
-        fontSize: 16
+        fontSize: 20,
     },
     middleInput: {
         width: '100%',

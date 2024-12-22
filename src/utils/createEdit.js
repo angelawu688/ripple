@@ -48,9 +48,11 @@ export const validateListing = (title, price, description, tags, photos, setErro
 export const uploadNewPhotos = async (photos, userId, listingID, setErrorMessage) => {
     const uploadPromises = photos.map(async (uri, index) => {
         try {
-            return await uploadListingImage(uri, userId, listingID, index);
+            const imageUrls = await uploadListingImage(uri, userId, listingID, index);
+            return imageUrls; // will be an object like { thumbnail: url, card: url, full: url }
         } catch (e) {
-            setErrorMessage(e?.message ? e.messsage : 'Image upload failed')
+            setErrorMessage(e?.message ? e.message : 'Image upload failed')
+            throw e; // Important to throw so Promise.all fails if any upload fails
         }
     });
     return await Promise.all(uploadPromises);
@@ -59,6 +61,8 @@ export const uploadNewPhotos = async (photos, userId, listingID, setErrorMessage
 
 // renders the image preview
 export const ImagePreview = ({ uri, removePhoto, imageSize }) => {
+    // const imageUri = typeof uri === 'object' ? uri.card : uri;
+
     return (
         <View style={{
             marginRight: 10,

@@ -67,22 +67,22 @@ const ListingsList = ({ listings,
 
                 // this allows us to customize the refresh spinner
                 // custom spinner is a lot harder––RN problem
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        tintColor={colors.loginBlue}
-                        colors={[colors.loginBlue, colors.loginBlue, colors.loginBlue]}
-                    />
-                }
+                // refreshControl={
+                //     <RefreshControl
+                //         refreshing={refreshing}
+                //         onRefresh={onRefresh}
+                //         tintColor={colors.loginBlue}
+                //         colors={[colors.loginBlue, colors.loginBlue, colors.loginBlue]}
+                //     />
+                // }
                 onEndReached={onEndReached}
                 onEndReachedThreshold={0.5}
                 ListFooterComponent={
                     <View style={{ width: 1, height: 20 }}>
                         {ListFooterComponent}
                     </View>
-
                 }
+
                 renderItem={renderItem} // memoized
                 keyExtractor={item => item.id} // use the conversationID as a key
 
@@ -93,13 +93,14 @@ const ListingsList = ({ listings,
                 // how many screens worth of content to render offscreen (maybe tune to 3)
                 // For a bigger windowSize, you will have more memory consumption. For a lower windowSize, you will have a bigger chance of seeing blank areas.
                 // DEFAULT IS 21
-                windowSize={3}
+                windowSize={4}
                 // how many items to render per batch           
-                maxToRenderPerBatch={4}
+                maxToRenderPerBatch={10}
                 // used to batch renders . Combine with maxToRenderPerBatch. default is 50ms, is the time gap between renders. 
                 updateCellsBatchingPeriod={50}
-                removeClippedSubviews={true} // basically removes the stuff off of the screen. Can help memory management
-                drawDistance={1600} // increases the amount of scroll. Might be a stupid amount
+            // might have bugs, per react native docs. Commented out for now
+            // removeClippedSubviews={true} // basically removes the stuff off of the screen. Can help memory management
+            // drawDistance={800} // increases the amount of scroll. Might be a stupid amount
 
             // estimatedListSize
 

@@ -27,12 +27,12 @@ const EditListing = ({ navigation, route }) => {
     // all of these are grabbed from the route params, not a database read. Also is immediate
     // cheaper, but if we are having issues with initialaztion that might be why
     const [photos, setPhotos] = useState(listing.photos || []) // array of photos
+    const originalPhotos = listing?.photos // track to compare final in order to delete
     const [tags, setTags] = useState(listing.tags || []) // array of tags
     const [title, setTitle] = useState(listing.title || '')
     const [price, setPrice] = useState(listing.price || 0)
     const [description, setDescription] = useState(listing.description || '')
     const [tagInput, setTagInput] = useState('')
-    const originalPhotos = listing?.photos // track to compare final in order to delete
 
 
     const [errorMessage, setErrorMessage] = useState('')
@@ -103,8 +103,6 @@ const EditListing = ({ navigation, route }) => {
             if (!result.canceled) {
                 const selectedImages = result.assets.map(asset => ({
                     uri: asset.uri,
-                    name: asset.fileName || `photo_${Date.now()}.jpg`,
-                    type: asset.type || 'image/jpeg',
                 }));
 
                 // frontend changes
@@ -126,16 +124,58 @@ const EditListing = ({ navigation, route }) => {
     };
 
     // removes a photo from the DB then updates the UI
-    const removePhoto = async (uri) => {
+    const removePhoto = async (photoData) => {
         try {
             setErrorMessage('')
-            // do we need loading state?
-            const fileName = uri.split('/').pop().split('?')[0]; // Extract file name from URI
-            const photoRef = decodeURIComponent(`${fileName}`);
-            await deleteImageFromDB(photoRef);
+            if (typeof photoData === 'object' && photoData.card) {
+                // 1. Delete from storage
+                const urls = [photoData.thumbnail, photoData.card, photoData.full];
+                for (const url of urls) {
+                    const fileName = decodeURIComponent(url.split('/').pop().split('?')[0]);
+                    await deleteImageFromDB(fileName);
+                }
 
-            // update UI after successful image deletion
-            setPhotos(photos.filter(photoURI => photoURI !== uri));
+                // 2. Update local state
+                setPhotos((prevPhotos) => prevPhotos.filter((photo) => {
+                    if (typeof photo === 'object' && photo.card) {
+                        const currentFileName = decodeURIComponent(photo.card.split('?')[0].split('/').pop());
+                        const fileNameToRemove = decodeURIComponent(photoData.card.split('?')[0].split('/').pop());
+                        return currentFileName !== fileNameToRemove;
+                    }
+                    return true; // keep any string-based entries
+                }));
+            } else if (typeof photoData === 'string') {
+                // old format
+                const fileName = photoData.split('/').pop().split('?')[0];
+                const photoRef = decodeURIComponent(`${fileName}`);
+                await deleteImageFromDB(photoRef);
+                setPhotos(photos.filter(photo =>
+                    typeof photo === 'object'
+                        ? true
+                        : photo !== photoData
+                ));
+            }
+            // if (typeof photoData === 'object' && photoData.card) {
+            //     // if has the new format
+            //     const cardUrl = new URL(photoData.card);
+            //     const fileName = cardUrl.pathname.split('/').pop().split('?')[0];
+            //     const photoRef = decodeURIComponent(`${fileName}`);
+            //     await deleteImageFromDB(photoRef);
+            //     setPhotos(photos.filter(photo =>
+            //         typeof photo === 'object'
+            //             ? photo.card !== photoData.card
+            //             : photo !== photoData
+            //     ));
+            // } else if (typeof photoData === 'string') {
+            //     // old format
+            //     const fileName = uri.split('/').pop().split('?')[0]; // Extract file name from URI
+            //     const photoRef = decodeURIComponent(`${fileName}`);
+            //     await deleteImageFromDB(photoRef);
+
+            //     // update UI after successful image deletion
+            //     setPhotos(photos.filter(photoURI => photoURI !== uri));
+            // }
+            // do we need loading state?
             setChanges(true)
         } catch (e) {
             if (e.code === 'storage/object-not-found') {
@@ -159,22 +199,19 @@ const EditListing = ({ navigation, route }) => {
         setIsLoading(true)
         try {
             const db = getFirestore();
-            // figure out which ones of the photos are new
-            const newPhotos = photos.filter((photo) => !originalPhotos.includes(photo))
+            // find out which photos are new (strings) vs existing (objects)
+            const newPhotos = photos.filter(photo => typeof photo === 'string');
+            const existingPhotos = photos.filter(photo => typeof photo === 'object');
 
-            // figure out which ones are deleted/missing
-            const removedPhotos = originalPhotos.filter((photo) => !photos.includes(photo));
-
-            // upload new ones to storage
-            // by using Date.now() in upload, we avoid potential issues with overwrites
+            // upload new photos
             const uploadPromises = newPhotos.map(async (uri, index) => {
                 return await uploadListingImage(uri, user.uid, listingID, index);
             });
             const newPhotoURLs = await Promise.all(uploadPromises);
 
-            // prepare photos (old + new photos)
+            // combine new and old
             const finalPhotoURLs = [
-                ...originalPhotos.filter((photo) => !removedPhotos.includes(photo)),
+                ...existingPhotos,
                 ...newPhotoURLs,
             ];
 
@@ -259,9 +296,9 @@ const EditListing = ({ navigation, route }) => {
 
                             {/* photo preview and + icon */}
                             {photos.length >= 1 && <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 66 }}>
-                                {photos.map((uri, index) => {
+                                {photos.map((photo, index) => {
                                     return (
-                                        <ImagePreview key={index} uri={uri} imageSize={imageSize} removePhoto={removePhoto} />
+                                        <ImagePreview key={index} uri={typeof photo === 'string' ? photo : photo.card} imageSize={imageSize} removePhoto={removePhoto} />
                                     )
                                 })}
 
@@ -482,7 +519,7 @@ const styles = StyleSheet.create({
     placeholderText: {
         color: '#7E7E7E',
         fontFamily: 'inter',
-        fontSize: 16
+        fontSize: 20,
     },
     middleInput: {
         width: '100%',

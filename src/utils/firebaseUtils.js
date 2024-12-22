@@ -3,6 +3,8 @@ import { db, storage } from "../../firebaseConfig"
 import { getDownloadURL, ref, uploadBytesResumable, refFromURL, deleteObject } from 'firebase/storage'
 import { useContext } from "react";
 import { userContext } from "../context/UserContext";
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+
 
 
 
@@ -11,7 +13,10 @@ import { userContext } from "../context/UserContext";
 // the downloadURL that is returned here can be used in an image component
 export const uploadPFP = async (uri, userID) => {
     try {
-        const response = await fetch(uri);
+        // processing to just be around 500 wide instead of huge. Probably dont need a thumbnail
+        const processed = await compressImage(uri, 500, 0.8)
+
+        const response = await fetch(processed);
         const blob = await response.blob();
 
         // create ref and upload
@@ -40,27 +45,65 @@ export const uploadPFP = async (uri, userID) => {
 // will upload an image to the storage bucket, but it does it for 
 export const uploadListingImage = async (uri, userID, listingID, index) => {
     try {
-        // basically converts the uri to something that we can store in firebase
-        const response = await fetch(uri)
-        const blob = await response.blob()
+        // // basically converts the uri to something that we can store in firebase
+        // const response = await fetch(uri)
+        // const blob = await response.blob()
 
-        // create ref and upload
-        const storageRef = ref(storage, `listing-pictures/${userID}/${listingID}-${index}-${Date.now()}`);
-        const uploadTask = uploadBytesResumable(storageRef, blob);
+        // // create ref and upload
+        // const storageRef = ref(storage, `listing-pictures/${userID}/${listingID}-${index}-${Date.now()}`);
+        // const uploadTask = uploadBytesResumable(storageRef, blob);
 
-        // this will return the download URL
-        // we do it as a promise because the upload isnt instant
-        return new Promise((resolve, reject) => {
-            uploadTask.on(
-                "state_changed",
-                null,
-                (error) => reject(error),
-                async () => {
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    resolve(downloadURL);
-                }
+        // // this will return the download URL
+        // // we do it as a promise because the upload isnt instant
+        // return new Promise((resolve, reject) => {
+        //     uploadTask.on(
+        //         "state_changed",
+        //         null,
+        //         (error) => reject(error),
+        //         async () => {
+        //             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        //             resolve(downloadURL);
+        //         }
+        //     );
+        // });
+
+        // process all 3 of the images
+        const processedImages = await processImage(uri);
+
+        // uploiad all of them to firebase
+        const uploadPromises = Object.entries(processedImages).map(async ([size, imageUri]) => {
+            const response = await fetch(imageUri);
+            const blob = await response.blob();
+
+            // put the size in the storage path
+            const storageRef = ref(
+                storage,
+                `listing-pictures/${userID}/${listingID}-${index}-${size}-${Date.now()}`
             );
+
+            const uploadTask = uploadBytesResumable(storageRef, blob);
+
+            return new Promise((resolve, reject) => {
+                uploadTask.on(
+                    "state_changed",
+                    null,
+                    (error) => reject(error),
+                    async () => {
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                        resolve({ [size]: downloadURL });
+                    }
+                );
+            });
         });
+
+        // await all the uploads
+        const results = await Promise.all(uploadPromises);
+
+        // combine all back into one object
+        const imageUrls = {};
+        results.forEach(result => Object.assign(imageUrls, result));
+        return imageUrls;
+
     } catch (e) {
         console.log(e)
         throw e
@@ -70,10 +113,14 @@ export const uploadListingImage = async (uri, userID, listingID, index) => {
 // will download an image to the messageID that we want
 export const uploadMessageImage = async (conversationId, imageUri, messageID) => {
     try {
+
+        // 
+        const processed = await compressImage(imageUri, 1000, 0.8)
+
         // Upload image to Firebase Storage
         const storageRef = ref(storage, `conversations/${conversationId}/${messageID}-${Date.now()}`);
 
-        const response = await fetch(imageUri);
+        const response = await fetch(processed);
         const blob = await response.blob();
 
         const uploadTask = uploadBytesResumable(storageRef, blob);
@@ -99,8 +146,15 @@ export const uploadMessageImage = async (conversationId, imageUri, messageID) =>
 
 // will delete an image from the DB
 export const deleteImageFromDB = async (photoRef) => {
-    const imageRef = ref(storage, photoRef);
-    await deleteObject(imageRef); // deletes from storage
+    try {
+        const imageRef = ref(storage, photoRef);
+        await deleteObject(imageRef); // deletes from storage
+    } catch (e) {
+        // console.error(e)
+        // throw e
+        // failed, but its fine
+    }
+
 };
 
 
@@ -420,4 +474,37 @@ export const deleteAccount = async (userID) => {
     // basically like they dissapeared without a trace
     console.log('account (not) deleted')
     setUser(null)
+}
+
+
+export const compressImage = async (uri, width = 500, quality = 0.8) => {
+    try {
+        const manipResult = await manipulateAsync(
+            uri,
+            [{ resize: { width: width } }],
+            { compress: quality, format: SaveFormat.JPEG }
+        );
+        return manipResult.uri;
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
+}
+
+
+export const processImage = async (uri) => {
+    try {
+        const thumbnail = await compressImage(uri, 50, 0.5)
+        const card = await compressImage(uri, 500, 0.8)
+        const full = await compressImage(uri, 1000, 0.8)
+        return {
+            thumbnail,
+            card,
+            full
+        };
+    } catch (e) {
+        console.error(e)
+        throw e
+    }
+
 }
