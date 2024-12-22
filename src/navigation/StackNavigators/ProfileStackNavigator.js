@@ -187,14 +187,14 @@ const ProfileStackNavigator = () => {
                 component={UserProfile}
                 options={({ navigation }) => ({
                     // headerShown: false
-                    // headerTitle: () => (
-                    //     <Logo />
-                    // ),
-                    // headerLeft: () => (
-                    //     <TouchableOpacity onPress={() => navigation.goBack()}>
-                    //         <Ionicons name="chevron-back" size={24} color="#000" />
-                    //     </TouchableOpacity>
-                    // )
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
                 })}
             />
 

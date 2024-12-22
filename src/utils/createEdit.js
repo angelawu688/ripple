@@ -61,7 +61,8 @@ export const uploadNewPhotos = async (photos, userId, listingID, setErrorMessage
 
 // renders the image preview
 export const ImagePreview = ({ uri, removePhoto, imageSize }) => {
-    // const imageUri = typeof uri === 'object' ? uri.card : uri;
+    const imageUri = typeof uri === 'object' ? uri.card : uri;
+    console.log('imguri', imageUri)
 
     return (
         <View style={{
@@ -77,7 +78,7 @@ export const ImagePreview = ({ uri, removePhoto, imageSize }) => {
                 onPress={() => removePhoto(uri)}>
                 <MinusCircle weight="fill" color={colors.loginBlue} size={30} />
             </TouchableOpacity>
-            <Image source={{ uri }} style={{
+            <Image source={{ uri: imageUri }} style={{
                 width: imageSize, height: imageSize, borderRadius: 8, borderWidth: 1, borderColor: 'lightgray'
             }} />
         </View>

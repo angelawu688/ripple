@@ -1,9 +1,10 @@
 import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where, deleteDoc } from "firebase/firestore";
-import { db, storage } from "../../firebaseConfig"
+import { auth, db, storage } from "../../firebaseConfig"
 import { getDownloadURL, ref, uploadBytesResumable, refFromURL, deleteObject } from 'firebase/storage'
 import { useContext } from "react";
 import { userContext } from "../context/UserContext";
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { signOut } from "firebase/auth";
 
 
 
@@ -463,17 +464,28 @@ export const updateAllSaved = async (listingID, listingTitle, listingPrice, phot
 }
 
 // deletes the users account and references to it
-export const deleteAccount = async (userID) => {
-    const { user, setUser } = useContext(userContext)
+export const deleteAccount = async (userID, setUser) => {
+    try {
+        console.log('delete account called')
+        // delete the user document (triggers cloud function to delete the rest)
+        // Reference to the user's document
+        const userRef = doc(db, "users", userID);
 
-    // delete all images from storage
-    // delete all saved posts
-    // delete all messages ? 
-    // delete the actual user profile document
+        // Delete the user's document
+        await deleteDoc(userRef);
+        console.log("User document deleted");
 
-    // basically like they dissapeared without a trace
-    console.log('account (not) deleted')
-    setUser(null)
+        // Sign out the user
+        await signOut(auth);
+        console.log("Signed out");
+
+        // loccl state
+        setUser(null);
+        console.log('account deleted')
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        throw error;
+    }
 }
 
 

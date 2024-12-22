@@ -48,7 +48,15 @@ const Profile = ({ navigation }) => {
                 },
                 {
                     text: 'Delete Account',
-                    onPress: () => deleteAccount(user.uid),
+                    onPress: async () => {
+                        try {
+                            console.log('delete account actually being called')
+                            await deleteAccount(user.uid, setUser)
+                            console.log('delete account actually being called')
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    },
                     style: 'destructive'
                 }
             ]
@@ -193,7 +201,10 @@ const Profile = ({ navigation }) => {
 
                 <TouchableOpacity
                     style={styles.profileCard}
-                    onPress={(() => handleDeleteAccount())}
+                    onPress={(() => {
+                        console.log('handle delete account being called')
+                        handleDeleteAccount()
+                    })}
                 >
                     <View style={styles.profileCardLeft}>
                         <Ionicons name={'trash-outline'} size={24} color={'black'} style={styles.icon} />

@@ -124,26 +124,27 @@ const EditListing = ({ navigation, route }) => {
     };
 
     // removes a photo from the DB then updates the UI
+    // issue is that if they go back, then the image will be deleted, but we keep the url stored. Full image is stored
+    // 
     const removePhoto = async (photoData) => {
         try {
+            console.log('photo', photoData)
             setErrorMessage('')
             if (typeof photoData === 'object' && photoData.card) {
                 // 1. Delete from storage
                 const urls = [photoData.thumbnail, photoData.card, photoData.full];
                 for (const url of urls) {
                     const fileName = decodeURIComponent(url.split('/').pop().split('?')[0]);
+                    console.log('fname', fileName)
                     await deleteImageFromDB(fileName);
                 }
 
                 // 2. Update local state
-                setPhotos((prevPhotos) => prevPhotos.filter((photo) => {
-                    if (typeof photo === 'object' && photo.card) {
-                        const currentFileName = decodeURIComponent(photo.card.split('?')[0].split('/').pop());
-                        const fileNameToRemove = decodeURIComponent(photoData.card.split('?')[0].split('/').pop());
-                        return currentFileName !== fileNameToRemove;
-                    }
-                    return true; // keep any string-based entries
-                }));
+
+                // okay so we just edle
+                setPhotos((prevPhotos) => prevPhotos.filter((photo) => (
+                    photo.thumbnail != photoData.thumbnail
+                )))
             } else if (typeof photoData === 'string') {
                 // old format
                 const fileName = photoData.split('/').pop().split('?')[0];
@@ -298,7 +299,7 @@ const EditListing = ({ navigation, route }) => {
                             {photos.length >= 1 && <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 66 }}>
                                 {photos.map((photo, index) => {
                                     return (
-                                        <ImagePreview key={index} uri={typeof photo === 'string' ? photo : photo.card} imageSize={imageSize} removePhoto={removePhoto} />
+                                        <ImagePreview key={index} uri={typeof photo === 'string' ? photo : photo} imageSize={imageSize} removePhoto={removePhoto} />
                                     )
                                 })}
 

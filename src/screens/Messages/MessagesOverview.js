@@ -129,7 +129,7 @@ const MessagesOverview = ({ navigation }) => {
                                     name={otherUserDetails?.name || "User"}
                                     lastMessage={item.lastMessage}
                                     lastSentAt={item.timestamp}
-                                    isUnread={!item.lastMessageReadBy || item.lastMessageReadBy !== user.uid} // style conditionally based on if its unread
+                                    unread={!item.lastMessageReadBy || item.lastMessageReadBy !== user.uid} // style conditionally based on if its unread
                                 />
                             </TouchableOpacity>
                         )
