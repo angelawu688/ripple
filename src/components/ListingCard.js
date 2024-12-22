@@ -1,32 +1,47 @@
 import { View, Text } from 'react-native'
 import { Image } from 'expo-image'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { colors } from '../colors';
 import { MotiView } from 'moti';
+import { Dimensions } from 'react-native';
+
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const ITEM_WIDTH = (SCREEN_WIDTH - 6) / 2; // accounting for the gaps
+const ITEM_HEIGHT = ITEM_WIDTH + 50; // adding extra height for the text
+
+
 
 const ListingCard = ({ listing }) => {
     if (!listing) {
         return null;
     }
-    const sold = listing.sold;
-    const { price, title } = listing;
-    const [img, setImg] = useState(undefined)
+    const { price, title, sold } = listing;
+    const firstImage = listing?.photos[0]
+    // const [img, setImg] = useState(undefined)
     // ensuring that we dont try to render images that are undefined
     // ie if photos is undefined, we cant get photos[0]
-    useEffect(() => {
-        if (listing?.photos?.length > 0) {
-            setImg(listing.photos[0])
-        }
-    }, [listing])
+    // useEffect(() => {
+    //     if (listing?.photos?.length > 0) {
+    //         setImg(listing.photos[0])
+    //     }
+    // }, [listing])
 
     return (
         <View
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', marginBottom: 15 }}>
             <View style={{ borderRadius: 12, width: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#F2F0F0' }}>
-                {img ? (
+                {listing?.photos[0] ? (
                     <Image
-                        source={{ uri: img }}
+                        source={{ uri: firstImage }}
+                        recyclingKey={firstImage}
+                        cachePolicy="memory-disk"
+                        thumbnailSource={{ uri: firstImage + '?w=50' }}
+                        transition={200}
                         style={{ width: '100%', aspectRatio: 1, borderRadius: 10 }}
+                        // these two are used together
+                        contentFit="cover"
+                        contentPosition="center"
 
                     />) : (<View
                         style={{ width: '100%', aspectRatio: 1, }}
@@ -61,4 +76,4 @@ const ListingCard = ({ listing }) => {
 }
 
 
-export default ListingCard;
+export default memo(ListingCard);

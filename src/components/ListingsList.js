@@ -1,9 +1,11 @@
 import { FlatList, View, Text, TouchableOpacity, StyleSheet, RefreshControl } from "react-native"
 import ListingCard from "./ListingCard"
 import { colorKeys, MotiView } from 'moti';
-import { useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { userContext } from "../context/UserContext";
 import { colors } from "../colors";
+import { FlashList } from '@shopify/flash-list'
+import { Dimensions } from "react-native";
 
 
 
@@ -22,56 +24,87 @@ const ListingsList = ({ listings,
         return null
     }
 
-    return (
-        <FlatList
-            style={styles.container}
-            columnWrapperStyle={styles.column}
-            ListHeaderComponent={null} // blank for now, this is where a header would go.
-            numColumns={2} // this is how we put them side by side
-            data={listings}
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={scrollEnabled}
 
-            // this allows us to customize the refresh spinner
-            // custom spinner is a lot harder––RN problem
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    tintColor={colors.loginBlue}
-                    colors={[colors.loginBlue, colors.loginBlue, colors.loginBlue]}
+    const renderItem = useCallback(async ({ item }) => {
+        return (
+            <TouchableOpacity
+                disabled={item.sold && user.uid !== item.userId}
+                onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
+                style={{ flex: 1, padding: 1 }}
+            >
+                <ListingCard
+                    listing={item}
                 />
-            }
+            </TouchableOpacity>
+        )
+    })
+
+    return (
+        <View style={{ flex: 1, width: '100%' }}>
 
 
-            onEndReached={onEndReached}
-            onEndReachedThreshold={0.5}
+            <FlashList
+                // contentContainerStyle={styles.container}
+                // estimatedListSize={{
+                //     height: Dimensions.get('window').height,
+                //     width: Dimensions.get('window').width,
+                // }}
+                estimatedItemSize={200} // need this for flashlist to work
+                // styling in flashList
+                contentContainerStyle={{
+                    padding: 2, // pad the whole list
+                }}
+                columnWrapperStyle={{
+                    gap: 2, // space between listings
+                    paddingHorizontal: 2, // gap
+                }}
+                numColumns={2}
+                ListHeaderComponent={null} // blank for now, this is where a header would go.
 
-            ListFooterComponent={
-                <View style={{ width: 1, height: 20 }}>
-                    {ListFooterComponent}
-                </View>
+                data={listings}
+                showsVerticalScrollIndicator={false}
+                scrollEnabled={scrollEnabled}
 
-            }
+                // this allows us to customize the refresh spinner
+                // custom spinner is a lot harder––RN problem
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={colors.loginBlue}
+                        colors={[colors.loginBlue, colors.loginBlue, colors.loginBlue]}
+                    />
+                }
+                onEndReached={onEndReached}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={
+                    <View style={{ width: 1, height: 20 }}>
+                        {ListFooterComponent}
+                    </View>
 
+                }
+                renderItem={renderItem} // memoized
+                keyExtractor={item => item.id} // use the conversationID as a key
 
-            keyExtractor={item => item.id} // use the conversationID as a key
-            // this is where we will put the handling to load more
-            renderItem={({ item }) => { // note: need to keep as "items", we are just renaming it to be clear
-                return (
-                    <TouchableOpacity
-                        disabled={item.sold && user.uid !== item.userId}
-                        onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
-                        style={{ width: '49.75%' }}
-                    >
-                        <ListingCard
-                            listing={item}
-                        />
+                // OPTIMIZATIONS
+                // Define precise number of items that would cover the screen for every device. This can be a big performance boost for the initial render.
+                initialNumToRender={6}       // how many items to render initially
 
-                    </TouchableOpacity>
-                )
-            }}
-        />
+                // how many screens worth of content to render offscreen (maybe tune to 3)
+                // For a bigger windowSize, you will have more memory consumption. For a lower windowSize, you will have a bigger chance of seeing blank areas.
+                // DEFAULT IS 21
+                windowSize={3}
+                // how many items to render per batch           
+                maxToRenderPerBatch={4}
+                // used to batch renders . Combine with maxToRenderPerBatch. default is 50ms, is the time gap between renders. 
+                updateCellsBatchingPeriod={50}
+                removeClippedSubviews={true} // basically removes the stuff off of the screen. Can help memory management
+                drawDistance={1600} // increases the amount of scroll. Might be a stupid amount
+
+            // estimatedListSize
+
+            />
+        </View>
     )
 }
 
@@ -79,11 +112,11 @@ export default ListingsList;
 
 const styles = StyleSheet.create({
     container: {
-        width: '99%',
-        alignSelf: 'center',
+        paddingHorizontal: 1,
+        backgroundColor: 'green',
     },
     skeletonCard: {
-        width: '49.75%'
+        width: '100%'
     },
     column: {
         justifyContent: 'space-between',

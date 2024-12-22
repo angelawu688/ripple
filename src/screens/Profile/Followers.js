@@ -104,7 +104,7 @@ export default function Followers({ navigation, route }) {
 
                     return (
                         <View
-                            key={`user-${userID}`}
+                            key={`user-${userID}-${index}`}
                             style={{ height: 60, width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}
                         >
                             <TouchableOpacity
@@ -186,7 +186,7 @@ export default function Followers({ navigation, route }) {
                         </View>
                     )
                 }}
-                keyExtractor={(item, index) => isFollowers ? item.followers_id : item.following_id}
+                keyExtractor={(item, index) => isFollowers ? item.follower_id : item.following_id}
 
             />}
 
