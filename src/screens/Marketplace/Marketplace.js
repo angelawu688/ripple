@@ -442,7 +442,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         position: 'relative',
-        backgroundColor: 'orange'
     },
     selectedTitle: {
         borderBottomWidth: 1,
