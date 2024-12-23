@@ -86,8 +86,11 @@ const MessagesOverview = ({ navigation }) => {
             {/* checking for conversations is a redundant check */}
             {!conversations || conversations.length === 0 ? (
                 <View style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '90%' }}>
-                    <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
-                        Start a conversation!
+                    <Text style={{ fontWeight: '600', fontFamily: 'inter', fontSize: 24 }}>
+                        No messages
+                    </Text>
+                    <Text style={{ fontWeight: '400', fontFamily: 'inter', fontSize: 16, marginTop: 4 }}>
+                        Visit other users's profiles to message them
                     </Text>
                 </View>
             ) : (

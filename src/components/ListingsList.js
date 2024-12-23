@@ -25,7 +25,7 @@ const ListingsList = ({ listings,
     }
 
 
-    const renderItem = useCallback(async ({ item }) => {
+    const renderItem = useCallback(({ item }) => {
         return (
             <TouchableOpacity
                 disabled={item.sold && user.uid !== item.userId}
@@ -49,7 +49,11 @@ const ListingsList = ({ listings,
                 //     height: Dimensions.get('window').height,
                 //     width: Dimensions.get('window').width,
                 // }}
-                estimatedItemSize={200} // need this for flashlist to work
+                // estimatedItemSize={200} // need this for flashlist to work
+                estimatedListSize={{
+                    height: Dimensions.get('window').height,
+                    width: Dimensions.get('window').width
+                }}
                 // styling in flashList
                 contentContainerStyle={{
                     padding: 2, // pad the whole list
@@ -76,9 +80,9 @@ const ListingsList = ({ listings,
                 //     />
                 // }
                 onEndReached={onEndReached}
-                onEndReachedThreshold={0.5}
+                onEndReachedThreshold={0.2}
                 ListFooterComponent={
-                    <View style={{ width: 1, height: 20 }}>
+                    <View style={{ width: 1, height: 50 }}>
                         {ListFooterComponent}
                     </View>
                 }

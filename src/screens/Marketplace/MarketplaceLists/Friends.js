@@ -117,27 +117,6 @@ const Friends = ({ navigation }) => {
             <ListingsList navigation={navigation} listings={friendsListings} />
         )
     }
-
-    // // empty
-    // if (friendsListings?.length === 0 && !isLoading) {
-    //     return (
-    //         <View style={styles.emptyContainer}>
-    //             <Text style={styles.title}>
-    //                 Don't see any items?
-    //             </Text>
-    //             <Text style={styles.subTitle}>
-    //                 Your friend's listings will appear here
-    //             </Text>
-    //             <TouchableOpacity onPress={() => shareProfile()}
-
-    //                 style={[styles.shadow, styles.button]}>
-    //                 <Text style={[styles.title,]}>
-    //                     Share profile
-    //                 </Text>
-    //             </TouchableOpacity>
-    //         </View>
-    //     )
-    // }
 }
 
 export default Friends

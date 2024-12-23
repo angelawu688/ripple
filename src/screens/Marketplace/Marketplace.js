@@ -3,13 +3,16 @@ import { getFirestore, where, setDoc, collection, query, orderBy, getDocs, limit
 
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../colors'
-import { useEffect, useState } from "react";
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
-import ListingCard from '../../components/ListingCard'
-import ForYou from './MarketplaceLists/ForYou'
-import Friends from './MarketplaceLists/Friends'
-import Sell from './MarketplaceLists/Sell'
-import Search from './MarketplaceLists/Search'
+
+const ForYou = lazy(() => import('./MarketplaceLists/ForYou'));
+const Friends = lazy(() => import('./MarketplaceLists/Friends'));
+const Sell = lazy(() => import('./MarketplaceLists/Sell'));
+// import ForYou from './MarketplaceLists/ForYou'
+// import Friends from './MarketplaceLists/Friends'
+// import Sell from './MarketplaceLists/Sell'
+// import Search from './MarketplaceLists/Search'
 import { Eyeglasses, MagnifyingGlass, MapPin, Plus } from "phosphor-react-native";
 import ListingsListSkeletonLoaderFull from "../../components/ListingsListSkeletonLoaderFull";
 import { useFocusEffect } from "@react-navigation/native";
@@ -17,9 +20,38 @@ import { useFocusEffect } from "@react-navigation/native";
 
 // how many items we fetch at a time
 // this is obviously terrible but makes it easy to see lol
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
+
+// lazy load the components
 
 const Marketplace = ({ navigation }) => {
+    // cache listings for performance improvements
+    const [listingsCache, setListingsCache] = useState({
+        foryou: {
+            items: [],
+            lastDoc: null,
+            hasMore: true
+        },
+        friends: {
+            items: [],
+            lastDoc: null,
+            hasMore: true
+        },
+        sell: {
+            items: [],
+            lastDoc: null,
+            hasMore: true
+        }
+    })
+
+    const [lastFetchTime, setLastFetchTime] = useState({
+        foryou: null,
+        friends: null,
+        sell: null
+    })
+
+
+
     // TODO refactor for clarity
     const totalUsers = '2.3k' // grab the total rows from the users DB and cache it
 
@@ -36,81 +68,194 @@ const Marketplace = ({ navigation }) => {
 
     const db = getFirestore();
 
-    // this is bad
-    useFocusEffect(() => {
-        fetchListings(true);
-    }) // db shouldnt change but just in case
+    // // this is bad
+    // useFocusEffect(() => {
+    //     fetchListings(true);
+    // }) // db shouldnt change but just in case
+
+    // // better, only will grab them once on the initial render
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         fetchListings(true);
+    //     }, []) // empty array, only on initial focus
+    // );
+
+    // every time we switch tabs, check our cache first
+    useEffect(() => {
+        const currentCache = listingsCache[selectedOption];
+        const cacheAge = lastFetchTime[selectedOption]
+            ? Date.now() - lastFetchTime[selectedOption]
+            : Infinity;
+
+        // Use cache if it exists and is fresh (less than 5 minutes old)
+        if (currentCache.items.length > 0 && cacheAge < 300000) {
+            setListings(currentCache.items);
+            setIsLoading(false)
+        } else {
+            fetchListings(true);
+        }
+    }, [selectedOption]);
 
 
     // moved outside of the use effect hook so that we can call this elsewhere
     const fetchListings = async (refresh = false) => {
+        console.log('fetch listings called')
+        const cacheAge = lastFetchTime[selectedOption] ? Date.now() - lastFetchTime[selectedOption] : Infinity
+
+        const currentCache = listingsCache[selectedOption]
+
+        // prevent bad fetches (no more items or no last doc)
+        if (loadingMore && (!currentCache.hasMore || !currentCache.lastDoc)) {
+            return
+        }
+
         if (refresh) {
             setRefreshing(true)
-            setLastDoc(null)
-        } else if (listings.length === 0) {
-            // then this is an initial load
             setIsLoading(true)
+            // reset our pagination states
+            setListingsCache(prev => ({
+                ...prev,
+                [selectedOption]: {
+                    ...prev[selectedOption],
+                    lastDoc: null,
+                    hasMore: true
+                }
+            }))
         } else {
-            // we are loading more
             setLoadingMore(true)
         }
 
         try {
             let q = query(
-                collection(db, "listings"),
-                where("sold", "==", false),
-                orderBy("createdAt", "desc"), // most recent first
-                limit(PAGE_SIZE));
+                collection(db, 'listings'),
+                where('sold', '==', false),
+                orderBy('createdAt', 'desc'),
+                limit(PAGE_SIZE)
+            )
 
-            // if we have a lastdoc and arent refreshing, we are grabbing more
-            // so we change our query to start from there
-            if (lastDoc && !refresh) {
-                q = query(q, startAfter(lastDoc))
+            // if we are fetching more, just append it to the end
+            if (!refresh && currentCache.lastDoc) {
+                q = query(q, startAfter(currentCache.lastDoc));
             }
 
             const querySnapshot = await getDocs(q);
             const listingsData = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
+            }))
+
+            const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+            // if we get less than listings data, then there wont be more left
+            const hasMore = listingsData.length === PAGE_SIZE
+
+            const newCacheData = {
+                items: refresh ? listingsData : [...currentCache.items, ...listingsData],
+                lastDoc: newLastDoc,
+                hasMore
+            };
+
+            // update cache and listings in one pass
+            setListingsCache(prev => ({
+                ...prev,
+                [selectedOption]: newCacheData
             }));
 
-            // store the last doc so that we can keep it for pagination
-            // if not present, then we just make it as null
-            const newLastDoc = querySnapshot.docs.length > 0 ? querySnapshot.docs[querySnapshot.docs.length - 1] : null
+            // only update the listings from the cache (once)
+            setListings(newCacheData.items);
 
-            if (refresh) {
-                setListings(listingsData);
-            } else {
-                setListings(prev => [...prev, ...listingsData])
-            }
+            //    update fetch time last
+            setLastFetchTime(prev => ({
+                ...prev,
+                [selectedOption]: Date.now()
+            }));
 
-            setLastDoc(newLastDoc)
-        } catch (error) {
-            console.error("Error fetching listings:", error);
+        } catch (e) {
+            showToast('Error: ' + e.message)
         } finally {
-            setIsLoading(false);
-            if (refresh) {
-                setRefreshing(false)
-            }
+            setRefreshing(false)
+            setLoadingMore(false)
+            setIsLoading(false)
         }
-    };
+    }
+
+
+    //     if (refresh) {
+    //         setRefreshing(true)
+    //         setLastDoc(null)
+    //     } else if (listings.length === 0) {
+    //         // then this is an initial load
+    //         setIsLoading(true)
+    //     } else {
+    //         // we are loading more
+    //         setLoadingMore(true)
+    //     }
+
+    //     try {
+    //         let q = query(
+    //             collection(db, "listings"),
+    //             where("sold", "==", false),
+    //             orderBy("createdAt", "desc"), // most recent first
+    //             limit(PAGE_SIZE));
+
+    //         // if we have a lastdoc and arent refreshing, we are grabbing more
+    //         // so we change our query to start from there
+    //         if (lastDoc && !refresh) {
+    //             q = query(q, startAfter(lastDoc))
+    //         }
+
+    //         const querySnapshot = await getDocs(q);
+    //         const listingsData = querySnapshot.docs.map(doc => ({
+    //             id: doc.id,
+    //             ...doc.data()
+    //         }));
+
+    //         // store the last doc so that we can keep it for pagination
+    //         // if not present, then we just make it as null
+    //         const newLastDoc = querySnapshot.docs.length > 0 ? querySnapshot.docs[querySnapshot.docs.length - 1] : null
+
+    //         if (refresh) {
+    //             setListings(listingsData);
+    //         } else {
+    //             setListings(prev => [...prev, ...listingsData])
+    //         }
+
+    //         setLastDoc(newLastDoc)
+    //     } catch (error) {
+    //         console.error("Error fetching listings:", error);
+    //     } finally {
+    //         setIsLoading(false);
+    //         if (refresh) {
+    //             setRefreshing(false)
+    //         }
+    //     }
+    // };
 
     const onRefresh = () => {
         fetchListings(true)
     }
 
     // method for if we hit the bottom
-    const onLoadMore = async () => {
-        // avoid duplicate requests
-        if (loadingMore || refreshing || !lastDoc) {
-            return;
+    const onLoadMore = useCallback(async () => {
+        const currentCache = listingsCache[selectedOption]
+        // avoid duplicate or bad reqs
+        if (!loadingMore && currentCache.hasMore && currentCache.lastDoc) {
+            await fetchListings(false) // false means not refresh (i.e. loading more)
         }
-        setLoadingMore(true)
-        await fetchListings(false)
-        setLoadingMore(false)
-    }
+    }, [loadingMore, listingsCache, selectedOption])
 
-    const renderSelectedOption = () => {
+
+
+    //     // avoid duplicate requests
+    //     if (loadingMore || refreshing || !lastDoc) {
+    //         return;
+    //     }
+    //     setLoadingMore(true)
+    //     await fetchListings(false)
+    //     setLoadingMore(false)
+    // }
+
+    const renderSelectedOption = useMemo(() => {
+
         switch (selectedOption) {
             case 'foryou':
                 return <ForYou
@@ -130,7 +275,8 @@ const Marketplace = ({ navigation }) => {
             default:
                 return <Text>Oops! Option not found.</Text>
         }
-    }
+    }, [selectedOption, listings]); // might need more deps? Cant think of any else
+
 
 
 
@@ -201,7 +347,11 @@ const Marketplace = ({ navigation }) => {
             </View>
             }
 
-            {isLoading ? (<ListingsListSkeletonLoaderFull />) : renderSelectedOption()}
+            <Suspense fallback={<ListingsListSkeletonLoaderFull />}>
+                {isLoading ? <ListingsListSkeletonLoaderFull /> : renderSelectedOption}
+            </Suspense>
+
+            {/* {isLoading ? (<ListingsListSkeletonLoaderFull />) : renderSelectedOption()} */}
 
             <TouchableOpacity onPress={() => navigation.navigate('CreateListing')}
 
@@ -223,6 +373,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: '100%',
         width: '100%',
+        flex: 1,
     },
     collegeHeaderContainer: {
         display: 'flex',
@@ -290,7 +441,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 15,
-        position: 'relative'
+        position: 'relative',
+        backgroundColor: 'orange'
     },
     selectedTitle: {
         borderBottomWidth: 1,

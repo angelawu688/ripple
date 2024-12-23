@@ -43,31 +43,9 @@ export const uploadPFP = async (uri, userID) => {
 }
 
 // same thing as above
-// will upload an image to the storage bucket, but it does it for 
+// will upload an image to the storage bucket, but it does it for the 3 images
 export const uploadListingImage = async (uri, userID, listingID, index) => {
     try {
-        // // basically converts the uri to something that we can store in firebase
-        // const response = await fetch(uri)
-        // const blob = await response.blob()
-
-        // // create ref and upload
-        // const storageRef = ref(storage, `listing-pictures/${userID}/${listingID}-${index}-${Date.now()}`);
-        // const uploadTask = uploadBytesResumable(storageRef, blob);
-
-        // // this will return the download URL
-        // // we do it as a promise because the upload isnt instant
-        // return new Promise((resolve, reject) => {
-        //     uploadTask.on(
-        //         "state_changed",
-        //         null,
-        //         (error) => reject(error),
-        //         async () => {
-        //             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        //             resolve(downloadURL);
-        //         }
-        //     );
-        // });
-
         // process all 3 of the images
         const processedImages = await processImage(uri);
 
