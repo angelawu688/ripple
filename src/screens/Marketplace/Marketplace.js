@@ -99,7 +99,6 @@ const Marketplace = ({ navigation }) => {
 
     // moved outside of the use effect hook so that we can call this elsewhere
     const fetchListings = async (refresh = false) => {
-        console.log('fetch listings called')
         const cacheAge = lastFetchTime[selectedOption] ? Date.now() - lastFetchTime[selectedOption] : Infinity
 
         const currentCache = listingsCache[selectedOption]

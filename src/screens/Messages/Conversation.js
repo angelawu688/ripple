@@ -13,6 +13,7 @@ import { ZoomableView } from 'react-native-zoom-toolkit';
 import { formatDate, formatDateForMessages } from '../../utils/formatDate';
 import { MessageBubble } from '../../components/MessageBubble';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useIsFocused } from '@react-navigation/native';
 
 
 
@@ -28,6 +29,7 @@ const Conversation = ({ navigation, route }) => {
     const [inputHeight, setInputHeight] = useState(50)
     const [sendingMessage, setSendingMessage] = useState(false)
     const [loadingMessages, setLoadingMessages] = useState(true)
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         if (!otherUserDetails) {
@@ -96,15 +98,25 @@ const Conversation = ({ navigation, route }) => {
         return () => unsubscribe();
     }, [conversationID]);
 
-    // mark the messages as read
+    // mark the messages as read if they are ready
     useEffect(() => {
-        if (conversationID && user?.uid) {
+
+        if (!conversationID || !user?.uid || messages.length === 0) {
+            return; // bail
+        }
+        // if not focused, do nothing
+        if (!isFocused) {
+            return
+        }
+        const lastMessage = messages[0]
+
+        if (lastMessage.sentBy !== user?.uid) {
             const conversationRef = doc(db, "conversations", conversationID);
             updateDoc(conversationRef, {
                 lastMessageReadBy: user.uid
             });
         }
-    }, [conversationID, user?.uid]);
+    }, [conversationID, user?.uid, messages]);
 
 
 

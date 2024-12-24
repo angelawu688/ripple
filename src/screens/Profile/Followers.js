@@ -7,10 +7,20 @@ import { userContext } from '../../context/UserContext'
 import { ToastContext } from '../../context/ToastContext'
 import { StyleSheet } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native'
+import { handleRemoveFollower } from '../../utils/socialUtils'
 
 export default function Followers({ navigation, route }) {
     const { isFollowers: initIsFollowers } = route.params
-    const { userData } = useContext(userContext)
+    const {
+        user,
+        userData,
+        setUser,
+        setUserData,
+        setUserFollowers,
+        setUserFollowing,
+        setUserFollowingIds
+    } = useContext(userContext);
+
     const { showToast } = useContext(ToastContext)
     const [users, setUsers] = useState([])
     const [isFollowers, setIsFollowers] = useState(initIsFollowers)
@@ -27,16 +37,6 @@ export default function Followers({ navigation, route }) {
         setUsers(data || []);
         setLoading(false);
     }, [isFollowers]);
-
-    const handleRemoveFollower = () => {
-        try {
-            showToast('Follower removed!')
-        } catch (e) {
-            console.error(e)
-        } finally {
-            setActiveModalId(null)
-        }
-    }
 
     const handleReportUser = () => {
         try {
@@ -90,7 +90,7 @@ export default function Followers({ navigation, route }) {
 
                 </TouchableOpacity>
             </View>
-            {users && <FlatList
+            {users && users.length !== 0 ? <FlatList
                 data={users}
                 ListFooterComponent={<View style={{ width: '100%', height: 100 }} />}
                 style={{ paddingHorizontal: 10 }}
@@ -150,10 +150,22 @@ export default function Followers({ navigation, route }) {
                                 >
                                     <View style={styles.modalContainer}>
                                         <TouchableOpacity
-                                            onPress={() => handleRemoveFollower()}
+                                            onPress={() => handleRemoveFollower(
+                                                user,
+                                                userID,
+                                                isFollowers,
+                                                setActiveModalId,
+                                                setUsers,
+                                                setUser,
+                                                showToast,
+                                                setUserData,
+                                                setUserFollowers,
+                                                setUserFollowing,
+                                                setUserFollowingIds
+                                            )}
                                             style={[styles.modalOption, { borderBottomWidth: 0 }]}>
                                             <Text style={[styles.modalText, { color: 'black' }]}>
-                                                Remove follower
+                                                {isFollowers ? 'Remove follower' : 'Unfollow'}
                                             </Text>
                                         </TouchableOpacity>
 
@@ -188,7 +200,11 @@ export default function Followers({ navigation, route }) {
                 }}
                 keyExtractor={(item, index) => isFollowers ? item.follower_id : item.following_id}
 
-            />}
+            /> : <View style={{ width: '100%', alignItems: 'center', marginTop: 25 }}>
+                <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '500' }}>
+                    {isFollowers ? 'You have no followers' : "You aren't following any users"}
+                </Text>
+            </View>}
 
 
             {!users && (

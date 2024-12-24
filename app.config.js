@@ -1,11 +1,11 @@
 export default () => ({
   expo: {
     name: "ripple",
-    slug: "uw-marketplace",
+    slug: "uw-marketplace", // this cant really be changed
     owner: 'phunt22',
     version: "1.0.1",
     orientation: "portrait",
-    icon: "./assets/images/favicon.png",
+    icon: "./assets/images/RippleIcon.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     ios: {
@@ -16,7 +16,7 @@ export default () => ({
       },
       bundleIdentifier: "com.phunt22.uwmarketplace"
     },
-    android: {
+    android: { // dont really need to pay attention, since we arent on android yet
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
@@ -33,7 +33,7 @@ export default () => ({
         "expo-splash-screen",
         {
           backgroundColor: "#FFFFFF",
-          // resizeMode: "contain",
+          resizeMode: "contain",
           image: "./assets/images/ripple_splashicon3.png",
           imageWidth: "600" // todo play with this
         }

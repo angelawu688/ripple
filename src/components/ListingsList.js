@@ -50,10 +50,7 @@ const ListingsList = ({ listings,
                 //     width: Dimensions.get('window').width,
                 // }}
                 // estimatedItemSize={200} // need this for flashlist to work
-                estimatedListSize={{
-                    height: Dimensions.get('window').height,
-                    width: Dimensions.get('window').width
-                }}
+                estimatedItemSize={238} // console log said that. Seems to work really good
                 // styling in flashList
                 contentContainerStyle={{
                     padding: 2, // pad the whole list

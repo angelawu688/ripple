@@ -17,7 +17,7 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
         return <RecentSearchSkeletonLoader />
     }
     return (
-        <View>
+        <View style={{ flex: 1 }}>
             {displayUserSearchResults ? (
                 loadingUserSearch ? (
                     <View>
@@ -64,7 +64,6 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                                 renderItem={(item, index) => (
                                     <RecommendationCard
                                         navigation={navigation}
-
                                     />
                                 )}
                             />
