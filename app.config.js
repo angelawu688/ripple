@@ -1,11 +1,11 @@
 export default () => ({
   expo: {
-    name: "ripple",
+    name: "Ripple",
     slug: "uw-marketplace", // this cant really be changed
     owner: 'phunt22',
-    version: "1.0.1",
+    version: "1.0.2",
     orientation: "portrait",
-    icon: "./assets/images/RippleIcon.png",
+    icon: "./assets/images/RippleIcon.png", // actual app Icon
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     ios: {
@@ -30,7 +30,7 @@ export default () => ({
     },
     plugins: [
       [
-        "expo-splash-screen",
+        "expo-splash-screen", // big static loading screen
         {
           backgroundColor: "#FFFFFF",
           resizeMode: "contain",
