@@ -34,7 +34,6 @@ const computeRecommendations = async (userData) => {
         const friendFollowing = friend.following || [];
 
         friendFollowing.forEach(followedUser => {
-            console.log(followedUser)
             const candidateId = followedUser.following_id;
 
             //    skip if its active user or someone that they already follow 
@@ -88,6 +87,12 @@ export default function Recommendations({ navigation }) {
         getRecs()
     }, [])
 
+    const removeUserFromRecommendations = (userId) => {
+        setRecommendations(prevRecs =>
+            prevRecs.filter(rec => rec.user.id !== userId)
+        );
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.text}>
@@ -100,6 +105,7 @@ export default function Recommendations({ navigation }) {
                     <RecommendationCard
                         navigation={navigation}
                         recommendedUser={item}
+                        onRemove={() => removeUserFromRecommendations(item.user.id)}
                     />
                 )}
             /> : <RecentSearchSkeletonLoader />}
@@ -116,5 +122,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'inter',
         fontWeight: '600',
+        marginBottom: 12
     }
 })

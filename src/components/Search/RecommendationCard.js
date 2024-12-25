@@ -4,31 +4,36 @@ import { Image } from 'expo-image'
 import { TouchableOpacity } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { colors } from '../../colors'
+import { X } from 'phosphor-react-native'
 
-export default function RecommendationCard({ navigation, recommendedUser }) {
+export default function RecommendationCard({ navigation, recommendedUser, onRemove }) {
     const { mutualCount, user: recommendedUserData } = recommendedUser
     return (
         <TouchableOpacity onPress={() => navigation.navigate('UserProfile', {
             userID: recommendedUserData?.id
         })}
             style={styles.container}
-
-
         >
-            <Image
-                source={{ uri: recommendedUserData?.pfp }}
-                style={styles.image}
-            />
+            <View style={{ display: 'flex', flexDirection: 'row' }}>
+                <Image
+                    source={{ uri: recommendedUserData?.pfp }}
+                    style={styles.image}
+                />
 
-            <View style={styles.textContainer}>
-                <Text style={[styles.text, { color: 'black', fontWeight: '500' }]}>
-                    {recommendedUserData?.name}
-                </Text>
+                <View style={styles.textContainer}>
+                    <Text style={[styles.text, { color: 'black', fontWeight: '500' }]}>
+                        {recommendedUserData?.name}
+                    </Text>
 
-                <Text style={[styles.text, { color: colors.loginBlue, fontWeight: '400' }]}>
-                    {mutualCount} mutual friends
-                </Text>
+                    <Text style={[styles.text, { color: colors.loginBlue, fontWeight: '400' }]}>
+                        {mutualCount} mutual friends
+                    </Text>
+                </View>
             </View>
+
+            <TouchableOpacity onPress={() => onRemove(recommendedUserData.id)}>
+                <X size={32} color={colors.accentGray} />
+            </TouchableOpacity>
         </TouchableOpacity>
     )
 }
@@ -39,7 +44,9 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 65,
         flexDirection: 'row',
-        marginBottom: 16
+        marginBottom: 16,
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
     textContainer: {
         display: 'flex',
