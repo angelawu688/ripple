@@ -21,7 +21,7 @@
 
 
 
-const { onDocumentCreated, onDocumentDeleted } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const admin = require('firebase-admin')
 
 
@@ -260,6 +260,158 @@ exports.onUserDeleted = onDocumentDeleted("users/{userID}", async (event) => {
         return { success: true, }
     } catch (error) {
         console.error(`Error cleaning up user data: `, error)
+        return { success: false, error: error.message }
+    }
+})
+
+exports.onUserInfoUpdated = onDocumentUpdated("users/{userID}", async (event) => {
+    // get uid from the deleted document
+    const uid = event.params.userID;
+    if (!uid) {
+        console.error("No user ID available in updating trigger");
+        return { success: false, error: "No user ID" };
+    }
+
+    // get current and previous user data
+    const data = event.data.after.data();
+    const prevData = event.data.before.data();
+
+    // only doing something if name or pfp change rn
+    // we can always add more fields but basically i don't want to do this everytime someone makes another search yk
+    // if we do mutuals, we can add following and follower fields to this
+    if (data.name === prevData.name && data.pfp === prevData.pfp && data.major === prevData.major) {
+        return null;
+    }
+
+    const db = admin.firestore();
+    try {
+        let batch = db.batch()
+        let operationCount = 0;
+
+        // note: firebase batch has a max of 500, so we will do this if needed
+        const commitBatchIfNeeded = async () => {
+            if (operationCount >= 450) {
+                await batch.commit();
+                batch = db.batch();
+                operationCount = 0;
+            }
+        };
+
+        // listings
+        const listingsSnapshot = await db.collection('listings')
+            .where('userId', '==', uid)
+            .get();
+
+        for (const listingDoc of listingsSnapshot.docs) {
+            batch.update(listingDoc.ref, {userPfp: data.pfp, userName: data.name});
+            operationCount++;
+            await commitBatchIfNeeded();
+        }
+
+        // following/followers
+        // update user info in other users following lists
+        if (prevData.followers && prevData.followers.length > 0) {
+            const followerUpdates = prevData.followers.map(async follower => {
+                const followerRef = db.collection('users').doc(follower.follower_id);
+                const followerDoc = await followerRef.get();
+
+                if (followerDoc.exists) {
+                    const following = followerDoc.data().following || [];
+
+                    // Update the follower entry with new username and profile picture
+                    const updatedFollowing = following.map(following => {
+                        if (following.following_id === uid) {
+                            return {
+                                ...following,
+                                following_name: data.name,
+                                following_pfp: data.pfp,
+                                following_major: data.major,
+                            };
+                        }
+                        return following;
+                    });
+
+                    operationCount++;
+                    await commitBatchIfNeeded();
+                    return followerRef.update({
+                        following: updatedFollowing
+                    });
+                }
+            });
+            await Promise.all(followerUpdates);
+        }
+
+        // update user info in other users followers lists
+        if (prevData.following && prevData.following.length > 0) {
+            const followingUpdates = prevData.following.map(async following => {
+                const followingRef = db.collection('users').doc(following.following_id);
+                const followingDoc = await followingRef.get();
+
+                if (followingDoc.exists) {
+                    const followers = followingDoc.data().followers || [];
+
+                    // Update the follower entry with new username and profile picture
+                    const updatedFollowers = followers.map(follower => {
+                        if (follower.follower_id === uid) {
+                            return {
+                                ...follower,
+                                follower_name: data.name,
+                                follower_pfp: data.pfp,
+                                follower_major: data.major,
+                            };
+                        }
+                        return follower;
+                    });
+
+                    operationCount++;
+                    await commitBatchIfNeeded();
+                    return followingRef.update({
+                        followers: updatedFollowers
+                    });
+                }
+            });
+            await Promise.all(followingUpdates);
+        }
+
+        // conversations
+        // find conversations that involved the user and update all of them
+        const conversationsSnapshot = await db
+            .collection('conversations')
+            .where('users', 'array-contains', uid)
+            .get()
+
+        // for each convdoc
+        for (const conversationDoc of conversationsSnapshot.docs) {
+            const conversationData = conversationDoc.data();
+            const userDetails = conversationData.userDetails;
+
+            //
+            const userKey = Object.keys(userDetails).find(
+                key => key === uid
+            );
+
+            if (userKey) {
+                const updatedUserDetails = {
+                    ...userDetails,
+                    [userKey]: {
+                        ...userDetails[userKey],
+                        name: data.name, // Update the name
+                        pfp: data.pfp // Update the profile picture
+                    }
+                };
+
+                // Add the update to the batch
+                batch.update(conversationDoc.ref, {userDetails: updatedUserDetails});
+                operationCount++;
+                await commitBatchIfNeeded();
+            }
+        }
+
+        await batch.commit();
+        console.log(`Successfully updated user data for: ${uid}`)
+        return { success: true, }
+    } catch (error) {
+        console.error(`Error updating user data: `, error)
         return { success: false, error: error.message }
     }
 })
