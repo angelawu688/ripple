@@ -9,7 +9,7 @@ import ListingsList from '../ListingsList'
 
 export default function ListingSearch({ isLoading, query, navigation, displayResults, searchResults, handleSearchSelect, handleRemoveItemFromRecentSearches, loadingRecentSearches, recentSearches }) {
     return (
-        <View>
+        <View style={{ flex: 1 }}>
             {displayResults ? (
                 isLoading ? (
                     <ListingsListSkeletonLoaderFull />

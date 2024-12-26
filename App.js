@@ -21,6 +21,7 @@ import { UnreadProvider } from './src/context/UnreadContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
+  const [appIsReady, setAppIsReady] = useState(false)
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
     Syne_400Regular,
@@ -30,14 +31,30 @@ export default function App() {
 
   // keep the splash up until the fonts are loaded
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync().catch(console.warn);;
+    const prepare = async () => {
+      try {
+        if (fontsLoaded) {
+          setAppIsReady(true)
+        }
+      } catch (e) {
+        console.error(e)
+      }
     }
+    prepare()
   }, [fontsLoaded]);
 
+  // this will dismiss the splash screen
+  useEffect(() => {
+    if (appIsReady) {
+      requestAnimationFrame(async () => {
+        await SplashScreen.hideAsync().catch(console.warn);
+      });
+    }
+  }, [appIsReady]);
+
   // dont load the app until the fonts are loaded
-  if (!fontsLoaded) {
-    return;
+  if (!appIsReady) {
+    return null; // this keeps the splash up
   }
 
   return (
@@ -55,12 +72,14 @@ export default function App() {
 // separate the middle into root so that we are able to grab the loading prop
 // from the user context, fixing the flickering issue
 const RootComponent = () => {
-  const { isLoading, user } = useContext(userContext);
+  const { isLoading, user, userData } = useContext(userContext);
 
   // register the user for async notifications
+  // only do this after there is userData, which means that they have complete onboarding
+  // Note: on sim, this will call on updates to user, since it autodeclines every time
   useEffect(() => {
     const handleRegisterForPushNotificationsAsync = async () => {
-      if (!isLoading && user) {
+      if (!isLoading && user && userData) {
         const token = await registerForPushNotificationsAsync(user.uid);
       }
     }
@@ -68,7 +87,7 @@ const RootComponent = () => {
   }, [isLoading, user])
 
   if (isLoading) {
-    return <FullLoadingScreen text={'Loading auth from main'} />
+    return <FullLoadingScreen />
   }
 
 

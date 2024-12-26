@@ -10,9 +10,9 @@ export default function UserResultCard({ navigation, user }) {
 
     return (
         <TouchableOpacity style={styles.container}
-        // onPress={navigation.navigate('UserProfile', {
-        //     userID: userID
-        // })}
+            onPress={() => navigation.navigate('UserProfile', {
+                userID: userID
+            })}
         >
             <Image
                 style={{ width: 50, height: 50, backgroundColor: colors.loginGray, borderRadius: 50 }}

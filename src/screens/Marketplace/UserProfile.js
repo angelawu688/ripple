@@ -475,32 +475,35 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 
 
                         </View>)}
-                        {userPosts && userPosts.length > 0 ? (
+                        <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 20 }}>
+                            Listings
+                        </Text>
+                        {/* {userPosts && userPosts.length > 0 && (
                             // <View>
                             <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 20 }}>
                                 Listings
                             </Text>
                             // </View>
-                        ) : (
-                            <View style={{ alignSelf: 'flex-start', }}>
-                                <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '500' }}>
-                                    {isOwnProfile ? 'User has' : 'You have '}  no listings
-                                </Text>
-                                {isOwnProfile && <Text style={{ fontFamily: 'inter', fontSize: 14 }}
-                                >
-                                    Make a post to get started!
-                                </Text>}
-                            </View>
-                        )}
+                        )} */}
                     </View>
                 </View>
-                {userPosts && userPosts.length > 0 && (userPosts.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
+                {userPosts && userPosts.length > 0 ? (userPosts.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
                     <ListingCard listing={userPosts[0]} />
                 </View>) : (<View style={{
                     width: '100%',
                 }}>
                     <ListingsList listings={userPosts} navigation={navigation} scrollEnabled={false} />
-                </View>))}
+                </View>)) : (
+                    <View style={{ alignSelf: 'center' }}>
+                        <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', marginLeft: 25 }}>
+                            {isOwnProfile ? 'You have ' : 'User has '}no listings
+                        </Text>
+                        {isOwnProfile && <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', marginLeft: 25 }}
+                        >
+                            Make a post to get started!
+                        </Text>}
+                    </View>
+                )}
 
             </ScrollView >
 
