@@ -9,10 +9,7 @@ import { StyleSheet } from 'react-native'
 import { RecentSearchSkeletonLoader } from '../../utils/search'
 
 
-
-// OLD RECOMMENDATIONS METHOD
-// Leaving now for reference, but this was damn near O(n^3), and we can do way better
-// will grab the friends of all of 
+// gets the recommendations for the user
 const computeRecommendations = async (userData) => {
     if (!userData?.following?.length) return [];
 
@@ -95,9 +92,19 @@ export default function Recommendations({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>
+            {recommendations?.length > 0 && <Text style={styles.text}>
                 Recommended
-            </Text>
+            </Text>}
+            {recommendations?.length === 0 &&
+                <View style={{ alignItems: 'center', marginTop: 20 }}>
+                    <Text style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 18 }}>
+                        No recommendations!
+                    </Text>
+                    <Text style={{ fontFamily: 'inter', fontWeight: '400', fontSize: 14 }}>
+                        Follow users to get started
+                    </Text>
+                </View>
+            }
             {!loading ? <FlatList
                 keyboardDismissMode="on-drag"
                 data={recommendations}
@@ -109,6 +116,8 @@ export default function Recommendations({ navigation }) {
                     />
                 )}
             /> : <RecentSearchSkeletonLoader />}
+
+
         </View>
     )
 }

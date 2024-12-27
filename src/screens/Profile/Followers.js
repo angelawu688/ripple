@@ -8,6 +8,7 @@ import { ToastContext } from '../../context/ToastContext'
 import { StyleSheet } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native'
 import { handleRemoveFollower } from '../../utils/socialUtils'
+import ReportModal from '../../components/ReportModal'
 
 export default function Followers({ navigation, route }) {
     const { isFollowers: initIsFollowers } = route.params
@@ -28,8 +29,13 @@ export default function Followers({ navigation, route }) {
 
     const [activeModalId, setActiveModalId] = useState(null) // track which modal should be open
     const toggleModal = (userId) => {
-        setActiveModalId(activeModalId === userId ? null : userId);
+        setActiveModalId((prevActiveModalId) =>
+            prevActiveModalId === userId ? null : userId
+        );
     };
+
+    // for reporting
+    const [reportModalVisible, setReportModalVisible] = useState(false)
 
 
     useEffect(() => {
@@ -38,28 +44,26 @@ export default function Followers({ navigation, route }) {
         setLoading(false);
     }, [isFollowers]);
 
-    const handleReportUser = () => {
+    const handleReportUser = (userId) => {
         try {
-            showToast('User reported!')
-        } catch (e) {
-            console.error(e
-            )
-        } finally {
-            setActiveModalId(null)
-
-        }
-    }
-
-    const handleBlockUser = () => {
-        try {
-            showToast('User blocked!')
+            setReportModalVisible(true)
         } catch (e) {
             console.error(e)
         } finally {
             setActiveModalId(null)
-
         }
     }
+
+    // const handleBlockUser = () => {
+    //     try {
+    //         showToast('User blocked!')
+    //     } catch (e) {
+    //         console.error(e)
+    //     } finally {
+    //         setActiveModalId(null)
+
+    //     }
+    // }
 
     if (loading) {
         return <LoadingSpinner />
@@ -170,20 +174,23 @@ export default function Followers({ navigation, route }) {
                                         </TouchableOpacity>
 
                                         <TouchableOpacity
-                                            onPress={() => handleReportUser()}
+                                            onPress={() => {
+                                                handleReportUser(userID)
+                                                toggleModal(userID)
+                                            }}
                                             style={[styles.modalOption, { borderBottomWidth: 0 }]}>
-                                            <Text style={[styles.modalText, { color: 'black' }]}>
+                                            <Text style={[styles.modalText, { color: 'red' }]}>
                                                 Report user
                                             </Text>
                                         </TouchableOpacity>
 
-                                        <TouchableOpacity
+                                        {/* <TouchableOpacity
                                             onPress={() => handleBlockUser()}
                                             style={[styles.modalOption, { borderBottomWidth: 0 }]}>
                                             <Text style={[styles.modalText, { color: 'red' }]}>
                                                 Block user
                                             </Text>
-                                        </TouchableOpacity>
+                                        </TouchableOpacity> */}
 
                                         {/* <TouchableOpacity style={[styles.modalOption, { borderBottomWidth: 0 }]} onPress={() => setModalVisible(false)}>
                             <Text style={[styles.modalText, { color: 'black' }]}>
@@ -215,6 +222,16 @@ export default function Followers({ navigation, route }) {
                     </Text>
                 </View>
             )}
+
+            <ReportModal
+                visible={reportModalVisible}
+                onClose={() => {
+                    setReportModalVisible(false)
+                    setActiveModalId(null);
+                }
+                }
+                userId={activeModalId} // id of the active user
+            />
         </View>
     )
 }

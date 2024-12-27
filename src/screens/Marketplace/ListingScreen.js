@@ -16,6 +16,7 @@ import { formatDate } from '../../utils/formatDate'
 import { useFocusEffect } from '@react-navigation/native';
 import { deleteFromSavedPosts, deleteImages, getConversation } from '../../utils/firebaseUtils';
 import { db } from '../../../firebaseConfig';
+import ReportModal from '../../components/ReportModal';
 
 
 
@@ -33,6 +34,8 @@ const ListingScreen = ({ navigation, route }) => {
     const [postSold, setPostSold] = useState(false) // grab this on init
     const [isOwnPost, setIsOwnPost] = useState(false) // grab this on init. Literally something like uid === userData.uid should be chill
     const [sellerID, setSellerID] = useState(null) // grab this on init
+
+    const [reportModalVisible, setReportModalVisible] = useState(false)
 
 
     // 3 dots 
@@ -129,15 +132,7 @@ const ListingScreen = ({ navigation, route }) => {
 
 
     const handleReportUser = () => {
-        try {
-
-        } catch (e) {
-
-        } finally {
-
-        }
-        // set some sort of toast or something
-        setModalVisible(false)
+        setReportModalVisible(true)
     }
 
     const handleDeleteListing = () => {
@@ -502,6 +497,15 @@ const ListingScreen = ({ navigation, route }) => {
                     </View>
                 </TouchableWithoutFeedback>
             )}
+
+            <ReportModal
+                visible={reportModalVisible}
+                onClose={() => {
+                    setReportModalVisible(false)
+                    setModalVisible(false)
+                }}
+                userId={sellerID}
+            />
         </ScrollView>
     )
 }
