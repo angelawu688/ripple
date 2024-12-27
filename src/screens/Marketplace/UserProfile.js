@@ -488,13 +488,26 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                     </View>
                 </View>
                 {userPosts && userPosts.length > 0 ? (userPosts.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
-                    <ListingCard listing={userPosts[0]} />
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('ListingScreen', { listingID: userPosts[0].id })}
+                    >
+                        <ListingCard
+                            listing={userPosts[0]}
+                            disabled={!isOwnProfile && userPosts[0].sold}
+                        />
+                    </TouchableOpacity>
+
                 </View>) : (<View style={{
                     width: '100%',
                 }}>
-                    <ListingsList listings={userPosts} navigation={navigation} scrollEnabled={false} />
+                    <ListingsList
+                        listings={userPosts}
+                        navigation={navigation}
+                        scrollEnabled={false}
+                        isOwnProfile={isOwnProfile}
+                    />
                 </View>)) : (
-                    <View style={{ alignSelf: 'center' }}>
+                    <View style={{ alignSelf: 'flex-start' }}>
                         <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', marginLeft: 25 }}>
                             {isOwnProfile ? 'You have ' : 'User has '}no listings
                         </Text>

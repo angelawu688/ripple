@@ -16,6 +16,7 @@ const ListingsList = ({ listings,
     onRefresh = () => { },
     onEndReached = () => { },
     onEndReachedThreshold = 0.5,
+    isOwnProfile = false,
     ListFooterComponent = null,
 }) => {
     const { user } = useContext(userContext)
@@ -26,16 +27,17 @@ const ListingsList = ({ listings,
 
 
     const renderItem = useCallback(({ item }) => {
+        const isClickDisabled = !isOwnProfile && item.sold;
         return (
             <TouchableOpacity
-                disabled={item.sold && user.uid !== item.userId}
+                disabled={isClickDisabled && false}
                 onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
                 style={{ flex: 1, padding: 1 }}
             >
                 <ListingCard
                     listing={item}
                 />
-            </TouchableOpacity>
+            </TouchableOpacity >
         )
     })
 

@@ -52,18 +52,6 @@ const AuthStackNavigator = () => {
           )
         })}
       />
-      {/*<AuthStack.Screen*/}
-      {/*  name="EmailConfirmation"*/}
-      {/*  component={EmailConfirmation}*/}
-      {/*  options={({ navigation }) => ({*/}
-      {/*    headerTitle: () => <Logo />,*/}
-      {/*    headerLeft: () => (*/}
-      {/*      <TouchableOpacity onPress={() => navigation.goBack()}>*/}
-      {/*        <Ionicons name="chevron-back" size={24} color="#000" />*/}
-      {/*      </TouchableOpacity>*/}
-      {/*    )*/}
-      {/*  })}*/}
-      {/*/>*/}
 
       <AuthStack.Screen
         name="EducationOnboarding"

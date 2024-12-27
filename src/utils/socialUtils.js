@@ -29,104 +29,6 @@ export const copyLink = async (link) => {
     Clipboard.setStringAsync(link);
 }
 
-// export const handleRemoveFollower = async (activeUser, otherUserID, isFollowers, setActiveModalId, setUsers, setUser, showToast) => {
-//     try {
-//         if (!activeUser?.uid || !otherUserID) {
-//             console.error("activeUser or otherUserID is undefined");
-//             showToast("Something went wrong. Please try again.");
-//             return;
-//         }
-
-//         const activeUserRef = doc(db, "users", activeUser.uid);
-//         const otherUserRef = doc(db, "users", otherUserID);
-
-//         // Fetch user documents
-//         const activeUserDoc = await getDoc(activeUserRef);
-//         const otherUserDoc = await getDoc(otherUserRef);
-
-//         if (!activeUserDoc.exists()) {
-//             console.error("Active user document does not exist");
-//             showToast("Active user not found.");
-//             return;
-//         }
-
-//         if (!otherUserDoc.exists()) {
-//             console.error("Other user document does not exist");
-//             showToast("User not found.");
-//             return;
-//         }
-
-//         // Update Firestore data based on isFollowers flag
-//         if (isFollowers) {
-//             const updatedFollowers = activeUserDoc.data().followers.filter(
-//                 follower => follower.follower_id !== otherUserID
-//             );
-
-//             // firebase
-//             await updateDoc(activeUserRef, { followers: updatedFollowers });
-
-//             // followers state
-//             setUser(prevUser => ({
-//                 ...prevUser,
-//                 followers: updatedFollowers
-//             }));
-
-//             // update async storage
-//             await Promise.all([
-//                 AsyncStorage.setItem('userFollowers', JSON.stringify(updatedFollowers)),
-//                 AsyncStorage.setItem('userData', JSON.stringify({
-//                     ...currentUserData,
-//                     followers: updatedFollowers
-//                 }))
-//             ]);
-//             // userContext
-//             setUsers(prevUsers =>
-//                 prevUsers.filter(u => u.follower_id !== otherUserID)
-//             );
-//         } else {
-//             const updatedFollowing = activeUserDoc.data().following.filter(
-//                 following => following.following_id !== otherUserID
-//             );
-
-
-//             await updateDoc(activeUserRef, { following: updatedFollowing });
-
-//             setUser(prevUser => ({
-//                 ...prevUser,
-//                 following: updatedFollowing
-//             }));
-
-//             await Promise.all([
-//                 AsyncStorage.setItem('userFollowing', JSON.stringify(updatedFollowing)),
-//                 AsyncStorage.setItem('userFollowingIds', JSON.stringify(updatedFollowingIds)),
-//                 AsyncStorage.setItem('userData', JSON.stringify({
-//                     ...currentUserData,
-//                     following: updatedFollowing
-//                 }))
-//             ]);
-
-//             setUsers(prevUsers =>
-//                 prevUsers.filter(u => u.following_id !== otherUserID)
-//             );
-//         };
-
-//         // Show success toast
-//         showToast(isFollowers ? "Removed Follower!" : "Unfollowed User!");
-//     } catch (e) {
-//         console.error("Error in handleRemoveFollower:", {
-//             activeUser,
-//             otherUserID,
-//             isFollowers,
-//             error: e,
-//         });
-//         showToast("Error removing user!");
-//     } finally {
-//         // Close the modal
-//         setActiveModalId(null);
-//     }
-// };
-
-
 export const handleRemoveFollower = async (
     activeUser,
     otherUserID,
@@ -245,3 +147,16 @@ export const handleRemoveFollower = async (
         setActiveModalId(null);
     }
 };
+
+export const openLink = async (url, showToast) => {
+    try {
+        const supported = await Linking.canOpenURL(url)
+        if (supported) {
+            await Linking.openURL(url)
+        } else {
+            showToast('Unable to open link!')
+        }
+    } catch (e) {
+        showToast('Error when opening link!')
+    }
+}

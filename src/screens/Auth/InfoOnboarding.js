@@ -17,6 +17,10 @@ import { UploadSimple } from 'phosphor-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { uploadPFP } from '../../utils/firebaseUtils'
 import { generateUserKeywords } from '../../utils/search'
+import { links } from '../../links';
+import { ToastContext } from '../../context/ToastContext';
+import { Linking } from 'react-native';
+import { openLink } from '../../utils/socialUtils';
 
 
 const InfoOnboarding = ({ navigation, route }) => {
@@ -37,6 +41,7 @@ const InfoOnboarding = ({ navigation, route }) => {
     const [inputError, setInputError] = useState('')
     const [bioHeight, setBioHeight] = useState(50)
     const { setUser, setUserData, setSavedPosts, setUserListings, setUserFollowingIds } = useContext(userContext);
+    const { showToast } = useContext(ToastContext)
 
     // focus the top text field on component mount
     const inputRef = useRef(null);
@@ -316,15 +321,37 @@ const InfoOnboarding = ({ navigation, route }) => {
                     </View>
 
                 </View>
-                <TouchableOpacity
-                    hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                    style={[styles.button, { backgroundColor: pfp && bio.length <= 163 ? colors.loginBlue : colors.loginGray }]}
-                    disabled={!pfp || bio.length > 163}
-                    onPress={() => handleSignUp()}
-                >
-                    <Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />
+                <View style={{
+                    width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 15
+                }}>
+                    <Text style={{ fontSize: 12, maxWidth: '75%', fontFamily: 'inter' }} numberOfLines={2}>
+                        By creating an account, you agree to our
+                        <Text
+                            onPress={() => openLink(links.termsOfService, showToast)}
+                            style={styles.link}
 
-                </TouchableOpacity>
+                        >
+                            {' '}Terms of Service{' '}
+                        </Text>
+                        and
+                        <Text
+                            onPress={() => openLink(links.privacyPolicy, showToast)}
+                            style={styles.link}
+                        >
+                            {' '}Privacy Policy{' '}
+                        </Text>
+                    </Text>
+                    <TouchableOpacity
+                        hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
+                        style={[styles.button, { backgroundColor: pfp && bio.length <= 163 ? colors.loginBlue : colors.loginGray }]}
+                        disabled={!pfp || bio.length > 163}
+                        onPress={() => handleSignUp()}
+                    >
+                        <Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />
+
+                    </TouchableOpacity>
+                </View>
+
 
 
 
@@ -471,7 +498,6 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         backgroundColor: '#D9D9D9',
         alignSelf: 'flex-end',
-        marginTop: 15
     },
     socialButton: {
         width: 140,
@@ -561,6 +587,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'gray',
         // marginTop: 12,
+    },
+    link: {
+        color: colors.loginBlue,
+        textDecorationLine: 'underline'
     }
 
 })

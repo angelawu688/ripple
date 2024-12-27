@@ -26,13 +26,13 @@ export default function RecommendationCard({ navigation, recommendedUser, onRemo
                     </Text>
 
                     <Text style={[styles.text, { color: colors.loginBlue, fontWeight: '400' }]}>
-                        {mutualCount} mutual friends
+                        {mutualCount} mutual friend{mutualCount > 1 && 's'}
                     </Text>
                 </View>
             </View>
 
             <TouchableOpacity onPress={() => onRemove(recommendedUserData.id)}>
-                <X size={32} color={colors.accentGray} />
+                <X size={30} color={colors.accentGray} />
             </TouchableOpacity>
         </TouchableOpacity>
     )

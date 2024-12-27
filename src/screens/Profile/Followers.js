@@ -198,7 +198,7 @@ export default function Followers({ navigation, route }) {
                         </View>
                     )
                 }}
-                keyExtractor={(item, index) => isFollowers ? item.follower_id : item.following_id}
+                keyExtractor={(item, index) => `${isFollowers ? item.follower_id : item.following_id}-${index}`}
 
             /> : <View style={{ width: '100%', alignItems: 'center', marginTop: 25 }}>
                 <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '500' }}>
