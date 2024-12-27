@@ -25,8 +25,9 @@ const { onDocumentCreated, onDocumentDeleted } = require("firebase-functions/v2/
 const admin = require('firebase-admin')
 
 
-admin.initializeApp(); // gives us access to firestore
+admin.initializeApp(); // gives us access to firestore & other stuff
 
+// sends an expo notification on a new message being created in the DB
 exports.sendNotificationOnNewMessage = onDocumentCreated(
     "conversations/{convID}/messages/{messageID}",
     async (event) => {
@@ -59,26 +60,7 @@ exports.sendNotificationOnNewMessage = onDocumentCreated(
         const expoPushToken = userData.expoPushToken;
         const expoPushTokenString = expoPushToken?.data;
 
-        // const senderName = userData?.name || 'You have a new message!'
-        // const expoPushTokenString = expoPushToken?.data
-
-
-
-
-        // // find thier userTokn
-        // const userRef = admin.firestore().collection('users').doc(receiverID)
-        // const userSnap = await userRef.get()
-        // const userData = userSnap.data()
-
-        // // get their push token from their userData
-        // const expoPushToken = userData.expoPushToken
-        // const name = userData.name || 'You have a new message!'
-        // const expoPushTokenString = expoPushToken?.data
-
         // data for the notification
-
-
-
         const title = senderName ? senderName.substring(0, 100) + (senderName.length > 50 ? "..." : '') : 'You received a message!'
         const body = messageData.textContent ? messageData.textContent.substring(0, 100) + (messageData.textContent.length > 100 ? "..." : "") : '1 attachment'
 
@@ -99,6 +81,7 @@ exports.sendNotificationOnNewMessage = onDocumentCreated(
     }
 );
 
+// helper function to send the actual expo notification
 async function sendExpoNotification(expoPushToken, title, body, data) {
     const response = await fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
@@ -119,6 +102,7 @@ async function sendExpoNotification(expoPushToken, title, body, data) {
 }
 
 
+// delete all user info and storage when someone deletes their account
 exports.onUserDeleted = onDocumentDeleted("users/{userID}", async (event) => {
     // get uid from the deleted document
     const uid = event.params.userID;
