@@ -37,7 +37,7 @@ export const uploadPFP = async (uri, userID) => {
             );
         });
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw e
     }
 }
@@ -84,7 +84,7 @@ export const uploadListingImage = async (uri, userID, listingID, index) => {
         return imageUrls;
 
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw e
     }
 }
@@ -117,8 +117,7 @@ export const uploadMessageImage = async (conversationId, imageUri, messageID) =>
         });
         return downloadURL
     } catch (e) {
-        console.log(e)
-
+        console.error(e)
         throw e
     }
 }
@@ -141,9 +140,11 @@ export const deleteImageFromDB = async (photoRef) => {
 // MESSAGES
 // ------------------
 export const sendMessage = async (convID, senderID, textContent = undefined, postID = undefined, imageUri = undefined) => {
+    // if(!convID) {
+    //     convID = await createConversation([se])
+    // }
     if (!textContent.trim() && !postID && !imageUri) {
         // ensure that we have at least one field
-        console.log('returned')
         return;
     }
     try {
@@ -157,7 +158,7 @@ export const sendMessage = async (convID, senderID, textContent = undefined, pos
             try {
                 downloadURL = await uploadMessageImage(convID, imageUri, messageRef.id)
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 throw e
             }
         }
@@ -195,7 +196,7 @@ export const sendMessage = async (convID, senderID, textContent = undefined, pos
             lastMessageReadBy: senderID
         })
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw e
     }
 }
@@ -203,7 +204,6 @@ export const sendMessage = async (convID, senderID, textContent = undefined, pos
 // this will get the conversation with another user
 // if the conversation already exists, then we will just return the ID
 export const getConversation = async (senderID, receiverID) => {
-    console.log(senderID, receiverID)
     try {
         // this makes sure that the ID is unique and that everyone has their own ID
         // this helps with dealing with rewrites and stuff
@@ -244,7 +244,7 @@ export const getConversation = async (senderID, receiverID) => {
             return convID
         }
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw e
     }
 }
@@ -259,10 +259,29 @@ export const getListingFromID = async (listingID) => {
             return { id: docSnap.id, ...docSnap.data() }
         }
     } catch (e) {
-        console.log(e)
+        console.error(e)
         throw e
     }
 }
+
+// creates a conversation collection
+export const createConversation = async (users) => {
+    try {
+        const conversationRef = await addDoc(collection(db, 'conversations'), {
+            users,
+            // Optionally, set default fields if you want them right away
+            lastMessage: '',
+            timestamp: Date.now(),
+            userDetails: {},
+        });
+
+        // Return the newly created conversation ID
+        return conversationRef.id;
+    } catch (error) {
+        console.error('Error creating conversation:', error);
+        throw error;
+    }
+};
 
 
 // delete functions
@@ -281,10 +300,8 @@ export const deleteImages = async (photos) => {
             // logs for debugging
             try {
                 await deleteObject(imageRef);
-                console.log(`Successfully deleted: ${fullPath}`);
             } catch (deleteError) {
                 if (deleteError.code === 'storage/object-not-found') {
-                    console.log(`File already deleted or not found: ${fullPath}`);
                     return;
                 }
                 throw deleteError;
@@ -444,22 +461,18 @@ export const updateAllSaved = async (listingID, listingTitle, listingPrice, phot
 // deletes the users account and references to it
 export const deleteAccount = async (userID, setUser) => {
     try {
-        console.log('delete account called')
         // delete the user document (triggers cloud function to delete the rest)
         // Reference to the user's document
         const userRef = doc(db, "users", userID);
 
         // Delete the user's document
         await deleteDoc(userRef);
-        console.log("User document deleted");
 
         // Sign out the user
         await signOut(auth);
-        console.log("Signed out");
 
         // loccl state
         setUser(null);
-        console.log('account deleted')
     } catch (error) {
         console.error('Error deleting account:', error);
         throw error;

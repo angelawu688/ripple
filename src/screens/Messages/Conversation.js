@@ -100,23 +100,24 @@ const Conversation = ({ navigation, route }) => {
 
     // mark the messages as read if they are ready
     useEffect(() => {
-
         if (!conversationID || !user?.uid || messages.length === 0) {
             return; // bail
         }
+
         // if not focused, do nothing
         if (!isFocused) {
             return
         }
         const lastMessage = messages[0]
 
-        if (lastMessage.sentBy !== user?.uid) {
+        // mark in read if there is a last message and it wasnt sent by the user
+        if (lastMessage?.sentBy && lastMessage.sentBy !== user.uid) {
             const conversationRef = doc(db, "conversations", conversationID);
             updateDoc(conversationRef, {
                 lastMessageReadBy: user.uid
             });
         }
-    }, [conversationID, user?.uid, messages]);
+    }, [conversationID, user?.uid, messages, isFocused]);
 
 
 

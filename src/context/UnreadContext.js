@@ -21,7 +21,7 @@ export const UnreadProvider = ({ children }) => {
             const totalUnread = snapshot.docs.reduce((count, doc) => {
                 const data = doc.data();
                 // if the last message was send by the user and hasnt been read
-                if (data.lastMessageBy !== user.uid && data.lastMessageReadBy !== user.uid) {
+                if (data.lastMessageBy !== user.uid && data.lastMessageReadBy !== user.uid && !!data.lastMessage) {
                     return count + 1;
                 }
                 return count;
