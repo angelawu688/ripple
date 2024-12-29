@@ -77,7 +77,6 @@ const TabNavigator = () => {
                 name={'ProfileStack'}
                 component={ProfileStackNavigator}
             />
-
         </Tab.Navigator>
     )
 }
