@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import { Image } from 'expo-image'
 import { TouchableOpacity } from 'react-native'
 import { StyleSheet } from 'react-native'
-import { colors } from '../../colors'
+import { colors } from '../../constants/colors'
 import { X } from 'phosphor-react-native'
 
 export default function RecommendationCard({ navigation, recommendedUser, onRemove }) {

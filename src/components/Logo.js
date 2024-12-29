@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../colors';
+import { colors } from '../constants/colors';
 
 
 const Logo = ({ fontSize }) => {

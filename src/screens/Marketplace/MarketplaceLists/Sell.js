@@ -1,8 +1,8 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import ListingCard from "../../../components/ListingCard"
+import ListingCard from "../../../components/listings/ListingCard"
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import ListingsList from "../../../components/ListingsList";
-import { colors } from "../../../colors";
+import ListingsList from "../../../components/listings/ListingsList";
+import { colors } from "../../../constants/colors";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { userContext } from "../../../context/UserContext";
 import { useFocusEffect } from "@react-navigation/native";

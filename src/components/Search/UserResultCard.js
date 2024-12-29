@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { StyleSheet } from 'react-native'
-import { colors } from '../../colors'
+import { colors } from '../../constants/colors'
 import { Image } from 'react-native'
 
 export default function UserResultCard({ navigation, user }) {

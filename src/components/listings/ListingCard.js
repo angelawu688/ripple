@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import { Image } from 'expo-image'
 import { memo, useEffect, useState } from 'react'
-import { colors } from '../colors';
+import { colors } from '../../constants/colors';
 import { MotiView } from 'moti';
 import { Dimensions } from 'react-native';
 

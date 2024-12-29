@@ -7,16 +7,16 @@ import {
 
 import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { userContext } from "../../context/UserContext";
-import { colors } from '../../colors'
+import { colors } from '../../constants/colors'
 import { User, Storefront, PaperPlaneTilt, TrashSimple, PencilSimple, Package, Tag, SmileySad, DotsThree } from 'phosphor-react-native';
 import { LocalRouteParamsContext } from 'expo-router/build/Route';
-import ListingScreenFullSkeletonLoader from '../../components/ListingScreenFullSkeletonLoader'
 import * as Linking from 'expo-linking'
 import { formatDate } from '../../utils/formatDate'
 import { useFocusEffect } from '@react-navigation/native';
 import { deleteFromSavedPosts, deleteImages, getConversation } from '../../utils/firebaseUtils';
 import { db } from '../../../firebaseConfig';
 import ReportModal from '../../components/ReportModal';
+import ListingScreenFullSkeletonLoader from '../../components/listings/ListingScreenFullSkeletonLoader'
 
 
 

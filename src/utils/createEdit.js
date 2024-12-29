@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { uploadListingImage } from "./firebaseUtils";
 import { MinusCircle } from "phosphor-react-native";
-import { colors } from "../colors";
+import { colors } from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 
 

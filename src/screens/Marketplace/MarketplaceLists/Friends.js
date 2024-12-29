@@ -1,14 +1,12 @@
 import { FlatList, Text, TouchableOpacity, View, StyleSheet } from "react-native"
-import ListingCard from "../../../components/ListingCard"
-import { colors } from "../../../colors"
-import ListingsList from "../../../components/ListingsList"
+import { colors } from "../../../constants/colors"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { userContext } from "../../../context/UserContext"
 import * as Linking from 'expo-linking'
 import { collection, getDocs, getFirestore, limit, orderBy, query, where } from "firebase/firestore";
-import ListingsListSkeletonLoaderFull from "../../../components/ListingsListSkeletonLoaderFull";
-// import { useFocusEffects } from "expo-router"
+import ListingsListSkeletonLoaderFull from "../../../components/listings/ListingsListSkeletonLoaderFull";
 import { useFocusEffect } from "@react-navigation/native"
+import ListingsList from "../../../components/listings/ListingsList"
 
 
 const Friends = ({ navigation }) => {

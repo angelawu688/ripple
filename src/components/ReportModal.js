@@ -9,7 +9,7 @@ import {
     TouchableWithoutFeedback,
 } from 'react-native';
 import { ToastContext } from '../context/ToastContext'
-import { colors } from "../colors";
+import { colors } from "../constants/colors";
 import { TouchableOpacity } from "react-native";
 import { userContext } from "../context/UserContext";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";

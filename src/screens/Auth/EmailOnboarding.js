@@ -3,8 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ActivityInd
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../colors';
-import Asterisk from '../shared/Asterisk';
+import { colors } from '../../constants/colors';
+import Asterisk from '../../components/Asterisk';
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')

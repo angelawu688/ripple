@@ -5,9 +5,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ChatTeardropText, User, Storefront, Bookmark, BookmarkSimple, ShoppingCart, ShareFat } from 'phosphor-react-native';
 import { deleteAccount } from "../../utils/firebaseUtils";
-import { colors } from "../../colors";
+import { colors } from "../../constants/colors";
 import { openLink } from "../../utils/socialUtils";
-import { links } from "../../links";
+import { links } from "../../constants/links";
 import { ToastContext } from "../../context/ToastContext";
 
 

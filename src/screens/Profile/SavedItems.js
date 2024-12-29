@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
-import ListingCard from '../../components/ListingCard'
+import ListingCard from '../../components/listings/ListingCard'
 import { getFirestore, query, where, collection, getDocs, orderBy } from "firebase/firestore";
 import { BookmarkSimple } from 'phosphor-react-native'
 

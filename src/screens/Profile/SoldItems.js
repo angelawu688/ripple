@@ -5,8 +5,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
-import ListingCard from '../../components/ListingCard'
-import ListingsList from '../../components/ListingsList'
+import ListingCard from '../../components/listings/ListingCard'
+import ListingsList from '../../components/listings/ListingsList'
 
 const SoldItems = ({ navigation }) => {
     const testListings = [

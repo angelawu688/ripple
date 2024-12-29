@@ -18,11 +18,11 @@ import {
     arrayRemove,
 } from "firebase/firestore";
 import FullLoadingScreen from "../shared/FullLoadingScreen";
-import ListingsList from '../../components/ListingsList'
+import ListingsList from '../../components/listings/ListingsList'
 import { ChatCircleDots, Check, DotsThree, EnvelopeSimple, Gear, InstagramLogo, Link, LinkedinLogo, Mailbox, Plus, QrCode, User, XLogo } from "phosphor-react-native";
-import { colors } from "../../colors";
+import { colors } from "../../constants/colors";
 import { userContext } from "../../context/UserContext";
-import ListingCard from "../../components/ListingCard";
+import ListingCard from "../../components/listings/ListingCard";
 import { getConversation } from '../../utils/firebaseUtils'
 import { sendProfile } from "../../utils/socialUtils";
 import * as Linking from 'expo-linking'

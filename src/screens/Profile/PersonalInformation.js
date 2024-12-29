@@ -4,7 +4,7 @@ import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import * as ImagePicker from 'expo-image-picker';
-import { colors } from '../../colors'
+import { colors } from '../../constants/colors'
 import { isLoading } from 'expo-font';
 import { PencilSimple } from 'phosphor-react-native';
 import {

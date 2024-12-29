@@ -1,6 +1,6 @@
 import { FlatList, View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import ListingCard from "../../../components/ListingCard"
-import ListingsList from "../../../components/ListingsList"
+import ListingCard from "../../../components/listings/ListingCard"
+import ListingsList from "../../../components/listings/ListingsList"
 import LoadingSpinner from '../../../components/LoadingSpinner'
 
 const ForYou = ({

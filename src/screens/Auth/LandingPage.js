@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions, Animated } from "react-native"
 import Logo from "../../components/Logo";
-import { colors } from "../../colors";
-import { Wave, Wave2 } from "../shared/Wave";
+import { colors } from "../../constants/colors";
+import { Wave, Wave2 } from "../../components/Wave";
 import { useEffect, useRef } from "react";
 
 

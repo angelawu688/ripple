@@ -11,13 +11,13 @@ import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { colors } from '../../colors';
-import Asterisk from '../shared/Asterisk';
+import { colors } from '../../constants/colors';
+import Asterisk from '../../components/Asterisk'
 import { UploadSimple } from 'phosphor-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { uploadPFP } from '../../utils/firebaseUtils'
 import { generateUserKeywords } from '../../utils/search'
-import { links } from '../../links';
+import { links } from '../../constants/links';
 import { ToastContext } from '../../context/ToastContext';
 import { Linking } from 'react-native';
 import { openLink } from '../../utils/socialUtils';

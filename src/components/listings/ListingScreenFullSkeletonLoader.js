@@ -1,7 +1,7 @@
 
 import { MotiView } from 'moti'
 import { Dimensions, View, StyleSheet } from 'react-native'
-import { colors } from '../colors'
+import { colors } from '../../constants/colors'
 
 const { width } = Dimensions.get('window')
 

@@ -1,9 +1,8 @@
 import { FlatList, View, Text, TouchableOpacity, StyleSheet, RefreshControl } from "react-native"
-import ListingCard from "./ListingCard"
+import ListingCard from ".//ListingCard"
 import { colorKeys, MotiView } from 'moti';
 import { useCallback, useContext, useEffect } from "react";
-import { userContext } from "../context/UserContext";
-import { colors } from "../colors";
+import { userContext } from "../../context/UserContext";
 import { FlashList } from '@shopify/flash-list'
 import { Dimensions } from "react-native";
 

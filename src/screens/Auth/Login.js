@@ -3,7 +3,7 @@ import { View, TextInput, Button, StyleSheet, Text, Touchable, TouchableOpacity,
 import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../colors';
+import { colors } from '../../constants/colors';
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');

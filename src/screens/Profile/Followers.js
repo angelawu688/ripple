@@ -1,6 +1,6 @@
 import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { colors } from '../../colors'
+import { colors } from '../../constants/colors'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { DotsThree } from 'phosphor-react-native'
 import { userContext } from '../../context/UserContext'

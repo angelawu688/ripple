@@ -1,13 +1,13 @@
 import { useCallback, useContext, useEffect, useState } from "react"
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 
-import MessagePreviewCard from '../../components/MessagePreviewCard'
+import MessagePreviewCard from '../../components/messages/MessagePreviewCard'
 import { useFocusEffect } from "@react-navigation/native"
 import { userContext } from "../../context/UserContext"
 import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../../../firebaseConfig"
 import LoadingSpinner from '../../components/LoadingSpinner'
-import { colors } from "../../colors"
+import { colors } from "../../constants/colors"
 
 
 const MessagesOverview = ({ navigation }) => {

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native'
 import { X } from 'phosphor-react-native';
-import { colors } from '../colors'
-import ListingCard from './ListingCard';
-import { getListingFromID } from '../utils/firebaseUtils';
+import { colors } from '../../constants/colors'
+import ListingCard from '../listings/ListingCard';
+import { getListingFromID } from '../../utils/firebaseUtils';
 
 
 export const MessageBubble = ({ navigation, message, activeUserID, formattedDate = undefined }) => {

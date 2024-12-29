@@ -8,7 +8,7 @@ import MessagesStackNavigator from './StackNavigators/MessagesStackNavigator';
 
 import Logo from '../components/Logo'
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../colors'
+import { colors } from '../constants/colors'
 import { ChatTeardropText, User, Storefront, ChatCircle } from 'phosphor-react-native';
 import { userContext } from '../context/UserContext';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';

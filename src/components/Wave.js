@@ -1,7 +1,7 @@
 import React from 'react';
 import { Animated } from 'react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { colors } from '../../colors';
+import { colors } from '../constants/colors';
 
 export const Wave = ({ width, color, animatedStyle }) => {
     // Define the aspect ratio of the original path

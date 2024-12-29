@@ -4,11 +4,11 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 import { getAuth } from 'firebase/auth';
-import { colors } from "../../../colors";
+import { colors } from "../../../constants/colors";
 import { userContext } from "../../../context/UserContext";
 import { MinusCircle, PlusCircle, Scroll, UploadSimple } from "phosphor-react-native";
 import CurrencyInput from 'react-native-currency-input'
-import Asterisk from "../../shared/Asterisk";
+import Asterisk from "../../../components/Asterisk";
 import { uploadListingImage } from "../../../utils/firebaseUtils";
 import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 import { ImagePreview, TagPreview, uploadNewPhotos, validateListing } from "../../../utils/createEdit";

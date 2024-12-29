@@ -2,16 +2,16 @@ import { Ionicons } from '@expo/vector-icons'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, FlatList, Keyboard, Modal } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
-import ListingCard from '../../components/ListingCard';
+import ListingCard from '../../components/listings/ListingCard';
 import { ArrowBendRightUp, CaretRight, Plus, User, X, XCircle } from 'phosphor-react-native';
-import { colors } from '../../colors';
+import { colors } from '../../constants/colors';
 import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { getListingFromID, sendMessage } from '../../utils/firebaseUtils';
 import { db } from '../../../firebaseConfig';
 import { userContext } from '../../context/UserContext';
 import { ZoomableView } from 'react-native-zoom-toolkit';
 import { formatDate, formatDateForMessages } from '../../utils/formatDate';
-import { MessageBubble } from '../../components/MessageBubble';
+import { MessageBubble } from '../../components/messages/MessageBubble';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useIsFocused } from '@react-navigation/native';
 
