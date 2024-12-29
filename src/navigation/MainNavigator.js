@@ -1,27 +1,34 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import TabNavigator from './TabNavigator'
-import { useContext } from 'react';
 import AuthStackNavigator from './StackNavigators/AuthStackNavigator'
 import FullLoadingScreen from '../screens/shared/FullLoadingScreen'
-import { userContext } from '../context/UserContext';
+import { useAuthNavigation } from '../hooks/useAuthNavigation';
 
 const RootStack = createNativeStackNavigator()
 
 
 
 const MainNavigator = () => {
-  const { user, isLoading } = useContext(userContext);
+  const { isLoading } = useAuthNavigation();
 
   if (isLoading) {
     return <FullLoadingScreen />;
   }
+
+  return <NavContent />
+}
+
+export default MainNavigator;
+
+const NavContent = () => {
+  const { isAuthenticated } = useAuthNavigation();
 
   return (
     <RootStack.Navigator screenOptions={{
       contentStyle: { backgroundColor: 'white' }, // Set background for all screens
       headerShown: false,
     }}>
-      {!user || (user && !user.emailVerified) ? (
+      {isAuthenticated ? (
         <RootStack.Screen name="Auth" component={AuthStackNavigator} />
       ) : (
         <RootStack.Screen name="Main" component={TabNavigator} />
@@ -29,5 +36,3 @@ const MainNavigator = () => {
     </RootStack.Navigator>
   );
 }
-
-export default MainNavigator;
