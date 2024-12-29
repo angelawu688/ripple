@@ -6,6 +6,9 @@ import { userContext } from "../../context/UserContext";
 import { FlashList } from '@shopify/flash-list'
 import { Dimensions } from "react-native";
 
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const ITEM_WIDTH = (SCREEN_WIDTH - 6) / 2
+const ITEM_HEIGHT = ITEM_WIDTH + 30;  // 30 is an estimate for the text
 
 
 const ListingsList = ({ listings,
@@ -52,6 +55,9 @@ const ListingsList = ({ listings,
                 // }}
                 // estimatedItemSize={200} // need this for flashlist to work
                 estimatedItemSize={238} // console log said that. Seems to work really good
+                getItemLayout={(data, index) => (
+                    { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
+                )}
                 // styling in flashList
                 contentContainerStyle={{
                     padding: 2, // pad the whole list
