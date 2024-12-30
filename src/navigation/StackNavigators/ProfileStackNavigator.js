@@ -6,7 +6,6 @@ import Logo from '../../components/Logo'
 import SoldItems from "../../screens/Profile/SoldItems";
 import YourListings from "../../screens/Profile/YourListings";
 import SavedItems from "../../screens/Profile/SavedItems";
-import Analytics from "../../screens/Profile/Analytics";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import ListingScreen from "../../screens/Marketplace/ListingScreen";
 import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
@@ -37,19 +36,6 @@ const ProfileStackNavigator = () => {
                 component={OwnUserProfile}
                 options={({ navigation }) => ({
                     headerShown: false
-                    // headerStyle: {
-                    //     height: 60, // Standard header height
-                    // },
-                    // headerTitle: () => (
-                    //     <></>
-                    // ),
-                    // headerRight: () => (
-                    //     <TouchableOpacity
-                    //         onPress={() => navigation.navigate('Profile')}
-                    //     >
-                    //         <DotsThree size={32} />
-                    //     </TouchableOpacity>
-                    // )
                 })}
             />
 
@@ -121,21 +107,6 @@ const ProfileStackNavigator = () => {
                 options={({ navigation }) => ({
                     headerTitle: () => (
                         <Text style={styles.title}>Sold listings</Text>
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    )
-                })}
-            />
-
-            <ProfileStack.Screen
-                name="Analytics"
-                component={Analytics}
-                options={({ navigation }) => ({
-                    headerTitle: () => (
-                        <Text style={styles.title}>Analytics</Text>
                     ),
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => navigation.goBack()}>

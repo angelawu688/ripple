@@ -92,21 +92,30 @@ export default function Recommendations({ navigation }) {
         );
     };
 
+    if (loading) {
+        return (
+            <RecentSearchSkeletonLoader />
+        )
+    }
+
+    if (recommendations?.length === 0) {
+        return (
+            <View style={{ alignItems: 'center', marginTop: 20 }}>
+                <Text style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 18 }}>
+                    No recommendations!
+                </Text>
+                <Text style={{ fontFamily: 'inter', fontWeight: '400', fontSize: 14 }}>
+                    Follow users to get started
+                </Text>
+            </View>
+        )
+    }
+
     return (
         <View style={styles.container}>
             {recommendations?.length > 0 && <Text style={styles.text}>
                 Recommended
             </Text>}
-            {recommendations?.length === 0 &&
-                <View style={{ alignItems: 'center', marginTop: 20 }}>
-                    <Text style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 18 }}>
-                        No recommendations!
-                    </Text>
-                    <Text style={{ fontFamily: 'inter', fontWeight: '400', fontSize: 14 }}>
-                        Follow users to get started
-                    </Text>
-                </View>
-            }
             {!loading ? <FlatList
                 keyboardDismissMode="on-drag"
                 data={recommendations}

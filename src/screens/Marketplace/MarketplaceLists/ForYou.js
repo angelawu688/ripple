@@ -41,6 +41,7 @@ const ForYou = ({ navigation }) => {
                 ListFooterComponent={
                     loadingMore ? <LoadingSpinner /> : null
                 }
+                showCollegeHeader={true}
             />
         </View>
 

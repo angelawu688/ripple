@@ -7,6 +7,8 @@ import {
     Button,
     StyleSheet,
     TouchableWithoutFeedback,
+    KeyboardAvoidingView,
+    Platform,
 } from 'react-native';
 import { ToastContext } from '../context/ToastContext'
 import { colors } from "../constants/colors";
@@ -50,7 +52,10 @@ const ReportModal = ({ visible, onClose, userId }) => {
             onRequestClose={onClose}
         >
             <TouchableWithoutFeedback onPress={onClose}>
-                <View style={styles.overlay}>
+                <KeyboardAvoidingView style={styles.overlay}
+                    keyboardVerticalOffset={-200} // how much the modal gets moved. This should be good?
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                >
                     {/* stop prop is bc we are using nested touchables */}
                     <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
                         <View style={styles.modalContainer}>
@@ -83,7 +88,7 @@ const ReportModal = ({ visible, onClose, userId }) => {
                             </View>
                         </View>
                     </TouchableWithoutFeedback>
-                </View>
+                </KeyboardAvoidingView>
             </TouchableWithoutFeedback >
         </Modal >
     )
@@ -104,6 +109,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 10,
         backgroundColor: '#ffffff',
+        position: 'relative',
     },
     title: {
         fontSize: 20,

@@ -112,7 +112,11 @@ const Friends = ({ navigation }) => {
         // i.e. onGetMore={getMoreFriendsPosts()} or something
         return (
             <View style={{ backgroundColor: 'white', flex: 1 }}>
-                <ListingsList navigation={navigation} listings={friendsListings} />
+                <ListingsList
+                    navigation={navigation}
+                    listings={friendsListings}
+                    showCollegeHeader={true}
+                />
             </View>
         )
     }

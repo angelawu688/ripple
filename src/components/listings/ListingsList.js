@@ -21,7 +21,7 @@ const ListingsList = ({ listings,
     onEndReachedThreshold = 0.5,
     isOwnProfile = false,
     ListFooterComponent = null,
-    showCollegeHeader = true
+    showCollegeHeader = false
 }) => {
     const { user } = useContext(userContext)
 
