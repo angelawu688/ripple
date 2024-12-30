@@ -23,7 +23,7 @@ const computeRecommendations = async (userData) => {
 
     // recommendationsMap to count mutuals
     const recommendationMap = new Map();
-    const myId = userData._id;
+    const myID = userData.uid;
 
     //  go over each account that the user follows, and go over all of their followers 
     followingSnapshot.docs.forEach(doc => {
@@ -32,9 +32,11 @@ const computeRecommendations = async (userData) => {
 
         friendFollowing.forEach(followedUser => {
             const candidateId = followedUser.following_id;
+            console.log(candidateId)
 
             //    skip if its active user or someone that they already follow 
-            if (candidateId === myId || followingIds.includes(candidateId)) {
+            if (!candidateId || candidateId === myID || followingIds.includes(candidateId)) {
+
                 return;
             }
 

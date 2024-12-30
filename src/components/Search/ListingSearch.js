@@ -32,7 +32,9 @@ export default function ListingSearch({ isLoading, query, navigation, displayRes
                 <View style={{ alignSelf: 'center', width: '95%' }}>
                     {query ? (
                         // Autocomplete
-                        <Text>Autocomplete for {query}</Text>
+                        <>
+                        </>
+                        // <Text>Autocomplete for {query}</Text>
                     ) : (
                         // Recent Searches
                         <>
