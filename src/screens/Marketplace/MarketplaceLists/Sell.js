@@ -36,12 +36,16 @@ const Sell = ({ navigation }) => {
 
             <TouchableOpacity onPress={() => navigation.navigate('CreateListing')}
                 style={styles.topTitle}>
-                <Text style={{ fontFamily: 'inter', fontSize: 18, color: 'white', fontWeight: '500' }}>
+                <Text style={styles.createListingText}>
                     Create listing
                 </Text>
             </TouchableOpacity>
 
-            {activeListings?.length > 0 ? <ListingsList navigation={navigation} listings={activeListings} /> : (
+            {activeListings?.length > 0 ? <ListingsList
+                navigation={navigation}
+                listings={activeListings}
+                showCollegeHeader={false}
+            /> : (
                 <View style={styles.textContainer}>
                     <Text style={{ fontSize: 16, fontFamily: 'inter', fontWeight: '600', marginBottom: 10 }}>
                         Ready to sell?
@@ -65,6 +69,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignSelf: 'center',
+        backgroundColor: 'white'
     },
     shadow: {
         shadowColor: colors.loginBlue,
@@ -92,5 +97,11 @@ const styles = StyleSheet.create({
         height: '70%',
         width: '70%',
         alignSelf: 'center'
+    },
+    createListingText: {
+        fontFamily: 'inter',
+        fontSize: 18,
+        color: 'white',
+        fontWeight: '500'
     }
 })

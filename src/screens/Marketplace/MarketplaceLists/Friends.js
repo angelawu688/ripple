@@ -67,7 +67,6 @@ const Friends = ({ navigation }) => {
 
     const shareProfile = () => {
         if (!userData?.uid) {
-            console.log('gotta wait lol we not loaded')
             return
         }
         const profileLink = Linking.createURL(`user/${userData.uid}`)
@@ -112,7 +111,9 @@ const Friends = ({ navigation }) => {
         // pass in a function to get more ?
         // i.e. onGetMore={getMoreFriendsPosts()} or something
         return (
-            <ListingsList navigation={navigation} listings={friendsListings} />
+            <View style={{ backgroundColor: 'white', flex: 1 }}>
+                <ListingsList navigation={navigation} listings={friendsListings} />
+            </View>
         )
     }
 }
@@ -152,7 +153,8 @@ const styles = StyleSheet.create({
         height: '70%',
         width: '100%',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: 'white'
     },
     subTitle: {
         fontSize: 16,

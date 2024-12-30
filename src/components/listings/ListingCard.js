@@ -1,9 +1,11 @@
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import { Image } from 'expo-image'
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import { colors } from '../../constants/colors';
 import { MotiView } from 'moti';
 import { Dimensions } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import { Asset } from 'expo-asset';
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -13,69 +15,55 @@ const ITEM_HEIGHT = ITEM_WIDTH + 50; // adding extra height for the text
 
 
 const ListingCard = ({ listing }) => {
+
     if (!listing) {
         return null;
     }
+
     const { price, title, sold } = listing;
-    const firstImage = listing?.photos[0]
-    const photoUrl = typeof firstImage === 'object'
-        ? {
-            uri: firstImage.card,
-            placeholder: firstImage.thumbnail // use the thumbnail
-        }
-        : { uri: firstImage }; // fallback to single image
-
-
-
-    // const [img, setImg] = useState(undefined)
-    // ensuring that we dont try to render images that are undefined
-    // ie if photos is undefined, we cant get photos[0]
-    // useEffect(() => {
-    //     if (listing?.photos?.length > 0) {
-    //         setImg(listing.photos[0])
-    //     }
-    // }, [listing])
+    const photoUrl = useMemo(() => {
+        const firstImage = listing?.photos[0]
+        return typeof firstImage === 'object'
+            ? {
+                uri: firstImage.card,
+                placeholder: firstImage.thumbnail // use the thumbnail
+            }
+            : { uri: firstImage }; // fallback to single image
+    }, [listing?.photos[0]])
 
     return (
         <View
-            style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', marginBottom: 15 }}>
-            <View style={{ borderRadius: 12, width: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: '#F2F0F0' }}>
+            style={styles.container}>
+            <View style={styles.imageContainer}>
                 {listing?.photos[0] ? (
                     <Image
-                        source={{ uri: firstImage.card ? firstImage.card : firstImage }}
-                        recyclingKey={firstImage}
-                        cachePolicy="memory-disk"
+                        source={photoUrl}
+                        recyclingKey={photoUrl}
+                        // commenting this line out ironically gave a 3x imrpovement in initial fps lmfao
+                        // cachePolicy="memory-disk"
+                        cachePolicy="none"
                         transition={200}
                         placeholder={photoUrl.placeholder ? { uri: photoUrl.placeholder } : undefined}
-                        style={{ width: '100%', aspectRatio: 1, borderRadius: 10 }}
+                        style={styles.image}
                         // these two are used together
                         contentFit="cover"
                         contentPosition="center"
 
                     />) : (<View
-                        style={{ width: '100%', aspectRatio: 1, }}
+                        style={styles.placeholder}
                     />)
                 }
-
                 {sold && (
-                    <Text style={{
-                        color: 'white', fontSize: 28, fontWeight: '900', position: 'absolute',
-                    }}>SOLD</Text>
+                    <Text style={
+                        styles.soldText
+                    }>SOLD</Text>
                 )}
-
             </View>
-
             <Text
-                style={{
-                    fontSize: 18,
-                    marginLeft: '5%',
-                    marginTop: 10,
-                    marginBottom: 0,
-                    fontWeight: '500'
-                }}
+                style={styles.title}
                 numberOfLines={1}
             >
-                <Text style={{ color: colors.loginBlue, }}>
+                <Text style={styles.priceText}>
                     ${price}
                 </Text>{" "}
                 | {title}
@@ -85,4 +73,47 @@ const ListingCard = ({ listing }) => {
 }
 
 
-export default memo(ListingCard);
+export default ListingCard;
+
+const styles = StyleSheet.create({
+    container: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        width: '100%',
+        marginBottom: 15
+    },
+    imageContainer: {
+        borderRadius: 12,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F2F0F0'
+    },
+    image: {
+        width: '100%',
+        aspectRatio: 1,
+        borderRadius: 10
+    },
+    placeholder: {
+        width: '100%',
+        aspectRatio: 1,
+    },
+    soldText: {
+        color: 'white',
+        fontSize: 28,
+        fontWeight: '900',
+        position: 'absolute',
+    },
+    title: {
+        fontSize: 18,
+        marginLeft: '5%',
+        marginTop: 10,
+        marginBottom: 0,
+        fontWeight: '500'
+    },
+    priceText: {
+        color: colors.loginBlue,
+    }
+
+})  

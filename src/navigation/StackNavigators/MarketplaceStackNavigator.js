@@ -12,6 +12,7 @@ import UserProfile from "../../screens/Marketplace/UserProfile";
 import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
 import { DotsThree } from "phosphor-react-native";
 import Search from "../../screens/Marketplace/MarketplaceLists/Search";
+import { MarketplaceTabNavigator } from "./MarketplaceTabNavigator";
 
 const MarketplaceStack = createNativeStackNavigator();
 
@@ -19,14 +20,15 @@ const MarketplaceStack = createNativeStackNavigator();
 const MarketplaceStackNavigator = () => {
     return (
         <MarketplaceStack.Navigator
-            initialRouteName="Marketplace"
+            initialRouteName="MarketplaceTabs"
             screenOptions={DEFAULT_STACK_OPTIONS}
         >
             <MarketplaceStack.Screen
-                name="Marketplace"
-                component={Marketplace}
+                name="MarketplaceTabs"
+                component={MarketplaceTabNavigator}
                 options={{
-                    ...getDefaultLogo()
+                    ...getDefaultLogo(),
+                    contentStyle: { flex: 1 }
                 }}
             />
 
