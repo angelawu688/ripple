@@ -20,7 +20,7 @@ const Friends = ({ navigation }) => {
     useFocusEffect(
         useCallback(() => {
             fetchListings();
-        }, [userData.userFollowingIds])
+        }, [userFollowingIds])
     );
 
     const fetchListings = useCallback(async () => {

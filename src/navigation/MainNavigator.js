@@ -29,9 +29,9 @@ const NavContent = () => {
       headerShown: false,
     }}>
       {isAuthenticated ? (
-        <RootStack.Screen name="Auth" component={AuthStackNavigator} />
-      ) : (
         <RootStack.Screen name="Main" component={TabNavigator} />
+      ) : (
+        <RootStack.Screen name="Auth" component={AuthStackNavigator} />
       )}
     </RootStack.Navigator>
   );
