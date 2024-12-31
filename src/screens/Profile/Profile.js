@@ -178,7 +178,7 @@ const Profile = ({ navigation }) => {
                         style={[styles.profileCard, { width: '48%', justifyContent: 'center' }]}
                         onPress={() => openLink(links.privacyPolicy, showToast)}
                     >
-                        <Text style={styles.cardText}>
+                        <Text style={[styles.cardText, { fontSize: 16 }]}>
                             Privacy Policy
                         </Text>
                     </TouchableOpacity>
@@ -189,7 +189,7 @@ const Profile = ({ navigation }) => {
                     >
 
 
-                        <Text style={styles.cardText}>
+                        <Text style={[styles.cardText, { fontSize: 15 }]}>
                             Terms of Service
                         </Text>
                     </TouchableOpacity>
@@ -205,7 +205,7 @@ const Profile = ({ navigation }) => {
                     <View style={styles.profileCardLeft}>
                         <Ionicons name={'exit-outline'} size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
-                            Logout
+                            Log out
                         </Text>
                     </View>
                     {/* need this for formatting */}
