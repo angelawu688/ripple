@@ -11,7 +11,7 @@ const Logo = ({ fontSize }) => {
 
     return (
         <View style={{ justifyContent: "center", alignItems: "center", }}>
-            <GradientText style={{ fontSize: size, fontFamily: 'Syne_700Bold' }}>Ripple</GradientText>
+            <GradientText style={{ fontSize: size, fontFamily: 'Inter', fontWeight: '600', letterSpacing: -0.75 }}>Ripple</GradientText>
         </View>
     );
 }

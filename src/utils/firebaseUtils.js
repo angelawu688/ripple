@@ -291,23 +291,48 @@ export const createConversation = async (users) => {
 // regardless of collection/location
 export const deleteImages = async (photos) => {
     try {
-        const deletePromises = photos.map(async (photoURL) => {
-            const url = new URL(photoURL);
-            const fullPath = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
-            const imageRef = ref(storage, fullPath);
+        // photos is always an array
+        // it is either just urls as strings, or it is an obect of {card: , thumbnail: , full: }
+        // in that case, we need to delete all of them 
+        const deletePromises = photos.map(async (photo) => {
+            if (typeof photo === 'string') {
+                const photoURL = photo;
+                const url = new URL(photoURL);
+                const fullPath = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
+                const imageRef = ref(storage, fullPath);
 
-            // handling errors if already deleted, ect,
-            // logs for debugging
-            try {
-                await deleteObject(imageRef);
-            } catch (deleteError) {
-                if (deleteError.code === 'storage/object-not-found') {
-                    return;
+                // handling errors if already deleted, ect,
+                // logs for debugging
+                try {
+                    await deleteObject(imageRef);
+                } catch (deleteError) {
+                    if (deleteError.code === 'storage/object-not-found') {
+                        return;
+                    }
+                    throw deleteError;
                 }
-                throw deleteError;
-            }
 
-        })
+            }
+            else {
+                const photoURLs = [photo.card, photo.thumbnail, photo.full].filter(Boolean);
+                const innerPromises = photoURLs.map(async (photoURL) => {
+                    const url = new URL(photoURL);
+                    const fullPath = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
+                    const imageRef = ref(storage, fullPath);
+                    try {
+                        await deleteObject(imageRef);
+                        console.log(`Successfully deleted image: ${photoURL}`);
+                    } catch (deleteError) {
+                        if (deleteError.code === 'storage/object-not-found') {
+                            console.log(`Image already deleted or not found: ${photoURL}`);
+                            return;
+                        }
+                        throw deleteError;
+                    }
+                });
+                await Promise.all(innerPromises);
+            }
+        });
         await Promise.all(deletePromises)
     } catch (e) {
         console.error(e)

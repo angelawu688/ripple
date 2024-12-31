@@ -128,7 +128,6 @@ const EditListing = ({ navigation, route }) => {
     // 
     const removePhoto = async (photoData) => {
         try {
-            console.log('photo', photoData)
             setErrorMessage('')
             if (typeof photoData === 'object' && photoData.card) {
                 // 1. Delete from storage

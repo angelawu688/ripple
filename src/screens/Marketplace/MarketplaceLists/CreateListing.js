@@ -161,12 +161,7 @@ const CreateListing = ({ navigation }) => {
 
 
             // 6. post completed message
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Marketplace' }],
-            });
-
-            // COMPLETED TOAST HERE
+            navigation.goBack()
             showToast('Listing uploaded!')
         } catch (e) {
             setErrorMessage(e.message)
