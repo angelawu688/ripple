@@ -51,7 +51,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
     );
 }
 
-export function MarketplaceTabNavigator() {
+export function MarketplaceTabNavigator({ navigation }) {
     return (
         <View style={styles.container}>
             <Tab.Navigator
@@ -77,6 +77,13 @@ export function MarketplaceTabNavigator() {
                     options={{ tabBarLabel: 'Sell' }}
                 />
             </Tab.Navigator>
+
+            <TouchableOpacity
+                style={styles.createButton}
+                onPress={() => navigation.navigate('CreateListing')}
+            >
+                <Plus color={colors.loginBlue} weight='bold' size={26} />
+            </TouchableOpacity>
         </View>
 
     );

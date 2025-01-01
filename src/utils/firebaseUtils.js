@@ -519,11 +519,11 @@ export const compressImage = async (uri, width = 500, quality = 0.8) => {
     }
 }
 
-
 export const processImage = async (uri) => {
     try {
-        const thumbnail = await compressImage(uri, 50, 0.5)
-        const card = await compressImage(uri, 500, 0.8)
+        // uri, width, quality (0,1)
+        const thumbnail = await compressImage(uri, 190, 0.1)
+        const card = await compressImage(uri, 500, 0.6)
         const full = await compressImage(uri, 1000, 0.8)
         return {
             thumbnail,

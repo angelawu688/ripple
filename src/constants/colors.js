@@ -15,5 +15,7 @@ export const colors = {
     skeletonGray: '#D9D9D9',
     placeholder: '#7E7E7E',
     mediumGray: '#F8F8F8',
-    bgGray: '#F2F2F2'
+    bgGray: '#F2F2F2',
+    gradientEnd: '#AAF7F7',
+    gradientMiddle: '#3AA1A1'
 }
