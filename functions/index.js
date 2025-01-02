@@ -1,32 +1,8 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-// const { onRequest } = require("firebase-functions/v2/https");
-// const logger = require("firebase-functions/logger");
-
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
-
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
-// const functions = require('firebase-functions')
-
-
-
-
 const { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const admin = require('firebase-admin')
+admin.initializeApp(); // gives us access to firestore & other stuff
 
-
-admin.initializeApp(); // gives us access to firestore
-
+// sends an expo notification on a new message being created in the DB
 exports.sendNotificationOnNewMessage = onDocumentCreated(
     "conversations/{convID}/messages/{messageID}",
     async (event) => {
@@ -59,26 +35,7 @@ exports.sendNotificationOnNewMessage = onDocumentCreated(
         const expoPushToken = userData.expoPushToken;
         const expoPushTokenString = expoPushToken?.data;
 
-        // const senderName = userData?.name || 'You have a new message!'
-        // const expoPushTokenString = expoPushToken?.data
-
-
-
-
-        // // find thier userTokn
-        // const userRef = admin.firestore().collection('users').doc(receiverID)
-        // const userSnap = await userRef.get()
-        // const userData = userSnap.data()
-
-        // // get their push token from their userData
-        // const expoPushToken = userData.expoPushToken
-        // const name = userData.name || 'You have a new message!'
-        // const expoPushTokenString = expoPushToken?.data
-
         // data for the notification
-
-
-
         const title = senderName ? senderName.substring(0, 100) + (senderName.length > 50 ? "..." : '') : 'You received a message!'
         const body = messageData.textContent ? messageData.textContent.substring(0, 100) + (messageData.textContent.length > 100 ? "..." : "") : '1 attachment'
 
@@ -99,6 +56,7 @@ exports.sendNotificationOnNewMessage = onDocumentCreated(
     }
 );
 
+// helper function to send the actual expo notification
 async function sendExpoNotification(expoPushToken, title, body, data) {
     const response = await fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
@@ -119,6 +77,7 @@ async function sendExpoNotification(expoPushToken, title, body, data) {
 }
 
 
+// delete all user info and storage when someone deletes their account
 exports.onUserDeleted = onDocumentDeleted("users/{userID}", async (event) => {
     // get uid from the deleted document
     const uid = event.params.userID;
@@ -303,7 +262,7 @@ exports.onUserInfoUpdated = onDocumentUpdated("users/{userID}", async (event) =>
             .get();
 
         for (const listingDoc of listingsSnapshot.docs) {
-            batch.update(listingDoc.ref, {userPfp: data.pfp, userName: data.name});
+            batch.update(listingDoc.ref, { userPfp: data.pfp, userName: data.name });
             operationCount++;
             await commitBatchIfNeeded();
         }
@@ -401,7 +360,7 @@ exports.onUserInfoUpdated = onDocumentUpdated("users/{userID}", async (event) =>
                 };
 
                 // Add the update to the batch
-                batch.update(conversationDoc.ref, {userDetails: updatedUserDetails});
+                batch.update(conversationDoc.ref, { userDetails: updatedUserDetails });
                 operationCount++;
                 await commitBatchIfNeeded();
             }

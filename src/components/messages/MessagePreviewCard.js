@@ -1,9 +1,9 @@
 import { View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
-import { formatDate } from '../utils/formatDate'
+import { formatDate } from '../../utils/formatDate'
 import { useEffect } from 'react';
 import { User } from 'phosphor-react-native';
-import { colors } from '../colors';
+import { colors } from '../../constants/colors';
 
 
 
@@ -11,10 +11,10 @@ import { colors } from '../colors';
 const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt, unread = false }) => {
     // const otherUserID = conversationIDToOtherUserID(conversationID); // to be implemented. Current placeholder is. 
     // not sure if we need this here
-    if (!lastMessage) {
-        // nothing has been sent, we dont want to display that
-        return null;
-    }
+    // if (!lastMessage) {
+    //     // nothing has been sent, we dont want to display that
+    //     return null;
+    // }
 
     return (
         <View
@@ -52,7 +52,7 @@ const MessagePreviewCard = ({ pfp, name, lastMessage, lastSentAt, unread = false
                     numberOfLines={1}
                     ellipsizeMode='tail'
                 >
-                    {lastMessage}
+                    {lastMessage || 'No messages yet.'}
                 </Text>
 
             </View>

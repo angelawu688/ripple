@@ -1,13 +1,13 @@
 import { useCallback, useContext, useEffect, useState } from "react"
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 
-import MessagePreviewCard from '../../components/MessagePreviewCard'
+import MessagePreviewCard from '../../components/messages/MessagePreviewCard'
 import { useFocusEffect } from "@react-navigation/native"
 import { userContext } from "../../context/UserContext"
 import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../../../firebaseConfig"
 import LoadingSpinner from '../../components/LoadingSpinner'
-import { colors } from "../../colors"
+import { colors } from "../../constants/colors"
 
 
 const MessagesOverview = ({ navigation }) => {
@@ -51,7 +51,12 @@ const MessagesOverview = ({ navigation }) => {
 
                 // sort the conversations in last read order
                 setConversations(
-                    fetchedConversations.sort((a, b) => b.timestamp - a.timestamp)
+                    fetchedConversations.sort((a, b) => {
+                        // if timestamps are undefined this way we dont break them
+                        const bT = b.timestamp || 0;
+                        const aT = a.timestamp || 0;
+                        return bT - aT;
+                    })
                 );
 
                 setIsLoading(false);
@@ -106,9 +111,15 @@ const MessagesOverview = ({ navigation }) => {
                         if (!item || !item.id || !item.users || !item.userDetails) {
                             return null
                         }
+
+                        // find other user's id in this conversation
                         const conversationID = item.id
-                        const otherUserId = item.users.find(id => id !== user.uid); // extract otheruserID from array
-                        const otherUserDetails = item.userDetails[otherUserId]; // grab the userdetails that we store there
+                        const otherUserId = item.users.find(id => id !== user.uid);
+                        const otherUserDetails = item?.userDetails?.[otherUserId] || {}; // grab the userdetails that we store there
+
+                        // handle missing data
+                        const lastMessage = item.lastMessage || ''
+                        const isUnread = !!lastMessage && lastMessage !== '' && item.lastMessageReadBy !== user.uid
 
 
                         return (
@@ -130,9 +141,9 @@ const MessagesOverview = ({ navigation }) => {
                                 <MessagePreviewCard
                                     pfp={otherUserDetails?.pfp}
                                     name={otherUserDetails?.name || "User"}
-                                    lastMessage={item.lastMessage}
-                                    lastSentAt={item.timestamp}
-                                    unread={!item.lastMessageReadBy || item.lastMessageReadBy !== user.uid} // style conditionally based on if its unread
+                                    lastMessage={lastMessage}
+                                    lastSentAt={item.timestamp || 0} // timestamp is 0 for brand new convos
+                                    unread={isUnread}
                                 />
                             </TouchableOpacity>
                         )

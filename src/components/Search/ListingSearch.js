@@ -1,11 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { EmptyMessage, RecentSearchItem, RecentSearchSkeletonLoader } from '../../utils/search'
-import ListingsListSkeletonLoaderFull from '../ListingsListSkeletonLoaderFull'
+import ListingsListSkeletonLoaderFull from '../listings/ListingsListSkeletonLoaderFull'
 import { FlatList } from 'react-native'
 import { StyleSheet } from 'react-native'
-import { colors } from '../../colors'
-import ListingsList from '../ListingsList'
+import { colors } from '../../constants/colors'
+import ListingsList from '../listings/ListingsList'
 
 export default function ListingSearch({ isLoading, query, navigation, displayResults, searchResults, handleSearchSelect, handleRemoveItemFromRecentSearches, loadingRecentSearches, recentSearches }) {
     return (
@@ -32,7 +32,9 @@ export default function ListingSearch({ isLoading, query, navigation, displayRes
                 <View style={{ alignSelf: 'center', width: '95%' }}>
                     {query ? (
                         // Autocomplete
-                        <Text>Autocomplete for {query}</Text>
+                        <>
+                        </>
+                        // <Text>Autocomplete for {query}</Text>
                     ) : (
                         // Recent Searches
                         <>

@@ -5,10 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 import ForYou from "./ForYou";
 import { collection, query as firestoreQuery, where, getDocs, getFirestore, doc, updateDoc, arrayUnion, arrayRemove, getDoc, limit } from 'firebase/firestore';
 import { userContext } from '../../../context/UserContext.js';
-import { colors } from "../../../colors";
-import ListingsList from '../../../components/ListingsList'
+import { colors } from "../../../constants/colors";
+import ListingsList from '../../../components/listings/ListingsList'
 import { MotiView } from 'moti';
-import ListingsListSkeletonLoaderFull from '../../../components/ListingsListSkeletonLoaderFull'
+import ListingsListSkeletonLoaderFull from '../../../components/listings/ListingsListSkeletonLoaderFull'
 import { EmptyMessage, fetchRecentSearches, RecentSearchItem, RecentSearchSkeletonLoader, removeItemFromRecentSearchesFirebase, saveRecentSearchFirebase, searchByKeyword } from '../../../utils/search.js'
 import LoadingSpinner from "../../../components/LoadingSpinner.js";
 import UserSearch from "../../../components/Search/UserSearch.js";

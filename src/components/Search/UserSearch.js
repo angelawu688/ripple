@@ -50,53 +50,16 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                     }
                 >
                     {query ? (
-                        <Text>
-                            Autocomplete for {query}
-                        </Text>
+                        <>
+                        </>
+                        // <Text>
+                        //     Autocomplete for {query}
+                        // </Text>
                     ) : (<Recommendations
                         navigation={navigation}
                     />)}
                 </TouchableWithoutFeedback>
             )}
-
-
-
-
-
-
-
-
-            {/* {loadingUserSearch ? (
-
-            ): (
-
-                )}
-
-            {displayUserSearchResults ? (
-                userSearchResults?.length > 0 ? (
-                    <Text>
-                        Results go here
-                    </Text>
-                ) : (
-                    <Text>
-                        No results found!
-                    </Text>
-                )
-            ) : (
-                <View>
-                    <Text>
-                        Recommendations
-                    </Text>
-                    <FlatList
-                        data={testRecs}
-                        renderItem={(item, index) => (
-                            <RecommendationCard />
-                        )}
-                    />
-                </View>
-
-            )} */}
-
         </View>
     )
 }

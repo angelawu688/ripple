@@ -5,12 +5,16 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ChatTeardropText, User, Storefront, Bookmark, BookmarkSimple, ShoppingCart, ShareFat } from 'phosphor-react-native';
 import { deleteAccount } from "../../utils/firebaseUtils";
-import { colors } from "../../colors";
+import { colors } from "../../constants/colors";
+import { openLink } from "../../utils/socialUtils";
+import { links } from "../../constants/links";
+import { ToastContext } from "../../context/ToastContext";
 
 
 
 const Profile = ({ navigation }) => {
     const { user, setUser, handleSignOut } = useContext(userContext);
+    const { showToast } = useContext(ToastContext)
     const [loading, setLoading] = useState(false)
 
     const handleLogout = async () => {
@@ -145,17 +149,17 @@ const Profile = ({ navigation }) => {
 
                 <TouchableOpacity
                     style={styles.profileCard}
-                    onPress={() => console.log('OPEN WEB URL TO LINK')}
+                    onPress={() => openURL('https://www.rippleu.net/')}
                 >
-
                     <View style={styles.profileCardLeft}>
                         <ShareFat size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
-                            Join our email list
+                            About Us
                         </Text>
                     </View>
                     <Ionicons name={'chevron-forward'} size={24} color={'black'} />
                 </TouchableOpacity>
+
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={() => console.log('OPEN WEB URL TO LINK')}
@@ -168,19 +172,28 @@ const Profile = ({ navigation }) => {
                     </View>
                     <Ionicons name={'chevron-forward'} size={24} color={'black'} />
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.profileCard}
-                    onPress={() => openURL('https://www.rippleu.net/')}
-                >
-                    <View style={styles.profileCardLeft}>
-                        <ShareFat size={24} color={'black'} style={styles.icon} />
-                        <Text style={styles.cardText}>
-                            About Us
-                        </Text>
-                    </View>
-                    <Ionicons name={'chevron-forward'} size={24} color={'black'} />
-                </TouchableOpacity>
 
+                <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <TouchableOpacity
+                        style={[styles.profileCard, { width: '48%', justifyContent: 'center' }]}
+                        onPress={() => openLink(links.privacyPolicy, showToast)}
+                    >
+                        <Text style={[styles.cardText, { fontSize: 16 }]}>
+                            Privacy Policy
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.profileCard, { width: '48%', justifyContent: 'center' }]}
+                        onPress={() => openLink(links.termsOfService, showToast)}
+                    >
+
+
+                        <Text style={[styles.cardText, { fontSize: 15 }]}>
+                            Terms of Service
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View >
 
             {/* Delete Account, log out */}
@@ -192,7 +205,7 @@ const Profile = ({ navigation }) => {
                     <View style={styles.profileCardLeft}>
                         <Ionicons name={'exit-outline'} size={24} color={'black'} style={styles.icon} />
                         <Text style={styles.cardText}>
-                            Logout
+                            Log out
                         </Text>
                     </View>
                     {/* need this for formatting */}

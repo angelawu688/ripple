@@ -9,10 +9,7 @@ import { StyleSheet } from 'react-native'
 import { RecentSearchSkeletonLoader } from '../../utils/search'
 
 
-
-// OLD RECOMMENDATIONS METHOD
-// Leaving now for reference, but this was damn near O(n^3), and we can do way better
-// will grab the friends of all of 
+// gets the recommendations for the user
 const computeRecommendations = async (userData) => {
     if (!userData?.following?.length) return [];
 
@@ -26,7 +23,7 @@ const computeRecommendations = async (userData) => {
 
     // recommendationsMap to count mutuals
     const recommendationMap = new Map();
-    const myId = userData._id;
+    const myID = userData.uid;
 
     //  go over each account that the user follows, and go over all of their followers 
     followingSnapshot.docs.forEach(doc => {
@@ -35,9 +32,11 @@ const computeRecommendations = async (userData) => {
 
         friendFollowing.forEach(followedUser => {
             const candidateId = followedUser.following_id;
+            console.log(candidateId)
 
             //    skip if its active user or someone that they already follow 
-            if (candidateId === myId || followingIds.includes(candidateId)) {
+            if (!candidateId || candidateId === myID || followingIds.includes(candidateId)) {
+
                 return;
             }
 
@@ -93,11 +92,30 @@ export default function Recommendations({ navigation }) {
         );
     };
 
+    if (loading) {
+        return (
+            <RecentSearchSkeletonLoader />
+        )
+    }
+
+    if (recommendations?.length === 0) {
+        return (
+            <View style={{ alignItems: 'center', marginTop: 20 }}>
+                <Text style={{ fontFamily: 'inter', fontWeight: '600', fontSize: 18 }}>
+                    No recommendations!
+                </Text>
+                <Text style={{ fontFamily: 'inter', fontWeight: '400', fontSize: 14 }}>
+                    Follow users to get started
+                </Text>
+            </View>
+        )
+    }
+
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>
+            {recommendations?.length > 0 && <Text style={styles.text}>
                 Recommended
-            </Text>
+            </Text>}
             {!loading ? <FlatList
                 keyboardDismissMode="on-drag"
                 data={recommendations}
@@ -109,6 +127,8 @@ export default function Recommendations({ navigation }) {
                     />
                 )}
             /> : <RecentSearchSkeletonLoader />}
+
+
         </View>
     )
 }

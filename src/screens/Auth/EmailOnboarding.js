@@ -3,8 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ActivityInd
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../colors';
-import Asterisk from '../shared/Asterisk';
+import { colors } from '../../constants/colors';
+import Asterisk from '../../components/Asterisk';
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')
@@ -35,6 +35,7 @@ const EmailOnboarding = ({ navigation }) => {
     }
 
     // listener for auth changes
+    // i actually dont know how effective this will be––something to visit
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -128,6 +129,7 @@ const EmailOnboarding = ({ navigation }) => {
     }
 
     // manual check to verify the email
+    // this is what works most of the time
     const checkEmailVerification = async () => {
         try {
             const user = auth.currentUser;
@@ -237,34 +239,36 @@ const EmailOnboarding = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </View>
+            <View style={{ width: '100%', }}>
+                <TouchableOpacity
+                    hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
+                    style={[styles.button, { backgroundColor: !isLoading && email && password.length >= 6 ? colors.loginBlue : colors.loginGray }]}
 
-            <TouchableOpacity
-                hitSlop={{ top: 0, bottom: 10, left: 10, right: 10 }}
-                style={[styles.button, { backgroundColor: !isLoading && email && password.length >= 6 ? colors.loginBlue : colors.loginGray }]}
+                    disabled={isLoading || !email || !password} // disabled when loading
+                    onPress={() => {
+                        if (!email) {
+                            setErrorMessage('Input an email!')
+                        } else if (!isValidEmail(email)) {
+                            setErrorMessage('Enter an email ending in @uw.edu')
+                            return;
+                        } else if (!isValidPassword()) {
+                            // setErrorMessage('Passswords must be 6 characters, contain a number, and a special character')
+                            return;
+                        }
+                        else if (!password) {
+                            setErrorMessage('Input a password!')
+                        } else {
+                            handleNext();
+                        }
+                    }}
+                >
 
-                disabled={isLoading || !email || !password} // disabled when loading
-                onPress={() => {
-                    if (!email) {
-                        setErrorMessage('Input an email!')
-                    } else if (!isValidEmail(email)) {
-                        setErrorMessage('Enter an email ending in @uw.edu')
-                        return;
-                    } else if (!isValidPassword()) {
-                        // setErrorMessage('Passswords must be 6 characters, contain a number, and a special character')
-                        return;
-                    }
-                    else if (!password) {
-                        setErrorMessage('Input a password!')
-                    } else {
-                        handleNext();
-                    }
-                }}
-            >
+                    {isLoading ? (<ActivityIndicator color={'white'} size={20} />) : (<Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />)}
+                    {/* <Text>Send verification</Text> */}
 
-                {isLoading ? (<ActivityIndicator color={'white'} size={20} />) : (<Icon name="chevron-right" size={20} color="#FFFFFF" style={{ marginLeft: 4, marginTop: 2 }} />)}
-                {/* <Text>Send verification</Text> */}
+                </TouchableOpacity>
+            </View>
 
-            </TouchableOpacity>
 
             <Modal
                 animationType="fade"

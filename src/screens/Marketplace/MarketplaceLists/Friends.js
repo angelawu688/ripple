@@ -1,14 +1,12 @@
 import { FlatList, Text, TouchableOpacity, View, StyleSheet } from "react-native"
-import ListingCard from "../../../components/ListingCard"
-import { colors } from "../../../colors"
-import ListingsList from "../../../components/ListingsList"
+import { colors } from "../../../constants/colors"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { userContext } from "../../../context/UserContext"
 import * as Linking from 'expo-linking'
 import { collection, getDocs, getFirestore, limit, orderBy, query, where } from "firebase/firestore";
-import ListingsListSkeletonLoaderFull from "../../../components/ListingsListSkeletonLoaderFull";
-// import { useFocusEffects } from "expo-router"
+import ListingsListSkeletonLoaderFull from "../../../components/listings/ListingsListSkeletonLoaderFull";
 import { useFocusEffect } from "@react-navigation/native"
+import ListingsList from "../../../components/listings/ListingsList"
 
 
 const Friends = ({ navigation }) => {
@@ -22,7 +20,7 @@ const Friends = ({ navigation }) => {
     useFocusEffect(
         useCallback(() => {
             fetchListings();
-        }, [userData.userFollowingIds])
+        }, [userFollowingIds])
     );
 
     const fetchListings = useCallback(async () => {
@@ -69,7 +67,6 @@ const Friends = ({ navigation }) => {
 
     const shareProfile = () => {
         if (!userData?.uid) {
-            console.log('gotta wait lol we not loaded')
             return
         }
         const profileLink = Linking.createURL(`user/${userData.uid}`)
@@ -114,7 +111,13 @@ const Friends = ({ navigation }) => {
         // pass in a function to get more ?
         // i.e. onGetMore={getMoreFriendsPosts()} or something
         return (
-            <ListingsList navigation={navigation} listings={friendsListings} />
+            <View style={{ backgroundColor: 'white', flex: 1 }}>
+                <ListingsList
+                    navigation={navigation}
+                    listings={friendsListings}
+                    showCollegeHeader={true}
+                />
+            </View>
         )
     }
 }
@@ -154,7 +157,8 @@ const styles = StyleSheet.create({
         height: '70%',
         width: '100%',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: 'white'
     },
     subTitle: {
         fontSize: 16,

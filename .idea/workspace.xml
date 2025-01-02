@@ -4,11 +4,96 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="git history alignment">
+    <list default="true" id="c3ea6011-aeb6-4234-bc83-b37636670536" name="Changes" comment="clean up personal info">
+      <change afterPath="$PROJECT_DIR$/src/components/ReportModal.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/TabIcons.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/UWHeader.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/listingScreen/ListingHeader.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/listingScreen/OtherUserButtons.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/listingScreen/OwnPostButtons.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/listingScreen/PhotoCarousel.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/listingScreen/ProfileCard.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/listingScreen/ThreeDotsModal.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/listings/ListingCard.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/listings/ListingsList.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/personalInformation/EditFieldModal.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/personalInformation/EditRow.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/profile/ProfileSocials.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/shared/ProfilePhotoPicker.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/config/fonts.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/constants/links.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useAuthNavigation.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useFontLoader.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useListing.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useListingsData.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/usePersonalInformation.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useProfileData.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/usePushNotifications.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useSocialMedia.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/useTabBarVisibility.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/navigation/StackNavigators/MarketplaceTabNavigator.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/providers/AppProviders.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/functions/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/functions/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/functions/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/functions/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/colors.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/constants/colors.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/BackArrow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/BackArrow.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ListingCard.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ListingScreenFullSkeletonLoader.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/listings/ListingScreenFullSkeletonLoader.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ListingsList.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ListingsListSkeletonLoaderFull.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/listings/ListingsListSkeletonLoaderFull.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/LoadingSpinner.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/LoadingSpinner.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Logo.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Logo.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MessageBubble.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/messages/MessageBubble.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/MessagePreviewCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/messages/MessagePreviewCard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Search/ListingSearch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Search/ListingSearch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Search/RecommendationCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Search/RecommendationCard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Search/Recommendations.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Search/Recommendations.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Search/UserResultCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Search/UserResultCard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Search/UserSearch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Search/UserSearch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ShareModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ShareModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/toasts/CustomToast.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/toasts/CustomToast.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/UnreadContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/context/UnreadContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/MainNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/MainNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/StackNavigators/AuthStackNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/StackNavigators/AuthStackNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/StackNavigators/MarketplaceStackNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/StackNavigators/MarketplaceStackNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/StackNavigators/ProfileStackNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/StackNavigators/ProfileStackNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/TabNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/TabNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Auth/EducationOnboarding.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Auth/EducationOnboarding.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Auth/EmailConfirmation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Auth/EmailOnboarding.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Auth/EmailOnboarding.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Auth/InfoOnboarding.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Auth/InfoOnboarding.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Auth/LandingPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Auth/LandingPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Auth/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Auth/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/ListingScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/Marketplace.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/Marketplace.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/CreateListing.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/CreateListing.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/EditPost.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/EditPost.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/ForYou.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/ForYou.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/Friends.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/Friends.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/Search.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/Search.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/Sell.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/MarketplaceLists/Sell.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Marketplace/UserProfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Marketplace/UserProfile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Messages/Conversation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Messages/Conversation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Messages/MessagesOverview.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Messages/MessagesOverview.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/Analytics.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/Followers.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/Followers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/OwnUserProfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/OwnUserProfile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/PersonalInformation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/PersonalInformation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/Profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/Profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/SavedItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/SavedItems.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/SoldItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/SoldItems.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Profile/YourListings.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Profile/YourListings.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shared/Asterisk.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Asterisk.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shared/FullLoadingScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shared/FullLoadingScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shared/PostCard.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shared/Wave.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Wave.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/createEdit.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/createEdit.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/firebaseUtils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/firebaseUtils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/socialUtils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/socialUtils.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +124,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "Merging master",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -380,15 +465,23 @@
       <option name="project" value="LOCAL" />
       <updated>1734588089320</updated>
     </task>
-    <task id="LOCAL-00038" summary="updates friends listings">
+    <task id="LOCAL-00038" summary="function to update user info">
       <option name="closed" value="true" />
-      <created>1734476494070</created>
+      <created>1735181707322</created>
       <option name="number" value="00038" />
       <option name="presentableId" value="LOCAL-00038" />
       <option name="project" value="LOCAL" />
-      <updated>1734476494070</updated>
+      <updated>1735181707330</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00039" summary="clean up personal info">
+      <option name="closed" value="true" />
+      <created>1735801095584</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1735801095628</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -406,8 +499,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="removed auth" />
-    <MESSAGE value="determine if it's own post, fetch seller profile" />
     <MESSAGE value="limit to grabbing 32 listings" />
     <MESSAGE value="grab seller profile, listings" />
     <MESSAGE value="display seller info on a listing" />
@@ -435,6 +526,8 @@
     <MESSAGE value="merge updates" />
     <MESSAGE value="updated context with followers/following" />
     <MESSAGE value="git history alignment" />
-    <option name="LAST_COMMIT_MESSAGE" value="git history alignment" />
+    <MESSAGE value="function to update user info" />
+    <MESSAGE value="clean up personal info" />
+    <option name="LAST_COMMIT_MESSAGE" value="clean up personal info" />
   </component>
 </project>

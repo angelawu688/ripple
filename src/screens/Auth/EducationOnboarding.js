@@ -3,8 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import { userContext } from '../../context/UserContext'
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { colors } from '../../colors';
-import Asterisk from '../shared/Asterisk';
+import { colors } from '../../constants/colors';
+import Asterisk from '../../components/Asterisk';
 
 
 const EducationOnboarding = ({ navigation, route }) => {

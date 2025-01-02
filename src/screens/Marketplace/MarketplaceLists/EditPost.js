@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 import { collection, addDoc, getFirestore, updateDoc, doc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { colors } from "../../../colors";
+import { colors } from "../../../constants/colors";
 import { userContext } from "../../../context/UserContext";
 import { ToastContext } from "../../../context/ToastContext";
 
@@ -128,7 +128,6 @@ const EditListing = ({ navigation, route }) => {
     // 
     const removePhoto = async (photoData) => {
         try {
-            console.log('photo', photoData)
             setErrorMessage('')
             if (typeof photoData === 'object' && photoData.card) {
                 // 1. Delete from storage

@@ -12,34 +12,23 @@ import UserProfile from "../../screens/Marketplace/UserProfile";
 import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
 import { DotsThree } from "phosphor-react-native";
 import Search from "../../screens/Marketplace/MarketplaceLists/Search";
+import { MarketplaceTabNavigator } from "./MarketplaceTabNavigator";
 
 const MarketplaceStack = createNativeStackNavigator();
+
 
 const MarketplaceStackNavigator = () => {
     return (
         <MarketplaceStack.Navigator
-            initialRouteName="Marketplace"
-            screenOptions={{
-                contentStyle: { backgroundColor: 'white' },
-                headerShadowVisible: false, // applied here
-                headerRight: () => (
-                    <Image
-                        source={require('../../../assets/images/Ripple_UW_Icon.png')}
-                        style={{ height: 25, width: 25, marginBottom: -5 }}
-
-                    />
-                )
-            }}
+            initialRouteName="MarketplaceTabs"
+            screenOptions={DEFAULT_STACK_OPTIONS}
         >
             <MarketplaceStack.Screen
-                name="Marketplace"
-                component={Marketplace}
+                name="MarketplaceTabs"
+                component={MarketplaceTabNavigator}
                 options={{
-                    headerLeft: () => (null),
-                    headerTitle: () => (
-                        <Logo />
-                    ),
-
+                    ...getDefaultLogo(),
+                    contentStyle: { flex: 1 }
                 }}
             />
 
@@ -47,15 +36,8 @@ const MarketplaceStackNavigator = () => {
                 name="Search"
                 component={Search}
                 options={({ navigation }) => ({
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    ),
-                    headerTitle: () => (
-                        <Logo />
-                    ),
-
+                    ...getDefaultBackArrow(navigation),
+                    ...getDefaultLogo()
                 })}
             />
 
@@ -64,14 +46,8 @@ const MarketplaceStackNavigator = () => {
                 name="ListingScreen"
                 component={ListingScreen}
                 options={({ navigation, route }) => ({
-                    headerTitle: () => (
-                        <Logo />
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    ),
+                    ...getDefaultBackArrow(navigation),
+                    ...getDefaultLogo(),
                     headerRight: () => (
                         <TouchableOpacity
                             onPress={() => route.params?.toggleModal && route.params.toggleModal()}
@@ -86,26 +62,16 @@ const MarketplaceStackNavigator = () => {
                 name="CreateListing"
                 component={CreateListing}
                 options={({ navigation }) => ({
-                    headerTitle: () => (
-                        <Text style={{ fontFamily: 'inter', fontSize: 18, fontWeight: '500' }}> Listing </Text>
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    )
+                    ...getDefaultBackArrow(navigation),
+                    ...getDefaultLogo(),
                 })}
             />
             <MarketplaceStack.Screen
                 name="UserProfile"
                 component={UserProfile}
                 options={({ navigation }) => ({
+                    ...getDefaultBackArrow(navigation),
                     headerTitle: () => '',
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    ),
                     headerRight: () => (
                         <></>
                     )
@@ -115,12 +81,9 @@ const MarketplaceStackNavigator = () => {
                 name="EditPost"
                 component={EditPost}
                 options={({ navigation }) => ({
+                    ...getDefaultBackArrow(navigation),
+                    ...getDefaultLogo(),
                     headerTitle: () => '',
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    )
                 })}
             />
         </MarketplaceStack.Navigator >
@@ -128,3 +91,31 @@ const MarketplaceStackNavigator = () => {
 }
 
 export default MarketplaceStackNavigator
+
+const DEFAULT_STACK_OPTIONS = {
+    contentStyle: { backgroundColor: 'white' },
+    headerShadowVisible: false,
+    headerRight: () => (
+        // UW LOGO
+        <Image
+            source={require('../../../assets/images/Ripple_UW_Icon.png')}
+            style={{ height: 25, width: 25, marginBottom: -5 }}
+        />
+    )
+};
+
+function getDefaultBackArrow(navigation) {
+    return ({
+        headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity >
+        )
+    })
+}
+
+function getDefaultLogo() {
+    return ({
+        headerTitle: () => <Logo />
+    })
+}

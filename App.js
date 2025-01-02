@@ -1,56 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import MainNavigator from './src/navigation/MainNavigator';
-import { userContext, UserProvider } from './src/context/UserContext';
 import 'react-native-url-polyfill/auto';
 import { AppRegistry } from 'react-native';
 import './firebaseConfig';
-import { useContext, useEffect, useState } from 'react';
-import { useFonts, Roboto_400Regular } from '@expo-google-fonts/roboto';
-import { Syne_700Bold, Syne_400Regular } from '@expo-google-fonts/syne';
-import { Inter_400Regular } from '@expo-google-fonts/inter'
-import * as SplashScreen from 'expo-splash-screen';
-import * as Linking from 'expo-linking'
 import FullLoadingScreen from './src/screens/shared/FullLoadingScreen';
-import { registerForPushNotificationsAsync } from './src/utils/notifications';
-import { handleUrlParams } from 'expo-router/build/fork/getStateFromPath-forks';
-import { ToastProvider } from './src/context/ToastContext';
 import Toast from './src/components/toasts/CustomToast';
-import { UnreadProvider } from './src/context/UnreadContext';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { linkingConfig } from './src/constants/links';
+import { AppProviders } from './src/providers/AppProviders';
+import { useFontLoader } from './src/hooks/useFontLoader';
+import { usePushNotifications } from './src/hooks/usePushNotifications';
 
 export default function App() {
-  const [appIsReady, setAppIsReady] = useState(false)
-  const [fontsLoaded] = useFonts({
-    Roboto_400Regular,
-    Syne_400Regular,
-    Syne_700Bold,
-    Inter_400Regular
-  });
-
-  // keep the splash up until the fonts are loaded
-  useEffect(() => {
-    const prepare = async () => {
-      try {
-        if (fontsLoaded) {
-          setAppIsReady(true)
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    prepare()
-  }, [fontsLoaded]);
-
-  // this will dismiss the splash screen
-  useEffect(() => {
-    if (appIsReady) {
-      requestAnimationFrame(async () => {
-        await SplashScreen.hideAsync().catch(console.warn);
-      });
-    }
-  }, [appIsReady]);
+  const { appIsReady } = useFontLoader();
 
   // dont load the app until the fonts are loaded
   if (!appIsReady) {
@@ -58,74 +20,27 @@ export default function App() {
   }
 
   return (
-    <UserProvider>
-      <ToastProvider>
-        <UnreadProvider>
-          <RootComponent />
-        </UnreadProvider>
-      </ToastProvider>
-    </UserProvider >
-
+    <AppProviders>
+      <RootComponent />
+    </AppProviders>
   );
 }
 
 // separate the middle into root so that we are able to grab the loading prop
 // from the user context, fixing the flickering issue
 const RootComponent = () => {
-  const { isLoading, user, userData } = useContext(userContext);
-
-  // register the user for async notifications
-  // only do this after there is userData, which means that they have complete onboarding
-  // Note: on sim, this will call on updates to user, since it autodeclines every time
-  useEffect(() => {
-    const handleRegisterForPushNotificationsAsync = async () => {
-      if (!isLoading && user && userData) {
-        const token = await registerForPushNotificationsAsync(user.uid);
-      }
-    }
-    handleRegisterForPushNotificationsAsync()
-  }, [isLoading, user])
+  const { isLoading } = usePushNotifications();
 
   if (isLoading) {
     return <FullLoadingScreen />
   }
 
-
-
-
-  // ALLOWS FOR DEEP LINKS
-  // this needs a lot more testing lmao
-  const linking = {
-    // basically grabbing how the link will be created
-    // i.e. if you are on dev you wont be able to try prod ones, vice versa
-    // dont anticipate this being an issue
-    // in prod, we will need to use firebase dynamic links to redirect users without the app to the app store
-    prefixes: [Linking.createURL('/')],
-    config: {
-      screens: {
-        Main: {
-          screens: {
-            MarketplaceStack: {
-              screens: {
-                ListingScreen: 'listing/:listingID', // bring them to the info that was passed in
-                UserProfile: 'user/:userID', // same thing as above, now just with the user
-              },
-            },
-          },
-        },
-        Auth: '*', // if no user profile, direct them to auth stack
-      },
-    },
-  };
-
   return (
-    <SafeAreaProvider>
-      <NavigationContainer linking={linking}>
-        <Toast />
-        <MainNavigator />
-        <StatusBar style='dark' />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <NavigationContainer linking={linkingConfig}>
+      <Toast />
+      <MainNavigator />
+      <StatusBar style='dark' />
+    </NavigationContainer>
   )
 }
 

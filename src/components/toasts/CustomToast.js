@@ -1,7 +1,7 @@
 import { View, Text, Animated, StyleSheet } from 'react-native'
 import React, { useContext, useEffect, useRef } from 'react'
 import { ToastContext } from '../../context/ToastContext'
-import { colors } from '../../colors'
+import { colors } from '../../constants/colors'
 
 export default function Toast() {
     const { isToastVisible, toastMessage } = useContext(ToastContext)

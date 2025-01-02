@@ -2,7 +2,7 @@ import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity,
 import { getFirestore, where, setDoc, collection, query, orderBy, getDocs, limit, startAfter } from "firebase/firestore";
 
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../colors'
+import { colors } from '../../constants/colors'
 import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 
@@ -14,8 +14,7 @@ const Sell = lazy(() => import('./MarketplaceLists/Sell'));
 // import Sell from './MarketplaceLists/Sell'
 // import Search from './MarketplaceLists/Search'
 import { Eyeglasses, MagnifyingGlass, MapPin, Plus } from "phosphor-react-native";
-import ListingsListSkeletonLoaderFull from "../../components/ListingsListSkeletonLoaderFull";
-import { useFocusEffect } from "@react-navigation/native";
+import ListingsListSkeletonLoaderFull from "../../components/listings/ListingsListSkeletonLoaderFull";
 
 
 // how many items we fetch at a time

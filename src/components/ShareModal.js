@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import { ImageBackground, Modal, StyleSheet, Text, TouchableOpacity, Animated } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
-import { colors } from '../colors'
+import { colors } from '../constants/colors'
 import { ChatCircleDots, Export, Link, X } from 'phosphor-react-native'
 import { View } from 'react-native'
 import { BlurView } from 'expo-blur'

@@ -1,53 +1,34 @@
 import { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator, ScrollView, Image, Modal, TouchableWithoutFeedback } from "react-native";
-import ForYou from "./MarketplaceLists/ForYou";
-import { Ionicons } from "@expo/vector-icons";
-import {
-    collection,
-    deleteDoc,
-    doc,
-    getDoc,
-    getDocs,
-    getFirestore,
-    query,
-    setDoc,
-    updateDoc,
-    addDoc,
-    where,
-    arrayUnion,
-    arrayRemove,
-} from "firebase/firestore";
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Image, } from "react-native";
+
 import FullLoadingScreen from "../shared/FullLoadingScreen";
-import ListingsList from '../../components/ListingsList'
-import { ChatCircleDots, Check, DotsThree, EnvelopeSimple, Gear, InstagramLogo, Link, LinkedinLogo, Mailbox, Plus, QrCode, User, XLogo } from "phosphor-react-native";
-import { colors } from "../../colors";
-import { userContext } from "../../context/UserContext";
-import ListingCard from "../../components/ListingCard";
-import { getConversation } from '../../utils/firebaseUtils'
-import { sendProfile } from "../../utils/socialUtils";
+import ListingsList from '../../components/listings/ListingsList'
+import { Check, DotsThree, EnvelopeSimple, Plus, QrCode, User } from "phosphor-react-native";
+import { colors } from "../../constants/colors";
+import ListingCard from "../../components/listings/ListingCard";
 import * as Linking from 'expo-linking'
 import ShareModal from "../../components/ShareModal";
-import { useFocusEffect } from "@react-navigation/native";
 import { ToastContext } from "../../context/ToastContext";
+import ProfileSocials from "../../components/profile/ProfileSocials";
+import { useProfileData } from "../../hooks/useProfileData";
 
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
     const { showToast } = useContext(ToastContext);
-    const { user, userData, setUserData, userListings, userFollowingIds, setUserFollowingIds } = useContext(userContext)
+    const {
+        isLoading,
+        userProfile,
+        userPosts,
+        isOwnProfile,
+        followingUser,
+        handleFollowToggle,
+        handleFollowers,
+        handleFollowing,
+        handleMessage
+    } = useProfileData(userID);
 
-    const [followingUser, setFollowingUser] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
-    const [userProfile, setUserProfile] = useState(null) // avoid using "user" because we have a context for that
-    const [isOwnProfile, setIsOwnProfile] = useState(false)
-    const [userPosts, setUserPosts] = useState([])
     const [shareModalVisible, setShareModalVisible] = useState(false)
-
-    const [loadingIG, setLoadingIG] = useState(false)
-    const [loadingLI, setLoadingLI] = useState(false)
-
-    // temp here, clean this up later to only do it once
     const [profileLink, setProfileLink] = useState('');
-
     useEffect(() => {
         if (userID) {
             const link = Linking.createURL(`user/${userID}`);
@@ -55,103 +36,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         }
     }, [userID]);
 
-    const db = getFirestore();
-
-    // OCM grab if its the users own post
-    // imo a little more bulletproof than having 2 diff accounts
-    useEffect(() => {
-        if (user.uid === userID) {
-            setIsOwnProfile(true)
-            const sortedListings = userListings.sort((a, b) => {
-                if (a.sold !== b.sold) {
-                    return a.sold ? 1 : -1;
-                }
-                return b.createdAt - a.createdAt;
-
-            });
-            setUserPosts(sortedListings);
-            setUserProfile(userData)
-            setIsLoading(false);
-        }
-    }, [user, userData, userListings])
-
-
-    // set navigation options and header based on what stack we are in
-    useEffect(() => {
-        if (isOwnProfileInProfileStack) {
-            navigation.setOptions({
-                // set options here, might not be needed anymore
-            })
-        } else {
-            // is own profile 
-            // is other user profile
-            // regardless, no 3 dots, top header is just the back arrow
-            // just want the back arrow
-        }
-    })
-
-
-    // grab the profile from the backend by the userID
-    useEffect(() => {
-        const getProfile = async () => {
-            try {
-                const db = getFirestore();
-                const userRef = doc(db, "users", userID);
-                const userDoc = await getDoc(userRef);
-                const queryListings = query(collection(db, "listings"),
-                    where("userId", "==", userID)
-                );
-                const listingsDoc = await getDocs(queryListings)
-                if (userDoc.exists()) {
-                    setUserProfile(userDoc.data())
-                    const listingsData = listingsDoc.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    // sort by 1) sold or not sold, 2) time as tiebreaker
-                    const sortedListings = listingsData.sort((a, b) => {
-                        if (a.sold !== b.sold) {
-                            return a.sold ? 1 : -1;
-                        }
-                        // convert to ms so that we can compare with subtraction
-                        return b.createdAt.toMillis() - a.createdAt.toMillis();
-
-                    });
-                    setUserPosts(sortedListings);
-
-                    // check if following user already
-                    if (userFollowingIds && userFollowingIds.length !== 0) {
-                        const followStatus = userFollowingIds.includes(userID);
-                        if (followStatus) {
-                            setFollowingUser(true)
-                        } else {
-                            setFollowingUser(false);
-                        }
-                    }
-                    else {
-                        setFollowingUser(false);
-                    }
-                }
-                else {
-                    console.error("No such user")
-                }
-            } catch (error) {
-                console.error("Error fetching user and their listings:", error);
-            } finally {
-                setIsLoading(false);
-            }
-            // // setting the socials for testing
-            // // TODO CHANGE TESTING (can we delete this)
-            // setUserProfile(prevProfile => ({
-            //     ...prevProfile,
-            //     // instagram: 'williamhuntt',
-            //     // linkedin: 'https://www.linkedin.com/in/william-hunt-7895a3212/'
-            // }));
-        };
-        if (user.uid !== userID) {
-            getProfile();
-        }
-    }, []);
 
     if (isLoading) {
         return <FullLoadingScreen />
@@ -170,173 +54,8 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         )
     }
 
-    const handleFollow = () => {
-        try {
-            if (followingUser) {
-                markAsUnfollowed();
-            }
-            else {
-                markAsFollowed();
-            }
-            setFollowingUser(!followingUser)
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
-    // TODO: go through and make sure error checking is fine
-    // TODO: see if it can be cleaner
-    const markAsFollowed = async () => {
-        // add other user to following
-        const newFollowing = {
-            following_id: userID,
-            following_name: userProfile.name,
-            following_pfp: userProfile.pfp,
-            following_major: userProfile.major
-        };
-        // add curr user to their followers
-        const newFollower = {
-            follower_id: user.uid,
-            follower_name: userData.name,
-            follower_pfp: userData.pfp,
-            follower_major: userProfile.major
-        }
-        const userRef = doc(db, "users", user.uid);
-        const followingRef = doc(db, "users", userID)
-        try {
-            await updateDoc(userRef, {
-                following: arrayUnion(newFollowing),
-            })
-            await updateDoc(followingRef, {
-                followers: arrayUnion(newFollower),
-            })
-            const userDoc = await getDoc(userRef);
-            setUserData(userDoc.data());
-
-            const followingUserDoc = await getDoc(followingRef);
-            setUserProfile(followingUserDoc.data())
-        } catch (error) {
-            console.error("Error following user", error);
-        } finally {
-            // frontend update
-            setUserFollowingIds((prevUserFollowingIds) => [...prevUserFollowingIds, userID]);
-        }
-    }
-
-    const markAsUnfollowed = async () => {
-        const userRef = doc(db, "users", user.uid);
-        const userToUnfollow = userData.following.find((item) => item.following_id === userID);
-
-        const followingRef = doc(db, "users", userID);
-        const userToRemove = userProfile.followers.find((item) => item.follower_id === user.uid);
-        try {
-            await updateDoc(userRef, {
-                following: arrayRemove(userToUnfollow),
-            });
-
-            await updateDoc(followingRef, {
-                followers: arrayRemove(userToRemove),
-            })
-
-            const userDoc = await getDoc(userRef);
-            setUserData(userDoc.data());
-
-            const followingUserDoc = await getDoc(followingRef);
-            setUserProfile(followingUserDoc.data())
-        } catch (error) {
-            console.error("Error unfollowing error:", error);
-        } finally {
-            // frontend update
-            setUserFollowingIds((prev) =>
-                prev.filter((id) => id !== userID)
-            );
-        }
-    }
-
-    const handleMessage = async () => {
-        // active user ID and the other user's ID
-        const conversationID = await getConversation(user.uid, userID)
-        const otherUserDetails = {
-            id: userID,
-            name: userProfile.name,
-            pfp: userProfile.pfp
-        }
-        navigation.navigate('MessagesStack', {
-            screen: 'Conversation',
-            params: {
-                conversationID: conversationID,
-                otherUserDetails: otherUserDetails
-            }
-        });
-    }
-
-    // just navigation here
-    const handleFollowers = () => {
-        const followers = userData.followers
-        navigation.navigate('Followers', {
-            followers: followers,
-            isFollowers: true,
-        })
-    }
-
-    const handleFollowing = () => {
-        const following = userData.following
-        navigation.navigate('Followers', {
-            following: following,
-            isFollowers: false
-        })
-    }
-
-    // todo maybe handle as error messages instead of alerts
-    const openSocial = async (social) => {
-        let url = ''
-        switch (social) {
-            case ('instagram'):
-                if (!userProfile.instagram) {
-                    setLoadingIG(true)
-                    Alert.alert('Error', 'No Instagram user found')
-                    return;
-                }
-                // works for now
-                url = `https://www.instagram.com/${userProfile.instagram.split('@')[1]}`;
-                break;
-            case ('linkedin'):
-                setLoadingLI(true)
-                const isUrl = /^https?:\/\/.+$/.test(userProfile.linkedin);
-                if (!isUrl) {
-                    Alert.alert('Error', 'Invalid URL')
-                    return;
-                }
-                if (!userProfile.linkedin) {
-                    Alert.alert('Error', 'No LinkedIn user found')
-                    return;
-                }
-                url = userProfile.linkedin
-                break;
-            default:
-                Alert.alert('Error', 'Unsupported platform');
-                return;
-        }
-        try {
-            const supported = await Linking.canOpenURL(url)
-            if (supported) {
-                await Linking.openURL(url)
-            } else {
-                Alert.alert('Error', "Can't open Instagram profile")
-            }
-        } catch (e) {
-            console.error("An error occurred while trying to open Instagram:", error);
-            Alert.alert("Error", "An unexpected error occurred.");
-        } finally {
-            setLoadingIG(false)
-            setLoadingLI(false)
-        }
-    }
-
     return (
         <View style={[styles.container]}>
-            {/* , { marginTop: isOwnProfileInProfileStack ? 80 : 0 } */}
-
             {isOwnProfileInProfileStack && <View style={{ height: 80, width: '100%' }} />}
             <View style={styles.topContainer}>
                 {userProfile.pfp ? (<Image
@@ -389,7 +108,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 
                         {isOwnProfile ? (
                             <TouchableOpacity style={[styles.followButton, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}
-                                onPress={() => handleFollowers()}
+                                onPress={handleFollowers}
                             >
                                 <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
                                     Followers
@@ -397,7 +116,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                             </TouchableOpacity>
                         ) : (
                             <TouchableOpacity style={[styles.followButton, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}
-                                onPress={() => handleFollow()}
+                                onPress={handleFollowToggle}
                             >
 
                                 {followingUser ? <Check size={18} color={followingUser ? colors.neonBlue : colors.accentGray} /> : <Plus size={18} color={colors.accentGray} />}
@@ -407,13 +126,13 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                             </TouchableOpacity>)}
 
                         {isOwnProfile ? (<TouchableOpacity style={[styles.followButton, styles.shadow]}
-                            onPress={() => handleFollowing()}
+                            onPress={handleFollowing}
                         >
                             <Text style={[styles.followText, { backgroundColor: 'white' }]}>
                                 Following
                             </Text>
                         </TouchableOpacity>) : (<TouchableOpacity style={[styles.followButton, styles.shadow]}
-                            onPress={() => handleMessage()}
+                            onPress={() => handleMessage(userID)}
                         >
                             <EnvelopeSimple size={18} color={colors.accentGray} />
                             <Text style={[styles.followText, { backgroundColor: 'white' }]}>
@@ -444,57 +163,37 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                                 {userProfile.bio}
                             </Text>
                         </View>)}
-                        {(userProfile.instagram || userProfile.linkedin) && (<View style={[styles.socials, { height: userProfile.instagram && userProfile.linkedin ? 60 : 40 }]}>
 
-                            {userProfile.instagram && <TouchableOpacity
-                                style={styles.socialContainer}
-                                onPress={() => openSocial('instagram')}
-                            >
-                                {loadingIG ? (<ActivityIndicator />) : (<Image
-                                    source={require('../../../assets/images/IG_logo.png')}
-                                    style={{ width: 25, height: 25, borderRadius: 5 }}
-                                />)}
-                                <Text style={styles.socialText}>
-                                    {userProfile.instagram}
-                                </Text>
-                            </TouchableOpacity>}
+                        <ProfileSocials userProfile={userProfile} />
 
-                            {userProfile.linkedin && <TouchableOpacity
-                                style={styles.socialContainer}
-                                onPress={() => openSocial('linkedin')}
-                            >
-                                <Image
-                                    source={require('../../../assets/images/LI_logo.png')}
-                                    style={{ width: 25, height: 25, borderRadius: 5 }}
-                                />
-                                <Text numberOfLines={1}
-                                    style={styles.socialText}>
-                                    {userProfile.linkedin}
-                                </Text>
-                            </TouchableOpacity>}
-
-
-                        </View>)}
                         <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 20 }}>
                             Listings
                         </Text>
-                        {/* {userPosts && userPosts.length > 0 && (
-                            // <View>
-                            <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 20 }}>
-                                Listings
-                            </Text>
-                            // </View>
-                        )} */}
+
                     </View>
                 </View>
+
                 {userPosts && userPosts.length > 0 ? (userPosts.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
-                    <ListingCard listing={userPosts[0]} />
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('ListingScreen', { listingID: userPosts[0].id })}
+                    >
+                        <ListingCard
+                            listing={userPosts[0]}
+                            disabled={!isOwnProfile && userPosts[0].sold}
+                        />
+                    </TouchableOpacity>
+
                 </View>) : (<View style={{
                     width: '100%',
                 }}>
-                    <ListingsList listings={userPosts} navigation={navigation} scrollEnabled={false} />
+                    <ListingsList
+                        listings={userPosts}
+                        navigation={navigation}
+                        scrollEnabled={false}
+                        isOwnProfile={isOwnProfile}
+                    />
                 </View>)) : (
-                    <View style={{ alignSelf: 'center' }}>
+                    <View style={{ alignSelf: 'flex-start' }}>
                         <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', marginLeft: 25 }}>
                             {isOwnProfile ? 'You have ' : 'User has '}no listings
                         </Text>
@@ -504,7 +203,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         </Text>}
                     </View>
                 )}
-
             </ScrollView >
 
             {isOwnProfile && (

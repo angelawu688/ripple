@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../colors';
+import { colors } from '../constants/colors';
 
 
 const Logo = ({ fontSize }) => {
@@ -11,7 +11,7 @@ const Logo = ({ fontSize }) => {
 
     return (
         <View style={{ justifyContent: "center", alignItems: "center", }}>
-            <GradientText style={{ fontSize: size, fontFamily: 'Syne_700Bold' }}>Ripple</GradientText>
+            <GradientText style={{ fontSize: size, fontFamily: 'Inter', fontWeight: '600', letterSpacing: -0.75 }}>Ripple</GradientText>
         </View>
     );
 }

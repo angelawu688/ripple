@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import { Image } from 'expo-image'
 import { TouchableOpacity } from 'react-native'
 import { StyleSheet } from 'react-native'
-import { colors } from '../../colors'
+import { colors } from '../../constants/colors'
 import { X } from 'phosphor-react-native'
 
 export default function RecommendationCard({ navigation, recommendedUser, onRemove }) {
@@ -26,13 +26,13 @@ export default function RecommendationCard({ navigation, recommendedUser, onRemo
                     </Text>
 
                     <Text style={[styles.text, { color: colors.loginBlue, fontWeight: '400' }]}>
-                        {mutualCount} mutual friends
+                        {mutualCount} mutual friend{mutualCount > 1 && 's'}
                     </Text>
                 </View>
             </View>
 
             <TouchableOpacity onPress={() => onRemove(recommendedUserData.id)}>
-                <X size={32} color={colors.accentGray} />
+                <X size={30} color={colors.accentGray} />
             </TouchableOpacity>
         </TouchableOpacity>
     )

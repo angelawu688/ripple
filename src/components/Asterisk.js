@@ -1,5 +1,5 @@
 import { Text } from 'react-native'
-import { colors } from '../../colors';
+import { colors } from '../constants/colors';
 
 const Asterisk = () => {
     return (

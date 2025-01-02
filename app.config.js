@@ -8,7 +8,9 @@ export default () => ({
     icon: "./assets/images/RippleIcon.png", // actual app Icon
     scheme: "myapp",
     userInterfaceStyle: "automatic",
+    // jsEngine: "hermes",
     ios: {
+      // jsEngine: "jsc",
       supportsTablet: false,
       infoPlist: {
         NSPhotoLibraryUsageDescription: "This app requires access to your photo library to upload photos.",
