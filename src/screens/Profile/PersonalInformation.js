@@ -75,10 +75,10 @@ const PersonalInformation = () => {
                     searchKeywords: keywords
                 });
 
-                await Promise.all([
-                    updateAllListingsName(user.uid, newValue),
-                    updateAllFollowName(user.uid, newValue, userData.name, userData.pfp)
-                ]);
+                // await Promise.all([
+                //     updateAllListingsName(user.uid, newValue),
+                //     updateAllFollowName(user.uid, newValue, userData.name, userData.pfp)
+                // ]);
             } else {
                 // update the single field for all others
                 await updateDoc(userRef, {
@@ -126,8 +126,8 @@ const PersonalInformation = () => {
                                     const userRef = doc(db, "users", user.uid);
                                     await updateDoc(userRef, { pfp: downloadLink });
 
-                                    await updateAllListingsPfp(user.uid, downloadLink);
-                                    await updateAllFollowPfp(user.uid, downloadLink, userData.pfp, userData.name);
+                                    // await updateAllListingsPfp(user.uid, downloadLink);
+                                    // await updateAllFollowPfp(user.uid, downloadLink, userData.pfp, userData.name);
 
                                     const userDoc = await getDoc(userRef);
                                     setUserData(userDoc.data());
