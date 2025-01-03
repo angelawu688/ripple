@@ -15,6 +15,10 @@ const ForYou = ({ navigation }) => {
         loadingMore // tells us what to pass in for the footer
     } = useListingsData('foryou')
 
+    if (isLoading) {
+        return <ListingsListSkeletonLoaderFull />
+    }
+
     if (!listings?.length && !isLoading) {
         return (
             <View style={styles.emptyContainer}>
@@ -23,10 +27,6 @@ const ForYou = ({ navigation }) => {
                 </Text>
             </View>
         )
-    }
-
-    if (isLoading) {
-        return <ListingsListSkeletonLoaderFull />
     }
 
     return (

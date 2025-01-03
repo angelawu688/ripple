@@ -78,7 +78,7 @@ const Friends = ({ navigation }) => {
         } catch (e) {
             console.log(e)
         }
-        // example dev URL: exp://10.155.102.135:8081/--/user/RsYuNgUxSUTm0xdD0CMi6Yhkjc73 
+        // example dev URL from expo: exp://10.155.102.135:8081/--/user/RsYuNgUxSUTm0xdD0CMi6Yhkjc73 
         // prod urls will look different
         // we will need to use firebase dynamic URLs so that people without the app will be prompted to go download
     }

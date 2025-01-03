@@ -67,7 +67,7 @@ export function MarketplaceTabNavigator({ navigation }) {
                     options={{ tabBarLabel: 'For You' }}
                 />
                 <Tab.Screen
-                    name="Screen2"
+                    name="Friends"
                     component={Friends}
                     options={{ tabBarLabel: 'Friends' }}
                 />

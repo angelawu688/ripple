@@ -45,21 +45,6 @@ const ListingsList = ({ listings,
         )
     })
 
-    // const renderItem = ({ item }) => {
-    //     const isClickDisabled = !isOwnProfile && item.sold;
-    //     return (
-    //         <TouchableOpacity
-    //             disabled={isClickDisabled && false}
-    //             onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
-    //             style={{ flex: 1, padding: 1 }}
-    //         >
-    //             <ListingCard
-    //                 listing={item}
-    //             />
-    //         </TouchableOpacity >
-    //     )
-    // }
-
     const keyExtractor = useCallback((item) => item.id, [])
 
     return (
