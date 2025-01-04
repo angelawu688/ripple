@@ -77,7 +77,7 @@ const LandingPage = ({ navigation }) => {
             {/* Logo */}
             <View style={styles.logoContainer}>
                 {/* <Logo fontSize={65} /> */}
-                <Text style={{ fontFamily: 'Syne', fontWeight: '700', fontSize: 65, color: '#51A2B0' }}>
+                <Text style={{ fontFamily: 'inter', fontWeight: '700', fontSize: 55, color: colors.loginBlue, opacity: 0.7, letterSpacing: -3 }}>
                     Ripple
                 </Text>
             </View>
@@ -130,8 +130,8 @@ const LandingPage = ({ navigation }) => {
                 <TouchableOpacity
                     hitSlop={{ top: 5, bottom: 30, left: 10, right: 10 }}
                     onPress={() => navigation.navigate('Login')}
-                    style={[styles.button, { backgroundColor: 'white', borderColor: colors.loginBlue, borderWidth: 1 }]}>
-                    <Text style={[styles.buttonText, { color: colors.loginBlue }]}>
+                    style={[styles.button, { backgroundColor: colors.loginGray, opacity: 0.8 }]}>
+                    <Text style={[styles.buttonText, { color: colors.black }]}>
                         Login
                     </Text>
                 </TouchableOpacity>
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
 
     },
     button: {
-        width: '90%',
+        width: '100%',
         height: 45,
         display: 'flex',
         justifyContent: 'center',
@@ -163,15 +163,16 @@ const styles = StyleSheet.create({
     buttonText: {
         fontFamily: 'inter',
         fontSize: 20,
-        fontWeight: '600'
+        fontWeight: '600',
+        letterSpacing: -0.5
     },
     buttonContainer: {
         height: 110,
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'absolute',
-        bottom: 75,
-        width: '100%',
+        bottom: 55,
+        width: '80%',
         alignItems: 'center'
     },
     topWaves: {

@@ -1,5 +1,5 @@
 export const colors = {
-    lightgray: '#E0E0E0',
+    lightgray: '#F2F2F2',
     darkgray: '#767676',
     black: 'black',
     teal: '#6CD0D0',
@@ -17,5 +17,5 @@ export const colors = {
     mediumGray: '#F8F8F8',
     bgGray: '#F2F2F2',
     gradientEnd: '#AAF7F7',
-    gradientMiddle: '#3AA1A1'
+    gradientMiddle: '#3AA1A1',
 }

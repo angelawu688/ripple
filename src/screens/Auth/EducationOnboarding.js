@@ -145,22 +145,22 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 26,
-        fontWeight: '600',
-        fontFamily: 'Syne_700Bold',
+        fontWeight: '700',
+        fontFamily: 'Rubik',
         color: colors.black
     },
     input: {
-        backgroundColor: 'white',
+        backgroundColor: colors.lightgray,
         borderRadius: 12,
         width: '100%',
         height: 35,
         paddingHorizontal: 12,
         // shadow
-        shadowColor: 'rgba(0, 0, 0, 0.25)',
-        shadowOffset: { width: 5, height: 5 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
-        elevation: 5,
+        // shadowColor: 'rgba(0, 0, 0, 0.25)',
+        // shadowOffset: { width: 5, height: 5 },
+        // shadowOpacity: 0.5,
+        // shadowRadius: 10,
+        // elevation: 5,
     },
     errorText: {
         fontFamily: 'inter',

@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react'
 import { useRef, useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Modal, Platform, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Modal, Platform, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Pressable } from 'react-native'
 import {
     getAuth,
     signInWithEmailAndPassword
@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../../constants/colors';
 import Asterisk from '../../components/Asterisk'
-import { UploadSimple } from 'phosphor-react-native';
+import { CheckSquare, Square, UploadSimple } from 'phosphor-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { uploadPFP } from '../../utils/firebaseUtils'
 import { generateUserKeywords } from '../../utils/search'
@@ -21,6 +21,7 @@ import { links } from '../../constants/links';
 import { ToastContext } from '../../context/ToastContext';
 import { Linking } from 'react-native';
 import { openLink } from '../../utils/socialUtils';
+import EditFieldModal from '../../components/personalInformation/EditFieldModal'
 
 
 const InfoOnboarding = ({ navigation, route }) => {
@@ -41,6 +42,7 @@ const InfoOnboarding = ({ navigation, route }) => {
     const [inputError, setInputError] = useState('')
     const [bioHeight, setBioHeight] = useState(50)
     const { setUser, setUserData, setSavedPosts, setUserListings, setUserFollowingIds } = useContext(userContext);
+    const [agreed, setAgreed] = useState(false)
     const { showToast } = useContext(ToastContext)
 
     // focus the top text field on component mount
@@ -87,6 +89,12 @@ const InfoOnboarding = ({ navigation, route }) => {
 
         if (bio.length > 163) {
             setErrorMessage('Bio must be under 163 characters')
+            setIsLoading(false)
+            return;
+        }
+
+        if (!agreed) {
+            setErrorMessage('Must agree to Terms of Service and Privacy Policy!')
             setIsLoading(false)
             return;
         }
@@ -198,7 +206,7 @@ const InfoOnboarding = ({ navigation, route }) => {
                     Personal
                 </Text>
 
-                <View style={{ height: 30, }}>
+                <View style={{ minHeight: 20, marginBottom: 10 }}>
                     {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
                 </View>
 
@@ -324,21 +332,29 @@ const InfoOnboarding = ({ navigation, route }) => {
                 <View style={{
                     width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 15
                 }}>
+
+                    <Pressable onPress={() => setAgreed(prev => !prev)}>
+                        {agreed ? (
+                            <CheckSquare size={32} color={colors.loginBlue} />
+                        ) : (
+                            <Square size={32} color={colors.accentGray} />
+                        )}
+                    </Pressable>
                     <Text style={{ fontSize: 12, maxWidth: '75%', fontFamily: 'inter' }} numberOfLines={2}>
-                        By creating an account, you agree to our
+                        To create an account, you must agree to our{' '}
                         <Text
                             onPress={() => openLink(links.termsOfService, showToast)}
                             style={styles.link}
 
                         >
-                            {' '}Terms of Service{' '}
+                            Terms of Service
                         </Text>
-                        and
+                        {' '}and{' '}
                         <Text
                             onPress={() => openLink(links.privacyPolicy, showToast)}
                             style={styles.link}
                         >
-                            {' '}Privacy Policy{' '}
+                            Privacy Policy
                         </Text>
                     </Text>
                     <TouchableOpacity
@@ -352,89 +368,53 @@ const InfoOnboarding = ({ navigation, route }) => {
                     </TouchableOpacity>
                 </View>
 
-
-
-
-                {/* Modal */}
-                <Modal
-                    animationType="fade"
-                    transparent={true}
-                    visible={showIGModal || showLIModal}
-                    onRequestClose={() => {
+                <EditFieldModal
+                    visible={showIGModal}
+                    fieldLabel="Instagram"
+                    fieldDescription={inputError || "Enter username starting with @"}
+                    initialValue={ig}
+                    onClose={() => {
                         setShowIGModal(false);
+                        setInput('');
+                        setInputError('');
+                        setContinueAvailable(false);
+                    }}
+                    onSave={(newValue) => {
+                        // Validate Instagram handle
+                        if (!newValue.trim().length > 1) {
+                            setInputError('Enter your username!');
+                            return;
+                        }
+                        if (newValue.trim().indexOf('@') !== 0) {
+                            setInputError('Username must start with @!');
+                            return;
+                        }
+                        setIG(newValue.trim());
+                        setShowIGModal(false);
+                    }}
+                    isLoading={isLoadingSave}
+                    errorMessage={inputError}
+                />
+
+                <EditFieldModal
+                    visible={showLIModal}
+                    fieldLabel="LinkedIn"
+                    fieldDescription="Enter your LinkedIn URL"
+                    initialValue={li}
+                    onClose={() => {
+                        setShowLIModal(false);
+                        setInput('');
+                        setInputError('');
+                        setContinueAvailable(false);
+                    }}
+                    onSave={(newValue) => {
+                        setLI(newValue.trim());
                         setShowLIModal(false);
                     }}
-                >
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
-                            <View style={styles.innerModalContainer}>
-                                <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 26, alignSelf: 'flex-start', marginBottom: 10 }}>
-                                    Edit {currentField.label}
-                                </Text>
-
-                                {currentField.description && !inputError ?
-                                    (
-                                        <Text
-                                            style={{ fontFamily: 'Inter', fontSize: 16, color: colors.loginBlue, marginVertical: 6 }}
-                                        >
-                                            {currentField.description}
-                                        </Text>
-                                    ) :
-                                    (
-                                        inputError && <Text
-                                            style={{ fontFamily: 'Inter', fontSize: 16, color: colors.errorMessage, marginVertical: 6 }}
-                                        >
-                                            {inputError}
-                                        </Text>
-                                    )
-                                }
-
-                            </View>
-                            <TextInput
-                                onChangeText={(newInput) => {
-                                    setInput(newInput);
-                                    setContinueAvailable(input.trim().length > 0);
-                                    if (inputError) setInputError(''); // removes error persistence
-                                }}
-                                value={input}
-                                style={styles.modalInput}
-                                keyboardType="url"
-                                placeholder={currentField.placeholder}
-                                placeholderTextColor={colors.placeholder}
-                            />
-                            <View style={styles.modalButtonContainer}>
-                                <TouchableOpacity
-                                    style={[styles.modalCloseButton, { backgroundColor: colors.loginGray }]}
-                                    onPress={() => {
-                                        setShowIGModal(false);
-                                        setShowLIModal(false);
-                                        setInput('')
-                                        setInputError('')
-                                        setContinueAvailable(false)
-                                    }}
-                                >
-                                    <Text style={[styles.modalCloseButtonText, { color: 'black' }]}>Cancel</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    disabled={!continueAvailable}
-                                    style={[
-                                        styles.modalCloseButton,
-                                        { backgroundColor: continueAvailable ? colors.loginBlue : colors.loginGray },
-                                    ]}
-                                    onPress={handleSave}
-                                >
-                                    {isLoadingSave ? (
-                                        <ActivityIndicator size="small" color="white" />
-                                    ) : (
-                                        <Text style={[styles.modalCloseButtonText, {
-                                            color: continueAvailable ? 'white' : 'black'
-                                        }]}>Save</Text>
-                                    )}
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-                </Modal >
+                    isLoading={isLoadingSave}
+                    errorMessage={inputError}
+                    keyboardType="url"
+                />
             </KeyboardAvoidingView >
         </TouchableWithoutFeedback>
     )
@@ -455,7 +435,7 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 26,
         fontWeight: '600',
-        fontFamily: 'Syne_700Bold'
+        fontFamily: 'Rubik'
     },
     input: {
         backgroundColor: 'white',
@@ -509,84 +489,6 @@ const styles = StyleSheet.create({
     },
     image: {
         height: 25, width: 25
-    },
-    // modal styles:
-    modalOverlay: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 20,
-        alignItems: 'flex-start',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-        width: '80%'
-    },
-    modalText: {
-        fontSize: 18,
-        marginBottom: 15,
-        textAlign: 'center',
-        backgroundColor: 'orange',
-
-    },
-    modalCloseButton: {
-        backgroundColor: colors.loginBlue,
-        width: 85,
-        height: 35,
-        borderRadius: 15,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    modalCloseButtonText: {
-        color: 'white',
-        fontFamily: 'inter',
-        fontWeight: '600',
-        textAlign: 'center',
-    },
-    innerModalContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'flex-start',
-        width: '100%',
-        alignSelf: 'center'
-    },
-    modalButtonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        marginTop: 20
-    },
-    manualCheckButton: {
-        backgroundColor: '#f0f0f0',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 5,
-        marginBottom: 10,
-    },
-    modalInput: {
-        backgroundColor: 'white',
-        borderRadius: 12,
-        width: '100%',
-        height: 35,
-        paddingHorizontal: 12,
-        // shadow
-        shadowColor: 'rgba(0, 0, 0, 0.25)',
-        shadowOffset: { width: 5, height: 5 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
-        elevation: 5,
-        borderWidth: 1,
-        borderColor: 'gray',
-        // marginTop: 12,
     },
     link: {
         color: colors.loginBlue,

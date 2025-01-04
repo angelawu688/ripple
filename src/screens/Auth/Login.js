@@ -196,7 +196,8 @@ const styles = StyleSheet.create({
     color: colors.loginBlue,
     marginTop: 15,
     textAlign: 'center',
-    marginLeft: 15
+    marginLeft: 15,
+    textDecorationLine: 'underline'
   },
   container: {
     display: 'flex',
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
   upperText: {
     fontSize: 26,
     fontWeight: '600',
-    fontFamily: 'Syne_700Bold',
+    fontFamily: 'Rubik',
     color: colors.black
   },
   lowerContainer: {

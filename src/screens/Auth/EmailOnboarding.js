@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailV
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../constants/colors';
 import Asterisk from '../../components/Asterisk';
+import EmailVerificationModal from '../../components/auth/EmailVerificationModal';
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')
@@ -183,7 +184,7 @@ const EmailOnboarding = ({ navigation }) => {
 
 
             <Text style={styles.headerText}>
-                What's your email?
+                What's your UW email?
             </Text>
 
             <View style={{ height: 30, }}>
@@ -268,53 +269,14 @@ const EmailOnboarding = ({ navigation }) => {
 
                 </TouchableOpacity>
             </View>
+            <EmailVerificationModal
+                isVisible={isModalVisible && emailSent}
+                onClose={() => setIsModalVisible(false)}
+                onResendEmail={handleResendEmail}
+                onCheckVerification={checkEmailVerification}
+                errorMessage={errorMessage}
+            />
 
-
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={isModalVisible && emailSent}
-                onRequestClose={() => setIsModalVisible(false)}
-            >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <View style={styles.innerModalContainer}>
-                            <Ionicons name='mail-outline' size={30} />
-                            <Text style={{ fontFamily: 'Syne_700Bold', fontSize: 30 }}>
-                                Verification sent!
-                            </Text>
-                        </View>
-                        <Text style={styles.modalText}>Check your inbox to verify your email</Text>
-
-                        <View style={styles.modalButtonContainer}>
-                            <TouchableOpacity onPress={() => handleResendEmail()}
-                                style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignSelf: 'center' }}>
-                                <Ionicons name='refresh' size={20} color='blue' />
-                                <Text style={[styles.link, { marginLeft: 6 }]}>
-                                    Resend email
-                                </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={styles.manualCheckButton}
-                                onPress={checkEmailVerification}
-                            >
-                                <Text style={styles.manualCheckButtonText}>I've Verified</Text>
-                            </TouchableOpacity>
-
-
-                            <TouchableOpacity
-                                style={styles.modalCloseButton}
-                                onPress={() => setIsModalVisible(false)}
-                            >
-                                <Text style={styles.modalCloseButtonText}>Close</Text>
-                            </TouchableOpacity>
-                        </View>
-
-
-                    </View>
-                </View>
-            </Modal>
         </View>
     )
 }
@@ -332,26 +294,26 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 26,
-        fontWeight: '600',
-        fontFamily: 'Syne_700Bold',
+        fontWeight: '700',
+        fontFamily: 'rubik',
         color: colors.black
     },
     input: {
-        backgroundColor: 'white',
+        backgroundColor: colors.lightgray,
         borderRadius: 12,
         width: '100%',
         height: 35,
         paddingHorizontal: 12,
         // shadow
-        shadowColor: 'rgba(0, 0, 0, 0.25)',
-        shadowOffset: { width: 5, height: 5 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
-        elevation: 5,
+        // shadowColor: 'rgba(0, 0, 0, 0.25)',
+        // shadowOffset: { width: 5, height: 5 },
+        // shadowOpacity: 0.5,
+        // shadowRadius: 10,
+        // elevation: 5,
     },
     errorText: {
         fontFamily: 'inter',
-        color: 'red'
+        color: colors.errorMessage
     },
     lowerContainer: {
         width: '100%',
@@ -365,6 +327,7 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         marginBottom: 6,
         fontFamily: 'inter',
+        fontWeight: '400',
         color: colors.loginBlue
     },
     button: {
@@ -382,65 +345,4 @@ const styles = StyleSheet.create({
         color: 'blue',
         textAlign: 'center',
     },
-
-    // modal styles:
-    modalOverlay: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // make back darker
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 20,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    modalText: {
-        fontSize: 18,
-        marginBottom: 15,
-        textAlign: 'center',
-    },
-    modalCloseButton: {
-        backgroundColor: 'black',
-        padding: 10,
-        borderRadius: 5,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    modalCloseButtonText: {
-        color: 'white',
-        fontFamily: 'inter',
-        fontWeight: '600',
-        textAlign: 'center',
-    },
-    innerModalContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '80%',
-        alignSelf: 'center'
-    },
-    modalButtonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '85%',
-        marginTop: 20,
-        alignItems: 'center'
-    },
-    manualCheckButton: {
-        backgroundColor: '#f0f0f0',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 5,
-    },
-
-
 })

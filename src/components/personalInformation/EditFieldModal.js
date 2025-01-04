@@ -185,7 +185,8 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     title: {
-        fontFamily: 'Syne_700Bold',
+        fontFamily: 'Rubik',
+        fontWeight: '600',
         fontSize: 26,
     },
     description: {
