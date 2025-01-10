@@ -8,7 +8,7 @@ import { ToastContext } from '../../context/ToastContext'
 import { StyleSheet } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native'
 import { handleRemoveFollower } from '../../utils/socialUtils'
-import ReportModal from '../../components/ReportUserModal'
+import ReportUserModal from '../../components/ReportUserModal'
 
 export default function Followers({ navigation, route }) {
     const { isFollowers: initIsFollowers } = route.params
@@ -223,7 +223,7 @@ export default function Followers({ navigation, route }) {
                 </View>
             )}
 
-            <ReportModal
+            <ReportUserModal
                 visible={reportModalVisible}
                 onClose={() => {
                     setReportModalVisible(false)
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
         paddingHorizontal: 10,
-        paddingVertical: 6,
+        // paddingVertical: 6,
         zIndex: 999,
     },
 
