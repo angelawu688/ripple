@@ -50,7 +50,7 @@ const ProfileSocials = ({ userProfile }) => {
                                 source={require('../../../assets/images/LI_logo.png')}
                                 style={styles.socialIcon}
                             />
-                            <Text style={styles.socialText}>
+                            <Text style={styles.socialText} numberOfLines={1}>
                                 {userProfile.linkedin}
                             </Text>
                         </>
@@ -66,12 +66,12 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         marginTop: 16,
         width: '100%',
-        gap: 12,
+        gap: 12
     },
     socialButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 8,
+        // paddingVertical: 8,
     },
     socialIcon: {
         width: 25,

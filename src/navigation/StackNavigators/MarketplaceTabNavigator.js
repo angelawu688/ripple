@@ -60,6 +60,9 @@ export function MarketplaceTabNavigator({ navigation }) {
                         <CustomTabBar {...props} />
                     )
                 }}
+                options={{
+                    style: { backgroundColor: 'white' }
+                }}
             >
                 <Tab.Screen
                     name="ForYou"
@@ -84,7 +87,7 @@ export function MarketplaceTabNavigator({ navigation }) {
             >
                 <Plus color={colors.loginBlue} weight='bold' size={26} />
             </TouchableOpacity>
-        </View>
+        </View >
 
     );
 }

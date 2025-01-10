@@ -298,13 +298,16 @@ const Conversation = ({ navigation, route }) => {
                     }]}>
                         <TouchableOpacity onPress={() => handleAddImage()}
                             style={{
-                                width: 35, height: 35, borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: 'rgba(0, 0, 0, 0.25)',
-                                // shadowOffset: { width: 5, height: 5 },
-                                shadowOpacity: 0.5,
-                                shadowRadius: 10,
-                                shadowColor: colors.loginBlue,
-                                shadowOpacity: 0.3,
-                                backgroundColor: 'white',
+                                width: 35, height: 35, borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                // shadowColor: 'rgba(0, 0, 0, 0.25)',
+                                // // shadowOffset: { width: 5, height: 5 },
+                                // shadowOpacity: 0.5,
+                                // shadowRadius: 10,
+                                // shadowColor: colors.loginBlue,
+                                // shadowOpacity: 0.3,
+                                // backgroundColor: 'white',
+                                borderWidth: 0.4,
+                                borderColor: colors.accentGray,
                                 marginRight: 10,
                                 alignSelf: 'flex-end',
                                 marginBottom: 4,
@@ -336,7 +339,7 @@ const Conversation = ({ navigation, route }) => {
                                 }
                             }}
                         />
-                        <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() || img || inputListing ? colors.neonBlue : colors.loginGray }]} onPress={() => handleSendMessage(input, img, inputListing, clearInputs)}>
+                        <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() || img || inputListing ? colors.loginBlue : colors.loginGray }]} onPress={() => handleSendMessage(input, img, inputListing, clearInputs)}>
                             <ArrowBendRightUp size={20} color='white' />
                         </TouchableOpacity>
                     </View>

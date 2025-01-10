@@ -3,6 +3,9 @@ import TabNavigator from './TabNavigator'
 import AuthStackNavigator from './StackNavigators/AuthStackNavigator'
 import FullLoadingScreen from '../screens/shared/FullLoadingScreen'
 import { useAuthNavigation } from '../hooks/useAuthNavigation';
+import { useContext } from 'react';
+import { userContext } from '../context/UserContext';
+import { BlankLandingPage } from '../screens/Auth/LandingPage';
 
 const RootStack = createNativeStackNavigator()
 
@@ -10,9 +13,12 @@ const RootStack = createNativeStackNavigator()
 
 const MainNavigator = () => {
   const { isLoading } = useAuthNavigation();
+  const { user } = useContext(userContext)
 
-  if (isLoading) {
+  if (isLoading && user) {
     return <FullLoadingScreen />;
+  } else if (isLoading && !user) {
+    // return <BlankLandingPage />
   }
 
   return <NavContent />

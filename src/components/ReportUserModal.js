@@ -16,6 +16,8 @@ import { TouchableOpacity } from "react-native";
 import { userContext } from "../context/UserContext";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import Asterisk from '../components/Asterisk'
+import { X } from "phosphor-react-native";
 
 const ReportUserModal = ({ visible, onClose, userId }) => {
     const [reportReason, setReportReason] = useState('')
@@ -51,42 +53,59 @@ const ReportUserModal = ({ visible, onClose, userId }) => {
             animationType="fade"
             onRequestClose={onClose}
         >
-            <TouchableWithoutFeedback onPress={onClose}>
+            <TouchableWithoutFeedback
+                onPress={onClose}
+            >
                 <KeyboardAvoidingView style={styles.overlay}
                     keyboardVerticalOffset={-200} // how much the modal gets moved. This should be good?
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
                     {/* stop prop is bc we are using nested touchables */}
-                    <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+                    <TouchableWithoutFeedback
+                        onPress={(e) => e.stopPropagation()}
+
+                    >
                         <View style={styles.modalContainer}>
-                            <Text style={styles.title}>Report User</Text>
-                            <Text style={{ fontFamily: 'inter' }}>Why are you reporting this user?</Text>
+                            <Text style={styles.title}>
+                                Report User
+
+                            </Text>
+                            <Text style={styles.middleText}>
+                                Please share your reason for reporting this user
+                                <Asterisk />
+                            </Text>
 
                             <TextInput
                                 style={styles.textInput}
                                 value={reportReason}
                                 onChangeText={setReportReason}
                                 onSubmitEditing={handleSubmit}
-                                placeholder="Type your reason here..."
+                                placeholder=""
                                 multiline
                             />
 
+                            <Text style={styles.middleText}>
+                                A moderator from Ripple will review your message
+                            </Text>
+
                             <View style={styles.buttonRow}>
 
-                                <TouchableOpacity style={styles.buttonWrapper}
-                                    onPress={onClose}
-                                >
-                                    <Text style={styles.text}>Cancel</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity style={[styles.buttonWrapper, { backgroundColor: colors.neonBlue }]}
+                                <TouchableOpacity style={styles.button}
                                     onPress={handleSubmit}
                                 >
-                                    <Text style={styles.text}>Report</Text>
+                                    <Text style={styles.text}>Submit Report</Text>
                                 </TouchableOpacity>
 
+
+
                             </View>
+                            <TouchableOpacity style={styles.closeButton}
+                                onPress={onClose}
+                            >
+                                <X size={28} color={colors.accentGray} />
+                            </TouchableOpacity>
                         </View>
+
                     </TouchableWithoutFeedback>
                 </KeyboardAvoidingView>
             </TouchableWithoutFeedback >
@@ -105,26 +124,28 @@ const styles = StyleSheet.create({
         zIndex: 99999
     },
     modalContainer: {
-        width: '80%',
-        padding: 20,
+        padding: 40,
+        paddingVertical: 60,
         borderRadius: 10,
         backgroundColor: '#ffffff',
         position: 'relative',
+        width: '95%'
     },
     title: {
-        fontSize: 20,
+        fontSize: 26,
         fontWeight: '600',
         marginBottom: 8,
-        fontFamily: 'inter'
+        fontFamily: 'rubik'
     },
     textInput: {
-        borderColor: '#ccc',
-        borderWidth: 1,
+        // borderColor: '#ccc',
+        // borderWidth: 1,
         marginVertical: 10,
         padding: 10,
         borderRadius: 5,
         textAlignVertical: 'top',
-        fontFamily: 'inter'
+        fontFamily: 'inter',
+        backgroundColor: colors.lightgray
     },
     buttonRow: {
         flexDirection: 'row',
@@ -133,16 +154,30 @@ const styles = StyleSheet.create({
         height: 30,
 
     },
-    buttonWrapper: {
-        backgroundColor: colors.loginGray,
+    button: {
+        backgroundColor: colors.loginBlue,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 12,
-        borderRadius: 8
+        borderRadius: 50,
+        width: '100%',
+        height: 40
     },
     text: {
         fontFamily: 'inter',
-        fontSize: 14
+        fontSize: 16,
+        color: 'white',
+        fontWeight: '600'
+    },
+    middleText: {
+        fontFamily: 'inter',
+        color: colors.loginBlue,
+        fontSize: 16,
+        marginVertical: 6
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 10, left: 10,
     }
 });

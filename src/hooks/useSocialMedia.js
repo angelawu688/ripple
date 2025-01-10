@@ -8,7 +8,6 @@ export const useSocialMedia = (userProfile) => {
 
     const openSocial = async (social) => {
         if (!userProfile) {
-            console.log('no user profile in useSocialMedia!')
             return;
         }
         let url = ''

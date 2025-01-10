@@ -36,7 +36,7 @@ export default () => ({
         {
           backgroundColor: "#FFFFFF",
           resizeMode: "contain",
-          image: "./assets/images/ripple_splashicon3.png",
+          image: "./assets/images/RippleIcon.png",
           imageWidth: "600" // todo play with this
         }
       ],

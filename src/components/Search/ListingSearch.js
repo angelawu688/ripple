@@ -33,8 +33,9 @@ export default function ListingSearch({ isLoading, query, navigation, displayRes
                     {query ? (
                         // Autocomplete
                         <>
+                            {/* <Text>Autocomplete for {query}</Text> */}
                         </>
-                        // <Text>Autocomplete for {query}</Text>
+
                     ) : (
                         // Recent Searches
                         <>
@@ -45,6 +46,7 @@ export default function ListingSearch({ isLoading, query, navigation, displayRes
                                 recentSearches.length > 0 ? (
                                     <FlatList
                                         keyboardDismissMode="on-drag"
+                                        keyboardShouldPersistTaps='handled'
                                         data={[...recentSearches].reverse().slice(0, 8)}
                                         keyExtractor={(item) => item}
                                         renderItem={({ item }) => (

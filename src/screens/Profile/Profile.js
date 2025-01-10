@@ -144,7 +144,7 @@ const Profile = ({ navigation }) => {
             {/* About */}
             < View >
                 <Text style={styles.title}>
-                    About Ripple
+                    Help Ripple
                 </Text>
 
                 <TouchableOpacity
@@ -162,7 +162,7 @@ const Profile = ({ navigation }) => {
 
                 <TouchableOpacity
                     style={styles.profileCard}
-                    onPress={() => console.log('OPEN WEB URL TO LINK')}
+                    onPress={() => openLink('https://docs.google.com/forms/d/152g3n-uab50ng3INshD7WwNLIsMhWaZSyWQwVZIeCeM/edit', showToast)}
                 >
                     <View style={styles.profileCardLeft}>
                         <ShareFat size={24} color={'black'} style={styles.icon} />

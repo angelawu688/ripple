@@ -10,6 +10,10 @@ import { linkingConfig } from './src/constants/links';
 import { AppProviders } from './src/providers/AppProviders';
 import { useFontLoader } from './src/hooks/useFontLoader';
 import { usePushNotifications } from './src/hooks/usePushNotifications';
+import { Image, View } from 'react-native'
+import { useContext } from 'react';
+import { userContext } from './src/context/UserContext';
+import { BlankLandingPage } from './src/screens/Auth/LandingPage';
 
 export default function App() {
   const { appIsReady } = useFontLoader();
@@ -30,10 +34,17 @@ export default function App() {
 // from the user context, fixing the flickering issue
 const RootComponent = () => {
   const { isLoading } = usePushNotifications();
+  const { user } = useContext(userContext)
 
-  if (isLoading) {
+  // if no user, never display the loading screen and keep the splash up
+
+  if (user && isLoading) {
     return <FullLoadingScreen />
+  } else if (!user && isLoading) {
+    // keep up the splash!
+    // return <BlankLandingPage />
   }
+  // either case of not loading, we want to show the navigation container
 
   return (
     <NavigationContainer linking={linkingConfig}>

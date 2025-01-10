@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useContext } from "react"
-import { FlatList, Keyboard, StyleSheet, TouchableOpacity } from "react-native";
+import { FlatList, Keyboard, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Text, TextInput, View } from "react-native"
 import { Ionicons } from '@expo/vector-icons';
 import ForYou from "./ForYou";
@@ -299,7 +299,10 @@ const Search = ({ navigation }) => {
     }
 
     return (
-        <View style={styles.container}>
+        <View
+            keyboardShouldPersistTaps={'handled'}
+            style={styles.container}
+        >
             {/* top input part */}
             <TextInput
                 ref={inputRef}
@@ -314,7 +317,6 @@ const Search = ({ navigation }) => {
                 onSubmitEditing={() => handleSearch(query)}
                 returnKeyType="search" // gives us the blue button on keyboard
                 autoComplete="off" // i feel like these are really annoying as a user
-                autoCorrect={true}
                 autoCapitalize="none"
             />
 

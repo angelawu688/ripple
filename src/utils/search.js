@@ -99,7 +99,10 @@ export const EmptyMessage = ({ message }) => {
 
 export const RecentSearchItem = ({ item, onSelect, onRemove }) => (
     <View style={styles.recentSearchItem}>
-        <TouchableOpacity style={styles.recentSearchButton} onPress={() => onSelect(item)}>
+        <TouchableOpacity
+            style={styles.recentSearchButton} onPress={() => onSelect(item)}
+
+        >
             <Ionicons name="time-outline" size={24} color="#000" />
             <Text style={styles.recentSearchText}>{item}</Text>
         </TouchableOpacity>
@@ -167,14 +170,18 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginVertical: 8,
-        padding: 8,
+        marginVertical: 2,
+        paddingHorizontal: 8,
         borderRadius: 8,
         backgroundColor: "#fff",
     },
     recentSearchButton: {
         flexDirection: "row",
         alignItems: "center",
+        flex: 1,
+        paddingVertical: 14,
+        paddingHorizontal: 12,
+
     },
     recentSearchText: {
         marginLeft: 8,

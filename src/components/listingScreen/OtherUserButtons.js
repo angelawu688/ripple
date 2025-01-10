@@ -12,7 +12,7 @@ export function OtherUserButtons({ isSaved, handleSendHi, handleSavePost, shareL
                 <View style={styles.messageContainer}>
                     <Storefront color='black' size={28} />
                     <Text style={styles.messageText}>
-                        "Hi, is this still available?"
+                        Hi, is this still available?
                     </Text>
                 </View>
 
@@ -65,16 +65,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 45,
-        borderWidth: 1,
-        borderColor: '#F2F0F0',
+        // borderWidth: 1,
+        // borderColor: '#F2F0F0',
         paddingHorizontal: 12,
-        borderRadius: 13
+        borderRadius: 13,
+        backgroundColor: colors.lightgray
     },
     messageContainer: {
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: colors.lightgray,
     },
     messageText: {
         marginLeft: 20,
@@ -87,13 +89,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 13,
-        backgroundColor: colors.neonBlue,
+        backgroundColor: colors.loginBlue,
         paddingHorizontal: 10
     },
     sendText: {
         fontSize: 14,
         fontFamily: 'inter',
-        fontWeight: '600',
+        fontWeight: '700',
         color: "white"
     },
     bottomButton: {
@@ -103,10 +105,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 45,
-        borderWidth: 1,
-        borderColor: '#F2F0F0',
+        // borderWidth: 1,
+        // borderColor: '#F2F0F0',
         borderRadius: 13,
         paddingHorizontal: 4,
+        backgroundColor: colors.lightgray
     },
     bottomButtonContainer: {
         width: '100%',
@@ -117,13 +120,13 @@ const styles = StyleSheet.create({
         marginTop: 12,
     },
     shadow: {
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 8,
+        // shadowColor: "#000",
+        // shadowOffset: {
+        //     width: 0,
+        //     height: 2,
+        // },
+        // shadowOpacity: 0.2,
+        // shadowRadius: 5,
+        // elevation: 8,
     },
 })

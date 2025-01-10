@@ -118,7 +118,6 @@ const ListingScreen = ({ navigation, route }) => {
         >
             <PhotoCarousel photos={listing.photos} sold={postSold} isOwnPost={isOwnPost} />
 
-
             <ListingHeader
                 title={listing.title}
                 price={listing.price}

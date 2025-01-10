@@ -7,6 +7,7 @@ import { collection, getDocs, getFirestore, limit, orderBy, query, where } from 
 import ListingsListSkeletonLoaderFull from "../../../components/listings/ListingsListSkeletonLoaderFull";
 import { useFocusEffect } from "@react-navigation/native"
 import ListingsList from "../../../components/listings/ListingsList"
+import { PaperPlane, PaperPlaneTilt } from "phosphor-react-native"
 
 
 const Friends = ({ navigation }) => {
@@ -100,8 +101,9 @@ const Friends = ({ navigation }) => {
                 </Text>
                 <TouchableOpacity onPress={() => shareProfile()}
 
-                    style={[styles.shadow, styles.button]}>
-                    <Text style={[styles.title,]}>
+                    style={styles.button}>
+                    <PaperPlaneTilt size={24} color='white' style={{ marginRight: 8 }} />
+                    <Text style={[styles.title, { color: 'white' }]}>
                         Share profile
                     </Text>
                 </TouchableOpacity>
@@ -140,21 +142,23 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontFamily: 'inter',
-        fontWeight: '600',
+        fontWeight: '500',
         textAlign: 'center'
     },
     button: {
         width: 200,
         height: 45,
         display: 'flex',
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 25,
         marginTop: 15,
+        backgroundColor: colors.loginBlue
     },
     emptyContainer: {
         display: 'flex',
-        height: '70%',
+        height: '100%',
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',

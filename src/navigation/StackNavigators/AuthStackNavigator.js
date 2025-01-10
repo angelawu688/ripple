@@ -6,7 +6,7 @@ import InfoOnboarding from "../../screens/Auth/InfoOnboarding";
 import EducationOnboarding from "../../screens/Auth/EducationOnboarding";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import LandingPage from "../../screens/Auth/LandingPage";
+import { LandingPage } from "../../screens/Auth/LandingPage";
 
 
 

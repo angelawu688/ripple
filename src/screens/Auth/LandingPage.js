@@ -5,8 +5,7 @@ import { Wave, Wave2 } from "../../components/Wave";
 import { useEffect, useRef } from "react";
 
 
-const LandingPage = ({ navigation }) => {
-    // TODO on component mount, we fade in the other pieces and have them be animated and stuff
+export const LandingPage = ({ navigation }) => {
 
     const randomize = (min, max) => Math.random() * (max - min) + min;
 
@@ -52,7 +51,6 @@ const LandingPage = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-
             {/* Top waves */}
             <View style={styles.topWaves}>
                 {waveAnimations.slice(0, 4).map((animation, index) => (
@@ -77,7 +75,7 @@ const LandingPage = ({ navigation }) => {
             {/* Logo */}
             <View style={styles.logoContainer}>
                 {/* <Logo fontSize={65} /> */}
-                <Text style={{ fontFamily: 'inter', fontWeight: '700', fontSize: 55, color: colors.loginBlue, opacity: 0.7, letterSpacing: -3 }}>
+                <Text style={{ fontFamily: 'inter', fontWeight: '800', fontSize: 55, color: colors.loginBlue, opacity: 0.65, letterSpacing: -3.5, paddingHorizontal: 10 }}>
                     Ripple
                 </Text>
             </View>
@@ -140,7 +138,22 @@ const LandingPage = ({ navigation }) => {
     )
 }
 
-export default LandingPage;
+// export default LandingPage;
+
+export function BlankLandingPage() {
+    return (
+        <View style={styles.container}>
+            <View style={styles.logoContainer}>
+                <Text style={{ fontFamily: 'inter', fontWeight: '800', fontSize: 55, color: colors.loginBlue, opacity: 0.65, letterSpacing: -3.5, paddingHorizontal: 10 }}>
+                    Ripple
+                </Text>
+            </View>
+        </View>
+    )
+
+
+}
+
 
 const styles = StyleSheet.create({
     container: {
@@ -195,6 +208,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
-        top: '35%'
+        bottom: '50%',
+        padding: 10,
     },
 })

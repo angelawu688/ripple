@@ -176,17 +176,17 @@ const Login = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: 'white',
+    backgroundColor: colors.mediumGray,
     borderRadius: 12,
     width: '100%',
     height: 35,
     paddingHorizontal: 12,
     // shadow
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 5,
+    // shadowColor: 'rgba(0, 0, 0, 0.25)',
+    // shadowOffset: { width: 5, height: 5 },
+    // shadowOpacity: 0.5,
+    // shadowRadius: 10,
+    // elevation: 5,
   },
   error: {
     color: 'red',

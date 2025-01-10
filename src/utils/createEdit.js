@@ -62,7 +62,6 @@ export const uploadNewPhotos = async (photos, userId, listingID, setErrorMessage
 // renders the image preview
 export const ImagePreview = ({ uri, removePhoto, imageSize }) => {
     const imageUri = typeof uri === 'object' ? uri.card : uri;
-    console.log('imguri', imageUri)
 
     return (
         <View style={{

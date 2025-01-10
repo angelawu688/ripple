@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         fontFamily: 'inter',
         marginTop: 0,
         fontWeight: '500',
-        color: colors.loginBlue
+        color: colors.loginBlue,
     },
     // createdAt: {
     //     fontFamily: 'inter',
