@@ -15,8 +15,9 @@ const MainNavigator = () => {
   const { isLoading } = useAuthNavigation();
   const { user } = useContext(userContext)
 
+  // if these are left blank, the splash will stay up
   if (isLoading && user) {
-    return <FullLoadingScreen />;
+    // return <FullLoadingScreen />;
   } else if (isLoading && !user) {
     // return <BlankLandingPage />
   }

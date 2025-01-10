@@ -36,13 +36,14 @@ const RootComponent = () => {
   const { isLoading } = usePushNotifications();
   const { user } = useContext(userContext)
 
-  // if no user, never display the loading screen and keep the splash up
-
+  // if left blank, the splash will stay up
   if (user && isLoading) {
-    return <FullLoadingScreen />
+    // return <FullLoadingScreen />
   } else if (!user && isLoading) {
-    // keep up the splash!
+
     // return <BlankLandingPage />
+    // return <FullLoadingScreen />
+    return null
   }
   // either case of not loading, we want to show the navigation container
 

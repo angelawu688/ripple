@@ -8,6 +8,17 @@ export function useFontLoader() {
     const [fontsLoaded] = useFonts(FONTS);
 
     useEffect(() => {
+        async function preventAutoHide() {
+            try {
+                await SplashScreen.preventAutoHideAsync();
+            } catch (e) {
+                console.warn('Error preventing splash screen hide')
+            }
+        }
+        preventAutoHide();
+    }, [])
+
+    useEffect(() => {
         async function prepare() {
             try {
                 if (fontsLoaded) {
@@ -23,9 +34,17 @@ export function useFontLoader() {
 
     useEffect(() => {
         if (appIsReady) {
-            requestAnimationFrame(async () => {
-                await SplashScreen.hideAsync().catch(console.warn);
-            });
+            async function hideSplash() {
+                try {
+                    await SplashScreen.hideAsync();
+                } catch (e) {
+                    console.warn('Error hiding the splash screen', e)
+                }
+            }
+            hideSplash();
+            // requestAnimationFrame(async () => {
+            //     await SplashScreen.hideAsync().catch(console.warn);
+            // });
         }
     }, [appIsReady]);
 
