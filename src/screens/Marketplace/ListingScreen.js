@@ -15,7 +15,7 @@ import { formatDate } from '../../utils/formatDate'
 import { useFocusEffect } from '@react-navigation/native';
 import { deleteFromSavedPosts, deleteImages, getConversation } from '../../utils/firebaseUtils';
 import { db } from '../../../firebaseConfig';
-import ReportModal from '../../components/ReportModal';
+import ReportListingModal from '../../components/ReportListingModal';
 import ListingScreenFullSkeletonLoader from '../../components/listings/ListingScreenFullSkeletonLoader'
 import { useListing } from '../../hooks/useListing';
 import PhotoCarousel from '../../components/listingScreen/PhotoCarousel';
@@ -23,7 +23,7 @@ import ListingHeader from '../../components/listingScreen/ListingHeader';
 import { ProfileCard } from '../../components/listingScreen/ProfileCard';
 import { OtherUserButtons } from '../../components/listingScreen/OtherUserButtons';
 import { OwnPostButtons } from '../../components/listingScreen/OwnPostButtons';
-import { ThreeDotsModal } from '../../components/listingScreen/ThreeDotsModal';
+import { ThreeDotsListingModal } from '../../components/listingScreen/ThreeDotsListingModal';
 import { ToastContext } from '../../context/ToastContext';
 
 
@@ -165,7 +165,7 @@ const ListingScreen = ({ navigation, route }) => {
             <View style={{ width: 1, height: 20 }} />
 
 
-            <ThreeDotsModal
+            <ThreeDotsListingModal
                 visible={modalVisible}
                 isOwnPost={isOwnPost}
                 onShare={handleShareListing}
@@ -183,13 +183,14 @@ const ListingScreen = ({ navigation, route }) => {
                 onClose={() => setModalVisible(false)}
             />
 
-            <ReportModal
+            <ReportListingModal
                 visible={reportModalVisible}
                 onClose={() => {
                     setReportModalVisible(false)
                     setModalVisible(false)
                 }}
                 userId={sellerID}
+                listingID={listingID}
             />
         </ScrollView>
     )

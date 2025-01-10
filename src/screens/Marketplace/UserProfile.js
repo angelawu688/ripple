@@ -11,6 +11,8 @@ import ShareModal from "../../components/ShareModal";
 import { ToastContext } from "../../context/ToastContext";
 import ProfileSocials from "../../components/profile/ProfileSocials";
 import { useProfileData } from "../../hooks/useProfileData";
+import {ThreeDotsUserModal} from "../../components/profile/ThreeDotsUserModal";
+import ReportUserModal from "../../components/ReportUserModal";
 
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
@@ -28,6 +30,8 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     } = useProfileData(userID);
 
     const [shareModalVisible, setShareModalVisible] = useState(false)
+    const [reportModalVisible, setReportModalVisible] = useState(false) // report modal
+    const [modalVisible, setModalVisible] = useState(false) // 3 dots modal
     const [profileLink, setProfileLink] = useState('');
     useEffect(() => {
         if (userID) {
@@ -82,7 +86,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 </View>
 
                 {/* navigation to other  */}
-                {isOwnProfileInProfileStack && (
+                {isOwnProfileInProfileStack ? (
                     <TouchableOpacity
                         style={{
                             position: 'absolute', right: 20,
@@ -93,7 +97,32 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         {/* <Gear size={30} /> */}
                         <DotsThree size={30} weight="bold" />
                     </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={{
+                            position: 'absolute', right: 20,
+                            top: 5
+                        }}
+                        onPress={() => setModalVisible(true)}
+                    >
+                        {/* <Gear size={30} /> */}
+                        <DotsThree size={30} weight="bold" />
+                    </TouchableOpacity>
                 )}
+                <ThreeDotsUserModal
+                    visible={modalVisible}
+                    onReport={() => setReportModalVisible(true)}
+                    onClose={() => setModalVisible(false)}
+                />
+
+                <ReportUserModal // TODO: not displayed correctly!! need to move it lower so you can still see the three dots
+                    visible={reportModalVisible}
+                    onClose={() => {
+                        setReportModalVisible(false)
+                        setModalVisible(false)
+                    }}
+                    userId={userID}
+                />
             </View>
 
             <ScrollView

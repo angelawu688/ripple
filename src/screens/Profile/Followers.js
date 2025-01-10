@@ -8,7 +8,7 @@ import { ToastContext } from '../../context/ToastContext'
 import { StyleSheet } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native'
 import { handleRemoveFollower } from '../../utils/socialUtils'
-import ReportModal from '../../components/ReportModal'
+import ReportModal from '../../components/ReportUserModal'
 
 export default function Followers({ navigation, route }) {
     const { isFollowers: initIsFollowers } = route.params

@@ -1,13 +1,10 @@
 import { StyleSheet, TouchableWithoutFeedback, View, Text, TouchableOpacity } from "react-native"
 import { colors } from "../../constants/colors"
 
-export function ThreeDotsModal({
-    visible,
-    isOwnPost,
-    onShare,
-    onDelete,
-    onReport,
-    onClose,
+export function ThreeDotsUserModal({
+   visible,
+   onReport,
+   onClose
 }) {
     if (!visible) {
         return null
@@ -18,22 +15,9 @@ export function ThreeDotsModal({
             onPress={onClose} // Dismiss modal on backdrop press
         >
             <View style={styles.modalContainer}>
-                {isOwnPost ? (
-                    <>
-                        <TouchableOpacity style={styles.modalOption} onPress={onShare}>
-                            <Text style={styles.modalText}>Share Post</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.modalOption, { borderBottomWidth: 0 }]} onPress={onDelete}>
-                            <Text style={[styles.modalText, { color: 'red' }]}>
-                                Delete Post
-                            </Text>
-                        </TouchableOpacity>
-                    </>
-                ) : (
-                    <TouchableOpacity style={[styles.modalOption, { borderBottomWidth: 0 }]} onPress={onReport}>
-                        <Text style={[styles.modalText, { color: 'red' }]}>Report User</Text>
-                    </TouchableOpacity>
-                )}
+                <TouchableOpacity style={[styles.modalOption, { borderBottomWidth: 0 }]} onPress={onReport}>
+                    <Text style={[styles.modalText, { color: 'red' }]}>Report User</Text>
+                </TouchableOpacity>
             </View>
         </TouchableWithoutFeedback >
     )

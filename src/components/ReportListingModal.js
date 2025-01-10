@@ -17,7 +17,7 @@ import { userContext } from "../context/UserContext";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 
-const ReportModal = ({ visible, onClose, userId }) => {
+const ReportListingModal = ({ visible, onClose, userId, listingID }) => {
     const [reportReason, setReportReason] = useState('')
     const { showToast } = useContext(ToastContext);
     const { user, userData } = useContext(userContext);
@@ -25,21 +25,22 @@ const ReportModal = ({ visible, onClose, userId }) => {
     const handleSubmit = async () => {
         try {
             // add {userId} to firebase with the corresponding reason
-            const userReportsRef = collection(db, "reports", userId, "userReports");
+            const listingReportsRef = collection(db, "reports", userId, "listingReports");
             // we have "userReports" in case we need to add more data later
 
             const reportData = {
                 reportedUserId: userId,
                 reason: reportReason,
                 reportedBy: user.uid,
-                timestamp: serverTimestamp(), // p much same as Date.now, using instead bc this will only be server-side 
+                listingId: listingID,
+                timestamp: serverTimestamp(), // p much same as Date.now, using instead bc this will only be server-side
             };
-            await addDoc(userReportsRef, reportData);
+            await addDoc(listingReportsRef, reportData);
             onClose()
             setReportReason('')
-            showToast('User reported!')
+            showToast('Listing reported!')
         } catch (e) {
-            showToast('Error reporting user')
+            showToast('Error reporting listing')
         }
     }
 
@@ -53,14 +54,14 @@ const ReportModal = ({ visible, onClose, userId }) => {
         >
             <TouchableWithoutFeedback onPress={onClose}>
                 <KeyboardAvoidingView style={styles.overlay}
-                    keyboardVerticalOffset={-200} // how much the modal gets moved. This should be good?
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                                      keyboardVerticalOffset={-200} // how much the modal gets moved. This should be good?
+                                      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
                     {/* stop prop is bc we are using nested touchables */}
                     <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
                         <View style={styles.modalContainer}>
-                            <Text style={styles.title}>Report User</Text>
-                            <Text style={{ fontFamily: 'inter' }}>Why are you reporting this user?</Text>
+                            <Text style={styles.title}>Report Listing</Text>
+                            <Text style={{ fontFamily: 'inter' }}>Why are you reporting this listing?</Text>
 
                             <TextInput
                                 style={styles.textInput}
@@ -74,13 +75,13 @@ const ReportModal = ({ visible, onClose, userId }) => {
                             <View style={styles.buttonRow}>
 
                                 <TouchableOpacity style={styles.buttonWrapper}
-                                    onPress={onClose}
+                                                  onPress={onClose}
                                 >
                                     <Text style={styles.text}>Cancel</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={[styles.buttonWrapper, { backgroundColor: colors.neonBlue }]}
-                                    onPress={handleSubmit}
+                                                  onPress={handleSubmit}
                                 >
                                     <Text style={styles.text}>Report</Text>
                                 </TouchableOpacity>
@@ -94,7 +95,7 @@ const ReportModal = ({ visible, onClose, userId }) => {
     )
 }
 
-export default ReportModal;
+export default ReportListingModal;
 
 const styles = StyleSheet.create({
     overlay: {
