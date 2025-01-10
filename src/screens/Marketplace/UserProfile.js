@@ -103,7 +103,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                             position: 'absolute', right: 20,
                             top: 5
                         }}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => setModalVisible(prev => !prev)}
                     >
                         {/* <Gear size={30} /> */}
                         <DotsThree size={30} weight="bold" />

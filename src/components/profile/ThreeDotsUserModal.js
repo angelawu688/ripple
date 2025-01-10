@@ -27,7 +27,7 @@ export function ThreeDotsUserModal({
 const styles = StyleSheet.create({
     modalContainer: {
         position: 'absolute',
-        top: 10, // Adjust to position the modal just below the header
+        top: 30, // Adjust to position the modal just below the header
         right: 10, // Align with the three dots
         width: 150,
         backgroundColor: 'white',
