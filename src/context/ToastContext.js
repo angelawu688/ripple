@@ -10,16 +10,22 @@ export const ToastContext = createContext(null);
 export const ToastProvider = ({ children }) => {
     const [toastMessage, setToastMessage] = useState('');
     const [isToastVisible, setIsToastVisible] = useState(false);
+    const [type, setType] = useState('')
 
     // show the toast for a default of 2s
-    const showToast = useCallback((message, duration = 2000) => {
+    const showToast = useCallback((message, type, duration = 2000) => {
         setToastMessage(message);
+        setType(type)
         setIsToastVisible(true);
         setTimeout(() => setIsToastVisible(false), duration);
     }, []);
 
+    const hideToast = () => {
+        setIsToastVisible(false)
+    }
+
     return (
-        <ToastContext.Provider value={{ showToast, isToastVisible, toastMessage }}>
+        <ToastContext.Provider value={{ showToast, hideToast, isToastVisible, toastMessage, type }}>
             {children}
         </ToastContext.Provider>
     );

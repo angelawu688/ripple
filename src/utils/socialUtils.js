@@ -45,7 +45,7 @@ export const handleRemoveFollower = async (
     try {
         if (!activeUser?.uid || !otherUserID) {
             console.error("activeUser or otherUserID is undefined");
-            showToast("Something went wrong. Please try again.");
+            showToast("Something went wrong. Please try again.", 'error');
             return;
         }
 
@@ -58,7 +58,7 @@ export const handleRemoveFollower = async (
 
         if (!activeUserDoc.exists() || !otherUserDoc.exists()) {
             console.error("One or more user documents do not exist");
-            showToast("User not found.");
+            showToast("User not found.", 'error');
             return;
         }
 
@@ -134,7 +134,7 @@ export const handleRemoveFollower = async (
         }
 
         // Show success message
-        showToast(isFollowers ? "Removed Follower!" : "Unfollowed User!");
+        showToast(isFollowers ? "Removed Follower!" : "Unfollowed User!", 'remove');
     } catch (e) {
         console.error("Error in handleRemoveFollower:", {
             activeUser,
@@ -142,7 +142,7 @@ export const handleRemoveFollower = async (
             isFollowers,
             error: e,
         });
-        showToast("Error removing user!");
+        showToast("Error removing user!", 'error');
     } finally {
         setActiveModalId(null);
     }
@@ -154,9 +154,9 @@ export const openLink = async (url, showToast) => {
         if (supported) {
             await Linking.openURL(url)
         } else {
-            showToast('Unable to open link!')
+            showToast('Unable to open link!', 'error')
         }
     } catch (e) {
-        showToast('Error when opening link!')
+        showToast('Error when opening link!', 'error')
     }
 }

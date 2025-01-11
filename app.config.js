@@ -37,7 +37,7 @@ export default () => ({
           backgroundColor: "#FFFFFF",
           resizeMode: "contain",
           image: "./assets/images/RippleIcon.png",
-          imageWidth: "600" // todo play with this
+          imageWidth: "300" // todo play with this
         }
       ],
       "expo-router",

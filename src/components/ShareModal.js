@@ -183,7 +183,7 @@ export default function ShareModal({ isVisible, profileLink, setShareModalVisibl
                             <TouchableOpacity
                                 onPress={() => {
                                     copyLink(profileLink)
-                                    showToast('Share link copied!')
+                                    showToast('Link copied', 'link')
                                 }}
                                 style={[styles.modalSocialButton]}
                             >

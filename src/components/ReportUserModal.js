@@ -37,7 +37,7 @@ const ReportUserModal = ({ visible, onClose, userId }) => {
                 timestamp: serverTimestamp(), // p much same as Date.now, using instead bc this will only be server-side 
             };
             await addDoc(userReportsRef, reportData);
-            onClose()
+            await onClose()
             setReportReason('')
             showToast('User reported!')
         } catch (e) {
@@ -57,7 +57,7 @@ const ReportUserModal = ({ visible, onClose, userId }) => {
                 onPress={onClose}
             >
                 <KeyboardAvoidingView style={styles.overlay}
-                    keyboardVerticalOffset={-200} // how much the modal gets moved. This should be good?
+                    keyboardVerticalOffset={-100} // how much the modal gets moved. This should be good?
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
                     {/* stop prop is bc we are using nested touchables */}
