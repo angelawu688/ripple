@@ -34,8 +34,6 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                                         navigation={navigation}
                                         user={item}
                                     />
-
-
                                 )
                             }}
                         />

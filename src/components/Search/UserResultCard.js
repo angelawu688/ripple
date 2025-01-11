@@ -35,7 +35,8 @@ const styles = StyleSheet.create({
     container: {
         width: '96%',
         flexDirection: 'row',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        paddingVertical: 8,
 
     },
     textContainer: { flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', marginLeft: 10 },

@@ -91,7 +91,12 @@ export default function Toast() {
             {...panResponder.panHandlers}
         >
             {type === 'link' && <View style={{ marginRight: 10 }}><Link size={28} color={colors.loginBlue} /></View>}
-            <Text style={[styles.toastText, { color: type === 'link' && colors.loginBlue }]}>
+
+            <Text style={[
+                styles.toastText,
+                { color: type === 'link' && colors.loginBlue },
+                { color: type === 'error' && colors.errorMessage }
+            ]}>
                 {toastMessage}
             </Text>
         </Animated.View>
