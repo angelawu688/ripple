@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Image, FlatList } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Image, FlatList, ScrollView } from 'react-native'
 import { userContext } from '../../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
@@ -57,14 +57,6 @@ const PersonalInformation = () => {
         }
         setIsLoadingSave(true)
 
-        // validation was moved to the child component
-        // const validationResponse = validateInput(currentField, newValue);
-        // if (validationResponse !== true) {
-        //     setErrorMessage(validationResponse);
-        //     setIsLoadingSave(false)
-        //     return;
-        // }
-
         try {
             const userRef = doc(db, "users", user.uid);
             if (currentField.key === 'name') {
@@ -98,7 +90,11 @@ const PersonalInformation = () => {
     }
 
     return (
-        <View style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '90%', height: '100%', alignSelf: 'center' }}>
+        <ScrollView
+            contentContainerStyle={{ justifyContent: 'flex-start', alignItems: 'center', paddingBottom: 20 }}
+            style={styles.container}
+            showsVerticalScrollIndicator={false}
+        >
             <FlatList
                 data={fields}
                 scrollEnabled={false}
@@ -151,16 +147,22 @@ const PersonalInformation = () => {
                     errorMessage={errorMessage}
                     onClose={() => setModalVisible(false)}
                     onSave={handleSaveField}
-                    multiline={currentField.label === 'bio'}
+                    multiline={currentField.label === 'Bio'}
                 />
             )}
-        </View >
+        </ScrollView >
     )
 }
 
 export default PersonalInformation;
 
 const styles = StyleSheet.create({
+    container: {
+        display: 'flex',
+        width: '90%',
+        height: '100%',
+        alignSelf: 'center',
+    },
     lowerText: {
         fontFamily: 'Inter',
         fontSize: 16,

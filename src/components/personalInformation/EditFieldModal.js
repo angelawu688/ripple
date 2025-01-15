@@ -46,11 +46,15 @@ export function EditFieldModal({
 
     const validateInput = (field, value) => {
         if (!value) return ''; // Allow empty values initially
-        switch (field.key) {
+        switch (field) {
+            case 'Bio':
+                console.log(value)
+                if (value.length > 163) {
+                    return 'Bio must be under 163 characters!'
+                } else {
+                    return ''
+                }
             case 'instagram':
-                return /^@[a-zA-Z0-9_]+$/.test(value) || 'Must be a username starting with @';
-            case 'twitter':
-                // Ensure the value is a valid username (alphanumeric and underscores, starting with @)
                 return /^@[a-zA-Z0-9_]+$/.test(value) || 'Must be a username starting with @';
             case 'gradYear':
                 // Validate the graduation year
@@ -69,7 +73,7 @@ export function EditFieldModal({
 
     // checks for an error before saving
     const saveInput = (input) => {
-        const error = validateInput(input)
+        const error = validateInput(fieldLabel, input)
         if (error) {
             setValidationError(error)
         } else {
@@ -100,18 +104,16 @@ export function EditFieldModal({
                 >
                     <View
                         style={styles.modalOverlay}>
-
-
                         <View style={styles.modalContent}>
                             <View style={styles.innerModalContainer}>
                                 <Text style={styles.title}>Edit {fieldLabel}</Text>
-                                <Text style={styles.description}>
+                                <Text style={[styles.description, validationError && { color: 'red' }]}>
                                     {validationError || fieldDescription || ''}
                                 </Text>
                             </View>
 
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, fieldLabel !== 'Bio' && { height: 35, }]}
                                 value={input}
                                 onChangeText={(text) => {
                                     setInput(text);
@@ -197,13 +199,13 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        height: 35,
         backgroundColor: 'white',
         borderWidth: 1,
         borderColor: 'gray',
         borderRadius: 12,
         paddingHorizontal: 12,
         marginBottom: 20,
+        paddingVertical: 6
     },
     buttonContainer: {
         width: '100%',

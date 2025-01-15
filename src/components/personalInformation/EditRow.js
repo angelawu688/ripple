@@ -18,7 +18,9 @@ export function FieldRow({
                 {required && <Asterisk />}
             </View>
             <View style={styles.lowerContainer}>
-                <Text style={styles.lowerText} numberOfLines={1} ellipsizeMode="tail">
+                <Text style={styles.lowerText}
+                    //   numberOfLines={1} // put this back if you want to test out single line/truncating
+                    ellipsizeMode="tail">
                     {value}
                 </Text>
                 {canEdit && <TouchableOpacity onPress={onEditPress}>

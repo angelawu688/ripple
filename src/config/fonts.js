@@ -1,7 +1,3 @@
-// import { Roboto_400Regular } from '@expo-google-fonts/roboto';
-// import { Syne_700Bold, Syne_400Regular } from '@expo-google-fonts/syne';
-// import { Inter_400Regular } from '@expo-google-fonts/inter'
-// import { Rubik_400Regular, Rubik_700Bold } from '@expo-google-fonts/rubik'
 import {
     Roboto_400Regular,
     Roboto_500Medium,
@@ -28,15 +24,6 @@ import {
     Rubik_700Bold,
     Rubik_800ExtraBold,
 } from '@expo-google-fonts/rubik';
-
-
-// export const FONTS = {
-//     Roboto_400Regular,
-//     Syne_700Bold,
-//     Syne_400Regular,
-//     Inter_400Regular,
-//     Rubik_400Regular, Rubik_700Bold
-// }
 
 export const FONTS = {
     Roboto_400Regular,
