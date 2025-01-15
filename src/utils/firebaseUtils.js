@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { userContext } from "../context/UserContext";
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { signOut } from "firebase/auth";
+import { checkIfBlocked } from "./blockUser";
 
 
 
@@ -128,11 +129,8 @@ export const deleteImageFromDB = async (photoRef) => {
         const imageRef = ref(storage, photoRef);
         await deleteObject(imageRef); // deletes from storage
     } catch (e) {
-        // console.error(e)
-        // throw e
-        // failed, but its fine
-    }
 
+    }
 };
 
 
@@ -140,9 +138,6 @@ export const deleteImageFromDB = async (photoRef) => {
 // MESSAGES
 // ------------------
 export const sendMessage = async (convID, senderID, textContent = undefined, postID = undefined, imageUri = undefined) => {
-    // if(!convID) {
-    //     convID = await createConversation([se])
-    // }
     if (!textContent.trim() && !postID && !imageUri) {
         // ensure that we have at least one field
         return;
@@ -205,6 +200,14 @@ export const sendMessage = async (convID, senderID, textContent = undefined, pos
 // if the conversation already exists, then we will just return the ID
 export const getConversation = async (senderID, receiverID) => {
     try {
+        const isBlocked = await checkIfBlocked(receiverID, senderID);
+        const hasBlocked = await checkIfBlocked(senderID, receiverID);
+
+        if (isBlocked || hasBlocked) {
+            throw new Error('Cannot create conversation due to blocking');
+        }
+
+
         // this makes sure that the ID is unique and that everyone has their own ID
         // this helps with dealing with rewrites and stuff
         const convID = [senderID, receiverID].sort().join('-')

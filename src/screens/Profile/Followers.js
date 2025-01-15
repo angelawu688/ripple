@@ -9,6 +9,7 @@ import { StyleSheet } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native'
 import { handleRemoveFollower } from '../../utils/socialUtils'
 import ReportUserModal from '../../components/ReportUserModal'
+import { blockUser } from '../../utils/blockUser'
 
 export default function Followers({ navigation, route }) {
     const { isFollowers: initIsFollowers } = route.params
@@ -54,16 +55,47 @@ export default function Followers({ navigation, route }) {
         }
     }
 
-    // const handleBlockUser = () => {
-    //     try {
-    //         showToast('User blocked!')
-    //     } catch (e) {
-    //         console.error(e)
-    //     } finally {
-    //         setActiveModalId(null)
+    const handleBlockUser = (otherUserID) => {
+        try {
+            blockUser(user.uid, otherUserID)
 
-    //     }
-    // }
+            // udpate local state
+            setUsers(prevUsers => {
+                if (isFollowers) {
+                    return prevUsers.filter(u => u.follower_id !== otherUserID);
+                } else {
+                    return prevUsers.filter(u => u.following_id !== otherUserID);
+                }
+            });
+
+
+            // update user context
+            setUserData(prevUserData => {
+                if (!prevUserData) return prevUserData;
+
+                if (isFollowers) {
+                    return {
+                        ...prevUserData,
+                        followers: prevUserData.followers.filter(
+                            f => f.follower_id !== otherUserID
+                        ),
+                    };
+                } else {
+                    return {
+                        ...prevUserData,
+                        following: prevUserData.following.filter(
+                            f => f.following_id !== otherUserID
+                        ),
+                    };
+                }
+            });
+            showToast('User blocked!')
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setActiveModalId(null)
+        }
+    }
 
     if (loading) {
         return <LoadingSpinner />
@@ -184,13 +216,13 @@ export default function Followers({ navigation, route }) {
                                             </Text>
                                         </TouchableOpacity>
 
-                                        {/* <TouchableOpacity
-                                            onPress={() => handleBlockUser()}
+                                        <TouchableOpacity
+                                            onPress={() => handleBlockUser(userID)}
                                             style={[styles.modalOption, { borderBottomWidth: 0 }]}>
                                             <Text style={[styles.modalText, { color: 'red' }]}>
                                                 Block user
                                             </Text>
-                                        </TouchableOpacity> */}
+                                        </TouchableOpacity>
 
                                         {/* <TouchableOpacity style={[styles.modalOption, { borderBottomWidth: 0 }]} onPress={() => setModalVisible(false)}>
                             <Text style={[styles.modalText, { color: 'black' }]}>

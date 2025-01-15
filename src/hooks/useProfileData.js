@@ -15,6 +15,7 @@ import { userContext } from '../context/UserContext';
 import { useNavigation } from '@react-navigation/native';
 import { getConversation } from '../utils/firebaseUtils';
 import { Easing } from 'react-native';
+import { checkIfBlocked } from '../utils/blockUser';
 
 export const useProfileData = (profileUserID) => {
     const [isLoading, setIsLoading] = useState(true);
@@ -22,6 +23,9 @@ export const useProfileData = (profileUserID) => {
     const [userPosts, setUserPosts] = useState([]);
     const [isOwnProfile, setIsOwnProfile] = useState(false);
     const [followingUser, setFollowingUser] = useState(false);
+    const [isBlocked, setIsBlocked] = useState(false);
+    const [hasBlocked, setHasBlocked] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const {
         user,
@@ -42,10 +46,33 @@ export const useProfileData = (profileUserID) => {
     }, [user, userData, userListings, profileUserID]);
 
     useEffect(() => {
+        const checkBlockingStatus = async () => {
+            if (!user?.uid || !profileUserID || user.uid === profileUserID) {
+                setIsBlocked(false);
+                setHasBlocked(false);
+                return;
+            }
+
+            try {
+                const [blocked, userHasBlocked] = await Promise.all([
+                    checkIfBlocked(profileUserID, user.uid),
+                    checkIfBlocked(user.uid, profileUserID)
+                ]);
+                setIsBlocked(blocked);
+                setHasBlocked(userHasBlocked);
+            } catch (error) {
+                console.error('Block check error:', error);
+            }
+        };
+
+        checkBlockingStatus();
+    }, [user?.uid, profileUserID, refreshTrigger]);
+
+    useEffect(() => {
         if (user.uid !== profileUserID) {
             fetchOtherUserProfile();
         }
-    }, [profileUserID]);
+    }, [profileUserID, refreshTrigger]);
 
     const handleOwnProfileData = () => {
         setIsOwnProfile(true);
@@ -60,8 +87,19 @@ export const useProfileData = (profileUserID) => {
         setIsLoading(false);
     };
 
+    const refreshProfile = () => {
+        setRefreshTrigger(prev => prev + 1)
+    }
+
     const fetchOtherUserProfile = async () => {
         try {
+            if (isBlocked || hasBlocked) {
+                setUserProfile(null);
+                setUserPosts([]);
+                setIsLoading(false);
+                return;
+            }
+
             const userRef = doc(db, "users", profileUserID);
             const userDoc = await getDoc(userRef);
 
@@ -232,9 +270,12 @@ export const useProfileData = (profileUserID) => {
         userPosts,
         isOwnProfile,
         followingUser,
+        isBlocked,
+        hasBlocked,
         handleFollowToggle,
         handleFollowers,
         handleFollowing,
-        handleMessage
+        handleMessage,
+        refreshProfile
     };
 };

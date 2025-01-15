@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     createButton: {
-        backgroundColor: 'white',
+        backgroundColor: colors.lightgray,
         borderColor: colors.darkblue,
         width: 60,
         height: 60,

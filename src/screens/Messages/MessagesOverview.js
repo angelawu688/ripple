@@ -8,6 +8,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../../../firebaseConfig"
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { colors } from "../../constants/colors"
+import { checkIfBlocked } from "../../utils/blockUser"
 
 
 const MessagesOverview = ({ navigation }) => {
@@ -43,23 +44,38 @@ const MessagesOverview = ({ navigation }) => {
                 where("users", "array-contains", user.uid)
             );
 
-            const unsubscribe = onSnapshot(q, (snapshot) => {
+            const unsubscribe = onSnapshot(q, async (snapshot) => {
                 const fetchedConversations = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
                 }));
 
+                // this returns an array of promises from the conversations
+                const filterPromises = fetchedConversations.map(async (conv) => {
+                    const otherUserID = conv.users.find(id => id !== user.uid)
+                    const hasBlocked = await checkIfBlocked(user.uid, otherUserID)
+                    const isBlocked = await checkIfBlocked(otherUserID, user.uid)
+                    return {
+                        conv: conv,
+                        isAllowed: !(hasBlocked || isBlocked)
+                    }
+                })
+
+                // filter out conversations that we arent allowed to view
+                const filterResults = await Promise.all(filterPromises);
+                const filteredConversations = filterResults.filter((conv) => conv.isAllowed).map(res => res.conv)
+
                 // sort the conversations in last read order
                 setConversations(
-                    fetchedConversations.sort((a, b) => {
+                    filteredConversations.sort((a, b) => {
                         // if timestamps are undefined this way we dont break them
                         const bT = b.timestamp || 0;
                         const aT = a.timestamp || 0;
                         return bT - aT;
                     })
                 );
-
                 setIsLoading(false);
+
             }, (error) => {
                 console.error("Error fetching conversations:", error);
                 setIsLoading(false);

@@ -49,7 +49,6 @@ export const searchByKeyword = async (searchQuery, limitNum = 20, startAfterList
     }
 }
 
-
 // grabs and returns a given user's recent searches
 export const fetchRecentSearches = async (userID) => {
     try {

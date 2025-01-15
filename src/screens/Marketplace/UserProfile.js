@@ -11,11 +11,15 @@ import ShareModal from "../../components/ShareModal";
 import { ToastContext } from "../../context/ToastContext";
 import ProfileSocials from "../../components/profile/ProfileSocials";
 import { useProfileData } from "../../hooks/useProfileData";
-import {ThreeDotsUserModal} from "../../components/profile/ThreeDotsUserModal";
+import { ThreeDotsUserModal } from "../../components/profile/ThreeDotsUserModal";
 import ReportUserModal from "../../components/ReportUserModal";
+import { unblockUser } from "../../utils/blockUser";
+import { userContext } from "../../context/UserContext";
+import { useNavigation } from "@react-navigation/native";
 
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
+    const { user } = useContext(userContext)
     const { showToast } = useContext(ToastContext);
     const {
         isLoading,
@@ -23,10 +27,13 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         userPosts,
         isOwnProfile,
         followingUser,
+        isBlocked,
+        hasBlocked,
         handleFollowToggle,
         handleFollowers,
         handleFollowing,
-        handleMessage
+        handleMessage,
+        refreshProfile
     } = useProfileData(userID);
 
     const [shareModalVisible, setShareModalVisible] = useState(false)
@@ -40,7 +47,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         }
     }, [userID]);
 
-
     if (isLoading) {
         return <FullLoadingScreen />
     }
@@ -53,6 +59,19 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 </Text>
                 <Text style={{ fontFamily: 'inter', fontWeight: '400', fontSize: 14 }}>
                     This account may have been deleted
+                </Text>
+            </View>
+        )
+    }
+
+    if (isBlocked) {
+        return (
+            <View style={styles.blockedContainer}>
+                <Text style={styles.topBlockedText}>
+                    This user has blocked you
+                </Text>
+                <Text style={styles.bottomBlockedText}>
+                    You are not able to see their content
                 </Text>
             </View>
         )
@@ -113,9 +132,10 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                     visible={modalVisible}
                     onReport={() => setReportModalVisible(true)}
                     onClose={() => setModalVisible(false)}
+                    userID={userID}
                 />
 
-                <ReportUserModal // TODO: not displayed correctly!! need to move it lower so you can still see the three dots
+                <ReportUserModal
                     visible={reportModalVisible}
                     onClose={() => {
                         setReportModalVisible(false)
@@ -125,7 +145,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 />
             </View>
 
-            <ScrollView
+            {!hasBlocked ? (<ScrollView
                 contentContainerStyle={{
                     alignItems: 'center',
                     justifyContent: 'flex-start',
@@ -232,7 +252,25 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         </Text>}
                     </View>
                 )}
-            </ScrollView >
+            </ScrollView >) : (
+                <TouchableOpacity
+                    onPress={async () => {
+                        try {
+                            await unblockUser(user.uid, userID);
+                            navigation.goBack()
+                            refreshProfile();
+                        } catch (error) {
+                            console.error('Error unblocking user:', error);
+                            showToast('Failed to unblock user');
+                        }
+                    }}
+                    style={styles.unblockUserButton}
+                >
+                    <Text style={styles.unblockButtonText}>
+                        Unblock user
+                    </Text>
+                </TouchableOpacity>
+            )}
 
             {isOwnProfile && (
                 <TouchableOpacity style={{ backgroundColor: 'white', borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.35, shadowRadius: 5, position: 'absolute', bottom: 15, right: 15, shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 } }}
@@ -346,4 +384,35 @@ const styles = StyleSheet.create({
         color: colors.loginBlue,
         maxWidth: '80%',
     },
+    blockedContainer: {
+        justifyContent: 'center',
+        flex: 1
+    },
+    topBlockedText: {
+        fontFamily: 'inter',
+        fontSize: 20,
+        fontWeight: '600'
+    },
+    bottomBlockedText: {
+        fontFamily: 'inter',
+        fontSize: 16,
+        fontWeight: '400'
+    },
+    unblockUserButton: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 200,
+        height: 45,
+        borderRadius: 50,
+        backgroundColor: colors.loginBlue,
+        alignSelf: 'center',
+        marginTop: 20
+    },
+    unblockButtonText: {
+        fontSize: 18,
+        fontWeight: '500',
+        color: 'white',
+        fontFamily: 'inter',
+    }
 })
