@@ -15,10 +15,13 @@ export default function UWHeader() {
 
 
     const formatNumber = (num) => {
+        if (num < 0) {
+            throw new Error('number of users must be positive')
+        }
         if (num > 1000000) {
-            return `${num / 1000000}.${num % 1000000 / 100000} m`
-        } else if (num > 1000) { // in the thousands
-            return `${num / 1000}.${num % 1000 / 100} k`
+            return `${(num / 1000000).toFixed(1)} m`
+        } else if (num >= 1000) { // in the thousands
+            return `${(num / 1000).toFixed(1)} k`
         } else { // under 1k, we can fit all of them
             return num
         }
@@ -55,7 +58,7 @@ export default function UWHeader() {
                     setUserCount(formatNumber(data.count))
                 }
             } catch (e) {
-                console.log(e)
+                console.error(e)
                 setUserCount('---')
             }
         }

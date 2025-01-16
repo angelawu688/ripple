@@ -48,7 +48,6 @@ export function EditFieldModal({
         if (!value) return ''; // Allow empty values initially
         switch (field) {
             case 'Bio':
-                console.log(value)
                 if (value.length > 163) {
                     return 'Bio must be under 163 characters!'
                 } else {

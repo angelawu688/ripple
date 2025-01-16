@@ -54,9 +54,7 @@ const Profile = ({ navigation }) => {
                     text: 'Delete Account',
                     onPress: async () => {
                         try {
-                            console.log('delete account actually being called')
                             await deleteAccount(user.uid, setUser)
-                            console.log('delete account actually being called')
                         } catch (e) {
                             console.error(e)
                         }
@@ -215,7 +213,6 @@ const Profile = ({ navigation }) => {
                 <TouchableOpacity
                     style={styles.profileCard}
                     onPress={(() => {
-                        console.log('handle delete account being called')
                         handleDeleteAccount()
                     })}
                 >

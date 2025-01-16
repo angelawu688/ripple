@@ -28,7 +28,6 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                             keyboardDismissMode="on-drag"
                             data={userSearchResults}
                             renderItem={({ item, index }) => {
-                                console.log('item', item)
                                 return (
                                     <UserResultCard
                                         navigation={navigation}

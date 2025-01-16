@@ -134,7 +134,6 @@ const EditListing = ({ navigation, route }) => {
                 const urls = [photoData.thumbnail, photoData.card, photoData.full];
                 for (const url of urls) {
                     const fileName = decodeURIComponent(url.split('/').pop().split('?')[0]);
-                    console.log('fname', fileName)
                     await deleteImageFromDB(fileName);
                 }
 

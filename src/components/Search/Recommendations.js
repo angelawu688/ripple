@@ -32,7 +32,6 @@ const computeRecommendations = async (userData) => {
 
         friendFollowing.forEach(followedUser => {
             const candidateId = followedUser.following_id;
-            console.log(candidateId)
 
             //    skip if its active user or someone that they already follow 
             if (!candidateId || candidateId === myID || followingIds.includes(candidateId)) {

@@ -6,6 +6,7 @@ import { MotiView } from 'moti';
 import { Dimensions } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { Asset } from 'expo-asset';
+import { renderPrice } from '../../utils/listings';
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -63,10 +64,13 @@ const ListingCard = ({ listing }) => {
                 style={styles.title}
                 numberOfLines={1}
             >
-                <Text style={styles.priceText}>
-                    ${price}
-                </Text>{" "}
-                | {title}
+                {title}
+            </Text>
+            <Text
+                style={styles.priceText}
+                numberOfLines={1}
+            >
+                ${renderPrice(price)}
             </Text>
         </View >
     )
@@ -108,12 +112,16 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         marginLeft: '5%',
-        marginTop: 10,
         marginBottom: 0,
-        fontWeight: '500'
+        fontWeight: '500',
+        marginTop: 6
     },
     priceText: {
         color: colors.loginBlue,
+        fontSize: 16,
+        marginLeft: '5%',
+        marginBottom: 0,
+        fontWeight: '500'
     }
 
 })  

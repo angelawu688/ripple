@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { formatDate } from "../../utils/formatDate";
 import { colors } from "../../constants/colors";
+import { renderPrice } from "../../utils/listings";
 
 export default function ListingHeader({
     title,
@@ -14,7 +15,7 @@ export default function ListingHeader({
                 {title}
             </Text>
             <Text style={styles.price}>
-                ${price}
+                ${renderPrice(price)}
             </Text>
         </View>
         {/* {(<Text style={styles.createdAt}>
@@ -34,10 +35,10 @@ const styles = StyleSheet.create({
     title: {
         fontFamily: 'inter',
         fontWeight: '600',
-        fontSize: 22,
+        fontSize: 24,
     },
     price: {
-        fontSize: 22,
+        fontSize: 18,
         fontFamily: 'inter',
         marginTop: 0,
         fontWeight: '500',
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
         width: '100%',
         display: 'flex',
         justifyContent: 'space-between',
-        flexDirection: 'row',
-        alignItems: 'center'
+        flexDirection: 'column',
+        alignItems: 'flex-start'
     }
 })
