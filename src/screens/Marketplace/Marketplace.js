@@ -3,7 +3,7 @@ import { getFirestore, where, setDoc, collection, query, orderBy, getDocs, limit
 
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../constants/colors'
-import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import {lazy, memo, Suspense, useCallback, useContext, useEffect, useMemo, useState} from "react";
 
 
 const ForYou = lazy(() => import('./MarketplaceLists/ForYou'));
@@ -15,7 +15,7 @@ const Sell = lazy(() => import('./MarketplaceLists/Sell'));
 // import Search from './MarketplaceLists/Search'
 import { Eyeglasses, MagnifyingGlass, MapPin, Plus } from "phosphor-react-native";
 import ListingsListSkeletonLoaderFull from "../../components/listings/ListingsListSkeletonLoaderFull";
-
+import { userContext } from "../../context/UserContext";
 
 // how many items we fetch at a time
 // this is obviously terrible but makes it easy to see lol
@@ -53,6 +53,8 @@ const Marketplace = ({ navigation }) => {
 
     // TODO refactor for clarity
     const totalUsers = '2.3k' // grab the total rows from the users DB and cache it
+
+    const { user } = useContext(userContext)
 
     const [listings, setListings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
@@ -137,10 +139,10 @@ const Marketplace = ({ navigation }) => {
             }
 
             const querySnapshot = await getDocs(q);
-            const listingsData = querySnapshot.docs.map(doc => ({
+            const listingsData= querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
-            }))
+            })).filter((post) => (post.userId !== user.uid));
 
             const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
             // if we get less than listings data, then there wont be more left
@@ -366,7 +368,6 @@ const styles = StyleSheet.create({
     container: {
         display: 'flex',
         backgroundColor: 'white',
-        display: 'flex',
         justifyContent: 'flex-start',
         alignItems: 'center',
         height: '100%',

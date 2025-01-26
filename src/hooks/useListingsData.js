@@ -1,10 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import {useState, useEffect, useCallback, useContext} from 'react';
 import { getFirestore, collection, query, where, orderBy, limit, startAfter, getDocs } from 'firebase/firestore';
+import {userContext} from "../context/UserContext";
 
 const PAGE_SIZE = 12;
 const CACHE_DURATION = 300000; // 5 min in ms
 
 export function useListingsData(selectedOption) {
+    const { user } = useContext(userContext)
+
     const [listingsCache, setListingsCache] = useState({
         foryou: { items: [], lastDoc: null, hasMore: true },
         friends: { items: [], lastDoc: null, hasMore: true },
@@ -54,7 +57,7 @@ export function useListingsData(selectedOption) {
             const listingsData = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
-            }));
+            })).filter((post) => (post.userId !== user.uid));
 
             // update cache and then state
             const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
