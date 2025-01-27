@@ -55,7 +55,13 @@ const PersonalInformation = () => {
         if (!currentField) {
             return;
         }
+        if (currentField.key === 'bio' && newValue.length > 163) {
+            setErrorMessage('Bio must be under 163 characters')
+            setIsLoadingSave(false)
+            return;
+        }
         setIsLoadingSave(true)
+
 
         try {
             const userRef = doc(db, "users", user.uid);

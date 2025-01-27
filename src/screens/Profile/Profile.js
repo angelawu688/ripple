@@ -83,7 +83,7 @@ const Profile = ({ navigation }) => {
                         <User size={24} color={'black'} style={styles.icon} />
                         {/* <Ionicons name={'person-outline'} size={24} color={'black'} style={styles.icon} /> */}
                         <Text style={{ fontSize: 18, marginLeft: 6 }}>
-                            Account Center
+                            Edit Profile
                         </Text>
                     </View>
 

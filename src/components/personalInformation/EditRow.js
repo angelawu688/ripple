@@ -17,17 +17,17 @@ export function FieldRow({
                 <Text style={styles.upperText}>{label}</Text>
                 {required && <Asterisk />}
             </View>
+            {canEdit && <TouchableOpacity onPress={onEditPress}>
             <View style={styles.lowerContainer}>
+                 {/*{canEdit && <TouchableOpacity onPress={onEditPress}>*/}
                 <Text style={styles.lowerText}
                     //   numberOfLines={1} // put this back if you want to test out single line/truncating
                     ellipsizeMode="tail">
                     {value}
                 </Text>
-                {canEdit && <TouchableOpacity onPress={onEditPress}>
                     <Ionicons name={'chevron-forward'} size={24} color={'black'} />
-                </TouchableOpacity>}
-
             </View>
+            </TouchableOpacity>}
         </View>
     );
 };
