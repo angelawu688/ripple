@@ -25,7 +25,6 @@ export default function ZoomableImage({
                     resizeMode='cover'
                 />
             </Pressable>
-
             {/* MODAL */}
             <Modal
                 visible={isModalVisible}
@@ -71,8 +70,8 @@ export default function ZoomableImage({
 
 const styles = StyleSheet.create({
     imageWrapper: {
-        flex: 1,
-        width: '100%',
+        // flex: 1,
+        // width: '100%',
     },
     modalContainer: {
         flex: 1,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native'
-import { X } from 'phosphor-react-native';
+import { FileX, X } from 'phosphor-react-native';
 import { colors } from '../../constants/colors'
 import ListingCard from '../listings/ListingCard';
 import { getListingFromID } from '../../utils/firebaseUtils';
@@ -54,17 +54,22 @@ export const MessageBubble = ({ navigation, message, activeUserID, formattedDate
 
                     style={{
                         width: 150,
-                        height: 170,
-                        marginVertical: 12,
+                        height: 184,
+                        marginVertical: 12
                     }}>
                     <ListingCard listing={listing} containerWidth={170} />
                 </TouchableOpacity>
             )}
 
+            {/* POST REMOVED PLACEHOLDER */}
             {postID && !listing && (
                 <View style={{ marginVertical: 4 }}>
-                    <View style={{ backgroundColor: colors.loginGray, width: 150, height: 150, borderRadius: 12 }} />
-                    <View style={{ marginTop: 4, backgroundColor: colors.loginGray, width: 150, height: 30, borderRadius: 12 }} />
+                    <View style={{ backgroundColor: colors.loginGray, width: 150, height: 150, borderRadius: 12, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <FileX size={40} />
+                        <Text style={{ fontFamily: 'inter', marginTop: 4 }}>
+                            Listing removed
+                        </Text>
+                    </View>
                 </View>
             )}
 

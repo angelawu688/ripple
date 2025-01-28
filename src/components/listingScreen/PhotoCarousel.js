@@ -51,16 +51,6 @@ export default function PhotoCarousel({ photos, sold }) {
                                     backgroundColor: colors.loginGray
                                 }}
                             />
-                            {/* <Image
-                                source={{ uri: url }}
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    borderRadius: 0,
-                                    backgroundColor: colors.loginGray
-                                }}
-                                contentFit="cover"
-                            /> */}
                             {sold && (
                                 <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: '100%' }}>
                                     <Text

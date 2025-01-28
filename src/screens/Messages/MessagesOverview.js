@@ -14,77 +14,60 @@ import { checkIfBlocked } from "../../utils/blockUser"
 const MessagesOverview = ({ navigation }) => {
     const { user, userData } = useContext(userContext)
 
-    // const fetchOtherUserData = async (userId) => {
-    //     try {
-    //         const userDoc = await getDoc(doc(db, "users", userId))
-    //         if (userDoc.exists()) {
-    //             const otherUserData = userDoc.data()
-    //             return {
-    //                 id: userId,
-    //                 name: otherUserData.name || undefined,
-    //                 pfp: otherUserData.pfp || undefined,
-    //             }
-    //         }
-    //     } catch (error) {
-    //         console.error("Error fetching user data:", error)
-    //     }
-    //     return null
-    // }
-
     // on component focus, grab all of the conversations for that user
-    useFocusEffect(
-        useCallback(() => {
-            // make sure we have uid
-            if (!user?.uid) return;
+    useEffect(() => {
+        // make sure we have uid
+        if (!user?.uid) return;
 
-            // function
-            setIsLoading(true);
-            const q = query(
-                collection(db, "conversations"),
-                where("users", "array-contains", user.uid)
-            );
+        // function
+        setIsLoading(true);
+        const q = query(
+            collection(db, "conversations"),
+            where("users", "array-contains", user.uid)
+        );
 
-            const unsubscribe = onSnapshot(q, async (snapshot) => {
-                const fetchedConversations = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
+        const unsubscribe = onSnapshot(q, async (snapshot) => {
+            const fetchedConversations = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
 
-                // this returns an array of promises from the conversations
-                const filterPromises = fetchedConversations.map(async (conv) => {
-                    const otherUserID = conv.users.find(id => id !== user.uid)
-                    const hasBlocked = await checkIfBlocked(user.uid, otherUserID)
-                    const isBlocked = await checkIfBlocked(otherUserID, user.uid)
-                    return {
-                        conv: conv,
-                        isAllowed: !(hasBlocked || isBlocked)
-                    }
+            // this returns an array of promises from the conversations
+            const filterPromises = fetchedConversations.map(async (conv) => {
+                const otherUserID = conv.users.find(id => id !== user.uid)
+                const hasBlocked = await checkIfBlocked(user.uid, otherUserID)
+                const isBlocked = await checkIfBlocked(otherUserID, user.uid)
+                return {
+                    conv: conv,
+                    isAllowed: !(hasBlocked || isBlocked)
+                }
+            })
+
+            // filter out conversations that we arent allowed to view or ones that are empty
+            const filterResults = await Promise.all(filterPromises);
+            const filteredConversations = filterResults
+                .filter((result) => result.isAllowed && result.conv.lastMessage && result.conv.lastMessage !== "")
+                .map(result => result.conv)
+
+            // sort the conversations in last read order
+            setConversations(
+                filteredConversations.sort((a, b) => {
+                    // if timestamps are undefined this way we dont break them
+                    const bT = b.timestamp || 0;
+                    const aT = a.timestamp || 0;
+                    return bT - aT;
                 })
+            );
+            setIsLoading(false);
 
-                // filter out conversations that we arent allowed to view
-                const filterResults = await Promise.all(filterPromises);
-                const filteredConversations = filterResults.filter((conv) => conv.isAllowed).map(res => res.conv)
+        }, (error) => {
+            console.error("Error fetching conversations:", error);
+            setIsLoading(false);
+        });
 
-                // sort the conversations in last read order
-                setConversations(
-                    filteredConversations.sort((a, b) => {
-                        // if timestamps are undefined this way we dont break them
-                        const bT = b.timestamp || 0;
-                        const aT = a.timestamp || 0;
-                        return bT - aT;
-                    })
-                );
-                setIsLoading(false);
-
-            }, (error) => {
-                console.error("Error fetching conversations:", error);
-                setIsLoading(false);
-            });
-
-            // cleanup
-            return () => unsubscribe();
-        }, [user?.uid])
-    )
+        // cleanup
+        return () => unsubscribe();
+    }, [user?.uid])
 
 
     // grab messages on component mount or as prop
@@ -175,7 +158,7 @@ export default MessagesOverview
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
-        diplsay: 'flex',
+        display: 'flex',
         alignItems: 'center',
         height: '100%',
         width: '100%'

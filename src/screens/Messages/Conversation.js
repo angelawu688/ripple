@@ -131,12 +131,12 @@ const Conversation = ({ navigation, route }) => {
         // optimistic update, makes it more responsive
         // for post and image, it makes more sense and looks cleaner to just keep them for a bit
         if (text) {
-            clearInputs();
+            clearInputs()
         }
+
 
         // send it away to our lovely database
         try {
-            // convID, senderID, textContent = undefined, postID = undefined, imageUri = undefined
             await sendMessage(
                 conversationID,
                 user.uid,
@@ -144,6 +144,11 @@ const Conversation = ({ navigation, route }) => {
                 post?.id,
                 img,
             )
+            // THERE IS A LITTLE GAP HERE TIME WISE, but it is fine for now
+            if (!text) { // already cleared, so we are good
+                clearInputs()
+            }
+
         } catch (e) {
             console.error('handlesend', e)
             // rollback if we want
@@ -340,7 +345,7 @@ const Conversation = ({ navigation, route }) => {
                             }}
                         />
                         <TouchableOpacity style={[styles.sendButton, { backgroundColor: input.trim() || img || inputListing ? colors.loginBlue : colors.loginGray }]} onPress={() => handleSendMessage(input, img, inputListing, clearInputs)}>
-                            <ArrowBendRightUp size={20} color='white' />
+                            {sendingMessage ? <ActivityIndicator /> : <ArrowBendRightUp size={20} color='white' />}
                         </TouchableOpacity>
                     </View>
                 </View>
