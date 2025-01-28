@@ -55,7 +55,7 @@ export default function UWHeader() {
 
                     // set async with updated and set the user count accordingly
                     await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
-                    setUserCount(formatNumber(data.count))
+                    setUserCount(formatNumber(cacheData.count))
                 }
             } catch (e) {
                 console.error(e)
