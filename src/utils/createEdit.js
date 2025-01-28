@@ -13,14 +13,15 @@ export const validateListing = (title, price, description, tags, photos, setErro
         return false
     }
 
+    // this is the max fallback. We also handle this in the actual input field
     if (title.length > 100) {
         setErrorMessage('Enter a shorter title!')
         return false
     }
 
     // price field validation is largely handled by our actual input field
-    // if issues arise, this is where to fix them, but for now just need to check for undefined
-    if (!price) {
+    // THIS ALLOWS FREE LISTINGS
+    if (!(price >= 0)) {
         setErrorMessage('Enter a price!')
         return false
     }
@@ -61,7 +62,7 @@ export const uploadNewPhotos = async (photos, userId, listingID, setErrorMessage
 
 // renders the image preview
 export const ImagePreview = ({ uri, removePhoto, imageSize }) => {
-    const imageUri = typeof uri === 'object' ? uri.card : uri;
+    const imageUri = typeof uri === 'object' ? uri.card : uri; // this is handling legacy before we had image compression
 
     return (
         <View style={{

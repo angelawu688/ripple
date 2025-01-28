@@ -252,6 +252,7 @@ const CreateListing = ({ navigation }) => {
                                 setImageErrorMessage('')
                             }}
                             onFocus={() => scrollToInput('title')}
+                            maxLength={60}
                         />
                     </View>
 
@@ -302,18 +303,20 @@ const CreateListing = ({ navigation }) => {
                                 }}
                                 onFocus={() => scrollToInput('tags')}
                             />}
-                            {tags.length < 3 && <TouchableOpacity
-                                onPressIn={() => {
-                                    handleAddTag(tagInput)
-                                }}
-                                // onPress={(e) => {
-                                //     handleAddTag(tagInput)
-                                // }}
-                                style={{ marginLeft: 10 }}
-                                disabled={tagInput.length === 0}
-                            >
-                                <PlusCircle color={tagInput.length > 0 && tagInput.length <= 15 ? colors.loginBlue : colors.accentGray} size={30} />
-                            </TouchableOpacity>}
+                            {tags.length < 3 && (
+                                <TouchableOpacity
+                                    disabled={tagInput.trim().length === 0 || tagInput.trim().length > 15}
+                                    onPressIn={() => {
+                                        handleAddTag(tagInput)
+                                    }}
+                                    // onPress={(e) => {
+                                    //     handleAddTag(tagInput)
+                                    // }}
+                                    style={{ marginLeft: 10 }}
+                                >
+                                    <PlusCircle color={tagInput.length > 0 && tagInput.length <= 15 ? colors.loginBlue : colors.accentGray} size={30} />
+                                </TouchableOpacity>
+                            )}
                         </View>
 
                         {/* tag previews */}
@@ -370,10 +373,10 @@ const CreateListing = ({ navigation }) => {
                             style={[
                                 styles.publishButton,
                                 errorMessage && { borderWidth: 1, borderColor: 'red' },
-                                title && price && photos.length > 0 && styles.publishButtonReady]}
+                                title && price >= 0 && photos.length > 0 && styles.publishButtonReady]}
                         >
 
-                            {!isLoading ? <Text style={[title && price && photos.length > 0 ? { fontSize: 20, color: 'white', fontFamily: 'inter', } : styles.placeholderText, { fontWeight: '600' }]}
+                            {!isLoading ? <Text style={[title && price >= 0 && photos.length > 0 ? { fontSize: 20, color: 'white', fontFamily: 'inter', } : styles.placeholderText, { fontWeight: '600' }]}
                             >
                                 Publish
                             </Text> : <LoadingSpinner />}
@@ -506,11 +509,12 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     tagInput: {
-        width: '50%',
+        // width: '50%',
         height: 36,
         paddingHorizontal: 16,
         backgroundColor: 'white',
         borderRadius: 15,
+        flex: 1
     },
     publishShadow: {
         shadowColor: colors.loginBlue,

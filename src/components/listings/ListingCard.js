@@ -70,7 +70,7 @@ const ListingCard = ({ listing }) => {
                 style={styles.priceText}
                 numberOfLines={1}
             >
-                ${renderPrice(price)}
+                {renderPrice(price)}
             </Text>
         </View >
     )

@@ -15,7 +15,7 @@ export default function ListingHeader({
                 {title}
             </Text>
             <Text style={styles.price}>
-                ${renderPrice(price)}
+                {renderPrice(price)}
             </Text>
         </View>
         {/* {(<Text style={styles.createdAt}>
