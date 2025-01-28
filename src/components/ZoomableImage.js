@@ -1,7 +1,10 @@
-import { Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { Text, TouchableOpacity, Image, StyleSheet, Pressable, ScrollView, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import { Modal } from 'react-native'
 import { X } from 'phosphor-react-native'
+
+const SCOLL_DOWN_THRESHOLD = 50
+
 
 export default function ZoomableImage({
     uri,
@@ -9,13 +12,11 @@ export default function ZoomableImage({
     modalBackgroundColor = 'black' // idk if this will need to change but allowing for future changes
 }) {
     const [isModalVisible, setIsModalVisible] = useState(false)
-    useEffect(() => {
-        console.log(uri)
-    }, [])
+
     return (
-        <>
+        <View style={styles.imageWrapper}>
             {/* THUMBNAIL */}
-            <TouchableOpacity
+            <Pressable
                 onPress={() => setIsModalVisible(true)}
             >
                 <Image
@@ -23,7 +24,7 @@ export default function ZoomableImage({
                     style={thumbnailStyle}
                     resizeMode='cover'
                 />
-            </TouchableOpacity>
+            </Pressable>
 
             {/* MODAL */}
             <Modal
@@ -38,25 +39,45 @@ export default function ZoomableImage({
                 >
                     <X size={32} color='white' weight='bold' />
                 </TouchableOpacity>
-                <TouchableOpacity
+                <ScrollView
                     style={[styles.modalContainer, { backgroundColor: modalBackgroundColor }]}
-                    activeOpacity={1}
-                    onPress={() => setIsModalVisible(false)}
+                    contentContainerStyle={styles.scrollContent}
+                    maximumZoomScale={3}
+                    minimumZoomScale={1}
+                    pinchGestureEnabled={true} // this is what allows for the zoom
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+
+                    // want to handle down scroll --> dismiss    
+                    bounces={true}
+                    onScrollEndDrag={({ nativeEvent }) => {
+                        if (nativeEvent.contentOffset.y < SCOLL_DOWN_THRESHOLD) { // 
+
+                            setIsModalVisible(false)
+                        }
+                    }}
                 >
                     <Image
                         source={{ uri: uri }}
                         style={styles.fullScreenImage}
                         resizeMode="contain"
                     />
-                </TouchableOpacity>
+                </ScrollView>
 
             </Modal>
-        </>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
+    imageWrapper: {
+        flex: 1,
+        width: '100%',
+    },
     modalContainer: {
+        flex: 1,
+    },
+    scrollContent: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'

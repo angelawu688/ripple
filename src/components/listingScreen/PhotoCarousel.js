@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Dimensions, FlatList, Image, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { colors } from "../../constants/colors";
+import ZoomableImage from "../ZoomableImage";
 
 export default function PhotoCarousel({ photos, sold }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,7 +41,17 @@ export default function PhotoCarousel({ photos, sold }) {
                         <View
                             style={{ height: width, width: width, alignSelf: 'center', justifyContent: 'center', }}
                         >
-                            <Image
+
+                            <ZoomableImage
+                                uri={url}
+                                thumbnailStyle={{
+                                    width: "100%",
+                                    height: "100%",
+                                    borderRadius: 0,
+                                    backgroundColor: colors.loginGray
+                                }}
+                            />
+                            {/* <Image
                                 source={{ uri: url }}
                                 style={{
                                     width: "100%",
@@ -49,7 +60,7 @@ export default function PhotoCarousel({ photos, sold }) {
                                     backgroundColor: colors.loginGray
                                 }}
                                 contentFit="cover"
-                            />
+                            /> */}
                             {sold && (
                                 <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: '100%' }}>
                                     <Text

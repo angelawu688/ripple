@@ -16,6 +16,7 @@ import ReportUserModal from "../../components/ReportUserModal";
 import { unblockUser } from "../../utils/blockUser";
 import { userContext } from "../../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
+import ZoomableImage from "../../components/ZoomableImage";
 
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
@@ -81,12 +82,12 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         <View style={[styles.container]}>
             {isOwnProfileInProfileStack && <View style={{ height: 80, width: '100%' }} />}
             <View style={styles.topContainer}>
-                {userProfile.pfp ? (<Image
-                    // pfp would go here
-                    style={{ width: 60, height: 60, borderRadius: 75, backgroundColor: 'gray' }}
-                    source={{ uri: userProfile?.pfp }}
-
-                />) :
+                {userProfile.pfp ? (
+                    <ZoomableImage
+                        uri={userProfile?.pfp}
+                        thumbnailStyle={{ width: 60, height: 60, borderRadius: 75, backgroundColor: 'gray' }}
+                    />
+                ) :
                     (<View style={{ backgroundColor: colors.loginGray, width: 60, height: 60, borderRadius: 75, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                         <User size={24} />
                     </View>)
