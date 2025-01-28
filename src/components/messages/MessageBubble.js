@@ -4,6 +4,7 @@ import { X } from 'phosphor-react-native';
 import { colors } from '../../constants/colors'
 import ListingCard from '../listings/ListingCard';
 import { getListingFromID } from '../../utils/firebaseUtils';
+import ZoomableImage from '../ZoomableImage';
 
 
 export const MessageBubble = ({ navigation, message, activeUserID, formattedDate = undefined }) => {
@@ -67,42 +68,20 @@ export const MessageBubble = ({ navigation, message, activeUserID, formattedDate
                 </View>
             )}
 
-            {/* {imageUri && (
-                <Image
-                    style={{
-                        width: 170,
-                        height: 170,
-                        // borderWidth: 1,
-                        borderColor: colors.loginGray,
-                        borderRadius: 8
-                    }}
-                    resizeMode='contain'
-                    source={{ uri: imageUri }}
-                />
-            )} */}
-
             {imageUri && (
-                <TouchableOpacity onPress={() => {
-                    setShowZoomModal(true)
-                }}>
-                    <Image
-                        source={{ uri: imageUri }}
-                        style={[
-                            {
-                                width: 170,
-                                height: 170,
-                                borderRadius: 8,
-                                borderWidth: 0.5,
-                                borderColor: colors.loginGray,
-                                backgroundColor: colors.loginGray,
-                                marginBottom: 4
-                            },
-                            // styles.messageImage,
-                            // isCurrentUser ? styles.sentImage : styles.receivedImage
-                        ]}
-                        resizeMode="cover"
-                    />
-                </TouchableOpacity>
+                <ZoomableImage
+                    uri={imageUri}
+                    thumbnailStyle={
+                        {
+                            width: 170,
+                            height: 170,
+                            borderRadius: 8,
+                            borderWidth: 0.5,
+                            borderColor: colors.loginGray,
+                            backgroundColor: colors.loginGray,
+                            marginBottom: 4
+                        }}
+                />
             )}
 
             {textContent && textContent.length !== 0 && (
@@ -114,7 +93,7 @@ export const MessageBubble = ({ navigation, message, activeUserID, formattedDate
                 </View>
             )}
 
-            <Modal
+            {/* <Modal
                 visible={showZoomModal}
                 transparent={true}
                 animationType="fade"
@@ -137,7 +116,7 @@ export const MessageBubble = ({ navigation, message, activeUserID, formattedDate
                         resizeMode="contain"
                     />
                 </TouchableOpacity>
-            </Modal>
+            </Modal> */}
         </View>
     )
 }
@@ -151,7 +130,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start'
     },
     sent: {
-        // backgroundColor: '#007aff',
+
         backgroundColor: colors.loginBlue,
         alignSelf: 'flex-end',
     },
@@ -162,33 +141,5 @@ const styles = StyleSheet.create({
         fontFamily: 'inter',
         fontSize: 16,
         fontWeight: '400'
-    },
-
-    // modal styles: 
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'black'
-    },
-    closeButtonText: {
-        fontSize: 30,
-        color: colors.white,
-        fontWeight: 'bold',
-    },
-    zoomContainer: {
-        width: '100%',
-        height: '100%',
-    },
-    fullScreenImage: {
-        width: '100%',
-        height: '100%',
-    },
-    closeButton: {
-        position: 'absolute',
-        top: 50,
-        left: 10,
-        zIndex: 9999,
-        padding: 10,
     },
 })
