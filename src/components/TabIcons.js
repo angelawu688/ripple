@@ -36,15 +36,25 @@ export function ProfileTabIcon({ focused, userData }) {
 
     return (
         <View style={[styles.profilePlaceholder, { opacity: focused ? 1.0 : 0.7 }]}>
-            <User size={20} />
+            <User
+                size={18}
+                color={colors.loginBlue}
+            // weight={focused ? 'regular' : 'thin'} 
+            />
         </View>
+
+
     );
 }
 
 export function MarketplaceTabIcon({ focused }) {
     return (
         <View style={styles.iconContainer}>
-            <Storefront size={28} color={colors.loginBlue} weight={focused ? 'fill' : 'regular'} />
+            <Storefront
+                size={28}
+                color={colors.loginBlue}
+                weight={focused ? 'fill' : 'regular'}
+            />
         </View>
     )
 }
@@ -59,14 +69,16 @@ const styles = StyleSheet.create({
         display: 'flex',
         borderRadius: 50,
         backgroundColor: colors.loginGray,
+        marginTop: -5
     },
     profileImage: {
-        width: 28,
-        height: 28,
+        width: 25,
+        height: 25,
         justifyContent: 'center',
         alignItems: 'center',
         display: 'flex',
         borderRadius: 50,
+        marginTop: -5
     },
     badge: {
         position: 'absolute',
