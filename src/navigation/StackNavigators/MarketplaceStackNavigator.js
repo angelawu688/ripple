@@ -13,6 +13,9 @@ import EditPost from "../../screens/Marketplace/MarketplaceLists/EditPost";
 import { DotsThree } from "phosphor-react-native";
 import Search from "../../screens/Marketplace/MarketplaceLists/Search";
 import { MarketplaceTabNavigator } from "./MarketplaceTabNavigator";
+import Reviews from "../../screens/Profile/Reviews";
+import FullListingsScreen from "../../components/profile/FullListingsScreen";
+import Followers from "../../screens/Profile/Followers";
 
 const MarketplaceStack = createNativeStackNavigator();
 
@@ -84,6 +87,56 @@ const MarketplaceStackNavigator = () => {
                     ...getDefaultBackArrow(navigation),
                     ...getDefaultLogo(),
                     headerTitle: () => '',
+                })}
+            />
+            <MarketplaceStack.Screen
+                name="Reviews"
+                component={Reviews}
+                options={({ navigation }) => ({
+                    ...getDefaultBackArrow(navigation),
+                    headerTitle: () => (
+                        <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600' }}>
+                            Reviews
+                        </Text>
+                    ),
+                    headerRight: () => (
+                        <></>
+                    ),
+                })}
+            />
+
+            <MarketplaceStack.Screen
+                name="FullListingsScreen"
+                component={FullListingsScreen}
+                options={({ navigation, route }) => ({
+                    headerTitle: () => (
+                        <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600' }}>
+                            {route?.title}
+                        </Text>
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => (
+                        <></>
+                    ),
+                })}
+            />
+
+            <MarketplaceStack.Screen
+                name="Followers"
+                component={Followers}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Logo />
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    )
                 })}
             />
         </MarketplaceStack.Navigator >

@@ -64,9 +64,8 @@ const ProfileSocials = ({ userProfile }) => {
 const styles = StyleSheet.create({
     socialsContainer: {
         flexDirection: 'column',
-        marginTop: 16,
         width: '100%',
-        gap: 12
+        gap: 8
     },
     socialButton: {
         flexDirection: 'row',

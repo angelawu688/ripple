@@ -3,10 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { userContext } from '../../context/UserContext'
 import FullLoadingScreen from '../shared/FullLoadingScreen'
 import { FlatList } from 'react-native'
-import ListingCard from '../../components/listings/ListingCard'
 import ListingsList from '../../components/listings/ListingsList'
 
-const YourListings = ({ navigation }) => {
+const YourListings = ({
+    navigation,
+    selectedMode = undefined
+}) => {
     const { userListings } = useContext(userContext)
     const [yourListings, setYourListings] = useState([])
     const [activeListings, setActiveListings] = useState([])
@@ -27,12 +29,16 @@ const YourListings = ({ navigation }) => {
     }, [userListings])
 
     useEffect(() => {
-        setIsLoading(false)
-        const active = yourListings.filter(listing => listing.sold === false)
-        const past = yourListings.filter(listing => listing.sold === true)
-        setActiveListings(active)
-        setPastListings(past)
-        // cleanup function
+        try {
+            const active = yourListings.filter(listing => listing.sold === false)
+            const past = yourListings.filter(listing => listing.sold === true)
+            setActiveListings(active)
+            setPastListings(past)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setIsLoading(false)
+        }
     }, [yourListings])
 
     if (isLoading) {

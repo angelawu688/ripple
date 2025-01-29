@@ -14,6 +14,8 @@ import Conversation from "../../screens/Messages/Conversation";
 import OwnUserProfile from "../../screens/Profile/OwnUserProfile";
 import { DotsThree, Gear } from "phosphor-react-native";
 import Followers from "../../screens/Profile/Followers";
+import Reviews from "../../screens/Profile/Reviews";
+import FullListingsScreen from "../../components/profile/FullListingsScreen";
 
 
 const ProfileStack = createNativeStackNavigator();
@@ -72,7 +74,6 @@ const ProfileStackNavigator = () => {
                 })}
             />
 
-
             <ProfileStack.Screen
                 name="SavedItems"
                 component={SavedItems}
@@ -93,20 +94,6 @@ const ProfileStackNavigator = () => {
                 options={({ navigation }) => ({
                     headerTitle: () => (
                         <Text style={styles.title}>Your listings</Text>
-                    ),
-                    headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons name="chevron-back" size={24} color="#000" />
-                        </TouchableOpacity>
-                    )
-                })}
-            />
-            <ProfileStack.Screen
-                name="SoldItems"
-                component={SoldItems}
-                options={({ navigation }) => ({
-                    headerTitle: () => (
-                        <Text style={styles.title}>Sold listings</Text>
                     ),
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -198,6 +185,44 @@ const ProfileStackNavigator = () => {
                     )
                 })}
             />
+
+            <ProfileStack.Screen
+                name="Reviews"
+                component={Reviews}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600' }}>
+                            Reviews
+                        </Text>
+                    ),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => (
+                        <></>
+                    ),
+                })}
+            />
+
+            <ProfileStack.Screen
+                name="FullListingsScreen"
+                component={FullListingsScreen}
+                options={({ navigation, route }) => ({
+                    headerTitle: () => (<></>),
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Ionicons name="chevron-back" size={24} color="#000" />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => (
+                        <></>
+                    ),
+                })}
+            />
+
+
         </ProfileStack.Navigator>
     )
 }

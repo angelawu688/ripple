@@ -41,7 +41,6 @@ export default function PhotoCarousel({ photos, sold }) {
                         <View
                             style={{ height: width, width: width, alignSelf: 'center', justifyContent: 'center', }}
                         >
-
                             <ZoomableImage
                                 uri={url}
                                 thumbnailStyle={{

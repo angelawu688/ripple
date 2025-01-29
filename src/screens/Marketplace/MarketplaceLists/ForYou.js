@@ -1,5 +1,4 @@
 import { FlatList, View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import ListingCard from "../../../components/listings/ListingCard"
 import ListingsList from "../../../components/listings/ListingsList"
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import { useListingsData } from "../../../hooks/useListingsData"
@@ -44,7 +43,6 @@ const ForYou = ({ navigation }) => {
                 showCollegeHeader={true}
             />
         </View>
-
     )
 }
 

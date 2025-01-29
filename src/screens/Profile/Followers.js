@@ -12,7 +12,13 @@ import ReportUserModal from '../../components/ReportUserModal'
 import { blockUser } from '../../utils/blockUser'
 
 export default function Followers({ navigation, route }) {
-    const { isFollowers: initIsFollowers } = route.params
+    const {
+        isFollowers: initIsFollowers,
+        isOwnProfile = false,
+        followers,
+        following,
+
+    } = route.params
     const {
         user,
         userData,
@@ -40,10 +46,10 @@ export default function Followers({ navigation, route }) {
 
 
     useEffect(() => {
-        const data = isFollowers ? userData.followers : userData.following;
+        const data = isFollowers ? followers : following;
         setUsers(data || []);
         setLoading(false);
-    }, [isFollowers]);
+    }, [isFollowers, followers, following]);
 
     const handleReportUser = (userId) => {
         try {
@@ -173,11 +179,13 @@ export default function Followers({ navigation, route }) {
                                 </View>
 
                             </TouchableOpacity>
-                            <TouchableOpacity
+
+
+                            {isOwnProfile && <TouchableOpacity
                                 onPress={() => toggleModal(userID)}
                             >
                                 <DotsThree size={30} weight='bold' />
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
                             {/* MODAL VIEW */}
                             {isModalVisible && (
                                 <TouchableWithoutFeedback
@@ -241,19 +249,20 @@ export default function Followers({ navigation, route }) {
 
             /> : <View style={{ width: '100%', alignItems: 'center', marginTop: 25 }}>
                 <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '500' }}>
-                    {isFollowers ? 'You have no followers' : "You aren't following any users"}
+                    {isFollowers ? 'No followers' : "Not following any users"}
                 </Text>
             </View>}
 
 
-            {!users && (
+
+            {/* {!users && (
                 <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90%' }}>
                     <Text style={{ fontSize: 16, fontWeight: '600', fontFamily: 'inter' }}>
                         {isFollowers && 'Your followers will show up here!'}
                         {!isFollowers && 'Users following you will show up here!'}
                     </Text>
                 </View>
-            )}
+            )} */}
 
             <ReportUserModal
                 visible={reportModalVisible}

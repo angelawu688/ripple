@@ -1,4 +1,4 @@
-import { FlatList, View, Text, TouchableOpacity, StyleSheet, RefreshControl } from "react-native"
+import { FlatList, View, Text, TouchableOpacity, StyleSheet, RefreshControl, Pressable } from "react-native"
 import ListingCard from ".//ListingCard"
 import { colorKeys, MotiView } from 'moti';
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -54,7 +54,7 @@ const ListingsList = ({ listings,
     const renderItem = useCallback(({ item }) => {
         const isClickDisabled = !isOwnProfile && item.sold;
         return (
-            <TouchableOpacity
+            <Pressable
                 disabled={isClickDisabled && false}
                 onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
                 style={{ flex: 1, padding: 1 }}
@@ -62,7 +62,7 @@ const ListingsList = ({ listings,
                 <ListingCard
                     listing={item}
                 />
-            </TouchableOpacity >
+            </Pressable>
         )
     })
 
@@ -108,47 +108,6 @@ const ListingsList = ({ listings,
                     onRefresh
                 }
                 refreshing={refreshing}
-            // getItemLayout={(data, index) => (
-            //     { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
-            // )}
-
-            // maxToRenderPerBatch={2}
-
-
-
-            // initialNumToRender={4}       // how many items to render initially
-            // updateCellsBatchingPeriod={50}
-
-
-            // this allows us to customize the refresh spinner
-            // custom spinner is a lot harder––RN problem
-            // refreshControl={
-            //     <RefreshControl
-            //         refreshing={refreshing}
-            //         onRefresh={onRefresh}
-            //         tintColor={colors.loginBlue}
-            //         colors={[colors.loginBlue, colors.loginBlue, colors.loginBlue]}
-            //     />
-            // }
-
-
-            // Define precise number of items that would cover the screen for every device. This can be a big performance boost for the initial render.
-
-
-            // how many screens worth of content to render offscreen (maybe tune to 3)
-            // For a bigger windowSize, you will have more memory consumption. For a lower windowSize, you will have a bigger chance of seeing blank areas.
-            // DEFAULT IS 21
-
-            // how many items to render per batch           
-
-            // used to batch renders . Combine with maxToRenderPerBatch. default is 50ms, is the time gap between renders. 
-
-            // might have bugs, per react native docs. Commented out for now
-            // removeClippedSubviews={true} // basically removes the stuff off of the screen. Can help memory management
-            // drawDistance={800} // increases the amount of scroll. Might be a stupid amount
-
-            // estimatedListSize
-
             />
         </View>
     )

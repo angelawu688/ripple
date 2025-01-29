@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where, deleteDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where, deleteDoc, getCountFromServer } from "firebase/firestore";
 import { auth, db, storage } from "../../firebaseConfig"
 import { getDownloadURL, ref, uploadBytesResumable, refFromURL, deleteObject } from 'firebase/storage'
 import { useContext } from "react";
@@ -539,3 +539,68 @@ export const processImage = async (uri) => {
     }
 
 }
+
+export const fetchUserListings = async (userID) => {
+    try {
+        // ACTIVE
+        const activeQuery = query(
+            collection(db, 'listings'),
+            where('userId', '==', userID),
+            where('sold', '==', false)
+        );
+        const activeSnapshot = await getDocs(activeQuery);
+        const activeListings = activeSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        // SOLD
+        const soldQuery = query(
+            collection(db, 'listings'),
+            where('userId', '==', userID),
+            where('sold', '==', true)
+        );
+        const soldSnapshot = await getDocs(soldQuery);
+        const soldListings = soldSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return {
+            activeListings,
+            soldListings
+        };
+    } catch (error) {
+        console.error('Error fetching user listings:', error);
+        throw error;
+    }
+}
+
+export const fetchUserCounts = async (userID) => {
+    try {
+        const userRef = doc(db, 'users', userID);
+
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+
+            // Get followers and following counts from the arrays
+            const followers = userData.followers
+            const following = userData.following
+
+            return {
+                followers,
+                following
+            };
+        } else {
+            console.log('User document does not exist.');
+            return {
+                followers: [],
+                following: []
+            };
+        }
+    } catch (error) {
+        console.error('Error fetching user counts:', error);
+        throw error;
+    }
+};

@@ -41,7 +41,7 @@ export default () => ({
         }
       ],
       "expo-router",
-      "expo-font"
+      "expo-font",
     ],
     experiments: {
       typedRoutes: true

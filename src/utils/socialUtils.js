@@ -5,6 +5,8 @@ import { ToastContext } from '../context/ToastContext';
 import { db } from '../../firebaseConfig';
 import { arrayRemove, doc, getDoc, updateDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Share } from 'react-native';
+
 
 export const sendProfile = (userID) => {
     if (!userID) {
@@ -27,6 +29,37 @@ export const sendProfile = (userID) => {
 
 export const copyLink = async (link) => {
     Clipboard.setStringAsync(link);
+}
+
+export const shareProfile = async (userID) => {
+    if (!userID) {
+        return
+    }
+
+    const profileLink = Linking.createURL(`user/${userID}`)
+    // const messageBody = `Follow me on Ripple!\n${profileLink}`
+    const messageBody = 'Follow me on Riple!'
+
+    try {
+        const result = await Share.share({
+            title: 'Ripple',
+            message: messageBody,
+            url: profileLink  // Some platforms will use this instead of finding URLs in message
+
+        })
+        if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+                // shared w type of result.activityType
+            } else {
+                // 
+            }
+        } else if (result.action === Share.dismissedAction) {
+            // user dismissed it 
+        }
+    } catch (e) {
+        console.log(e)
+        showToast('error', e.message)
+    }
 }
 
 export const handleRemoveFollower = async (

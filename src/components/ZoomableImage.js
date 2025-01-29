@@ -36,7 +36,7 @@ export default function ZoomableImage({
                     style={styles.closeButton}
                     onPress={() => setIsModalVisible(false)}
                 >
-                    <X size={32} color='white' weight='bold' />
+                    <X size={24} color='white' weight='bold' />
                 </TouchableOpacity>
                 <ScrollView
                     style={[styles.modalContainer, { backgroundColor: modalBackgroundColor }]}

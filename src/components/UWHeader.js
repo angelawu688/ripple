@@ -3,18 +3,18 @@ import React, { useEffect, useState } from 'react'
 import { colors } from '../constants/colors'
 import { MapPin } from 'phosphor-react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { collection, getCountFromServer, query } from 'firebase/firestore'
+import { collection, getCountFromServer, query, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../firebaseConfig'
+import { formatDate } from '../utils/formatDate'
 
 const CACHE_KEY = 'uw_user_count'
-const CACHE_EXPIRY = 60 * 60 * 1000 * 24;
-const totalUsers = '2.3k'
+const CACHE_EXPIRY = 24 * 60 * 60;
 
 export default function UWHeader() {
-    const [userCount, setUserCount] = useState('---')
-
+    const [userCount, setUserCount] = useState(' -- ')
 
     const formatNumber = (num) => {
+        console.log('format', num)
         if (num < 0) {
             throw new Error('number of users must be positive')
         }
@@ -38,10 +38,12 @@ export default function UWHeader() {
 
                     // check if the data time is still within the cache expiry
                     if (Date.now() - timestamp < CACHE_EXPIRY) {
+                        console.log('setting')
                         setUserCount(formatNumber(count))
                         return
                     }
                 } else {
+                    console.log('IN ELSE BRANC')
                     // grab COUNT from DB
                     // not grabbing all of the user docs
                     const usersRef = collection(db, 'users')

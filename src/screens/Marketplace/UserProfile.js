@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Image, } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Image, Pressable, FlatList, } from "react-native";
 
 import FullLoadingScreen from "../shared/FullLoadingScreen";
 import ListingsList from '../../components/listings/ListingsList'
-import { Check, DotsThree, EnvelopeSimple, Plus, QrCode, User } from "phosphor-react-native";
+import { CaretRight, Check, DotsThree, EnvelopeSimple, Plus, QrCode, Star, User } from "phosphor-react-native";
 import { colors } from "../../constants/colors";
 import ListingCard from "../../components/listings/ListingCard";
 import * as Linking from 'expo-linking'
@@ -17,10 +17,12 @@ import { unblockUser } from "../../utils/blockUser";
 import { userContext } from "../../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import ZoomableImage from "../../components/ZoomableImage";
+import ListingSection from "../../components/profile/ListingSection";
+import { fetchUserCounts, fetchUserListings } from "../../utils/firebaseUtils";
 
 const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) => {
     const { userID } = route.params
-    const { user } = useContext(userContext)
+    const { user, savedPosts } = useContext(userContext)
     const { showToast } = useContext(ToastContext);
     const {
         isLoading,
@@ -41,11 +43,41 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     const [reportModalVisible, setReportModalVisible] = useState(false) // report modal
     const [modalVisible, setModalVisible] = useState(false) // 3 dots modal
     const [profileLink, setProfileLink] = useState('');
+
+    const [followers, setFollowers] = useState([])
+
+    const [following, setFollowing] = useState([])
+
+    const [activeListings, setActiveListings] = useState([])
+    const [soldListings, setSoldListings] = useState([])
+
     useEffect(() => {
         if (userID) {
             const link = Linking.createURL(`user/${userID}`);
             setProfileLink(link);
         }
+        console.log(savedPosts)
+    }, [userID]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // COUNTS for followers/following
+                const { followers, following } = await fetchUserCounts(userID);
+                setFollowers(followers)
+                setFollowing(following)
+
+                // LISTINGS sorted into active and sold
+                const listings = await fetchUserListings(userID);
+                setActiveListings(listings.activeListings);
+                setSoldListings(listings.soldListings);
+            } catch (e) {
+                console.error('Error fetching user data:', e);
+                showToast?.('Failed to load user data');
+            }
+        };
+
+        fetchData();
     }, [userID]);
 
     if (isLoading) {
@@ -82,16 +114,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
         <View style={[styles.container]}>
             {isOwnProfileInProfileStack && <View style={{ height: 80, width: '100%' }} />}
             <View style={styles.topContainer}>
-                {userProfile.pfp ? (
-                    <ZoomableImage
-                        uri={userProfile?.pfp}
-                        thumbnailStyle={{ width: 60, height: 60, borderRadius: 75, backgroundColor: 'gray' }}
-                    />
-                ) :
-                    (<View style={{ backgroundColor: colors.loginGray, width: 60, height: 60, borderRadius: 75, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                        <User size={24} />
-                    </View>)
-                }
                 <View style={styles.headerTextContainer}>
                     <Text
                         numberOfLines={1}
@@ -99,9 +121,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         style={styles.nameText}
                     >
                         {userProfile?.name || "Anonymous"}
-                    </Text>
-                    <Text style={styles.netIDText}>
-                        {userProfile?.email || "mystery@uw.edu"}
                     </Text>
                 </View>
 
@@ -144,6 +163,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                     }}
                     userId={userID}
                 />
+
             </View>
 
             {!hasBlocked ? (<ScrollView
@@ -153,106 +173,160 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 }}
                 style={styles.scrollContainer}
             >
-                <View style={{ paddingHorizontal: 25, display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                    <View style={[{ width: '100%', display: 'flex', backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-between', marginVertical: 16, },]}>
+                {/* TOP HEADER */}
+                <View style={{
+                    paddingHorizontal: 12,
+                    flex: 1,
+                    gap: 16
+                }}>
+                    {/* pfp and following/followers */}
+                    <View style={{ flex: 1, width: '100%', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
+                        {userProfile.pfp ? (
+                            <ZoomableImage
+                                uri={userProfile?.pfp}
+                                thumbnailStyle={{ width: 62, height: 62, borderRadius: 75, backgroundColor: 'gray' }}
+                            />
+                        ) :
+                            (<View style={{ backgroundColor: colors.loginGray, width: 60, height: 60, borderRadius: 75, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                                <User size={24} />
+                            </View>)
+                        }
+                        {isOwnProfile && (
+                            // QR CODE
+                            <View style={{ position: 'absolute', zIndex: 4 }}>
+                                <ShareModal
+                                    isVisible={shareModalVisible}
+                                    setShareModalVisible={setShareModalVisible}
+                                    profileLink={profileLink} />
+                            </View>
 
-                        {isOwnProfile ? (
-                            <TouchableOpacity style={[styles.followButton, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}
-                                onPress={handleFollowers}
-                            >
-                                <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
-                                    Followers
-                                </Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <TouchableOpacity style={[styles.followButton, styles.shadow, { shadowColor: followingUser ? colors.neonBlue : colors.accentGray }]}
-                                onPress={handleFollowToggle}
-                            >
-
-                                {followingUser ? <Check size={18} color={followingUser ? colors.neonBlue : colors.accentGray} /> : <Plus size={18} color={colors.accentGray} />}
-                                <Text style={[styles.followText, { color: followingUser ? colors.neonBlue : colors.accentGray }]}>
-                                    Follow{followingUser && 'ing'}
-                                </Text>
-                            </TouchableOpacity>)}
-
-                        {isOwnProfile ? (<TouchableOpacity style={[styles.followButton, styles.shadow]}
-                            onPress={handleFollowing}
+                        )}
+                        {/* Reviews */}
+                        <Pressable
+                            onPress={() => navigation.navigate('Reviews')}
+                            style={styles.followingContainer}
                         >
-                            <Text style={[styles.followText, { backgroundColor: 'white' }]}>
+                            {/* <View style={{ flexDirection: 'row' }}>
+                                {[0, 1, 2, 3, 4].map((item) => (<Star key={item} size={16} color={'black'} weight="regular" />))}
+                            </View> */}
+                            <Star size={18} color={'black'} weight="fill" />
+                            <Text style={[styles.followingText, { color: colors.loginBlue }]}>
+                                Reviews
+                            </Text>
+                        </Pressable>
+
+                        {/* Followers */}
+                        <Pressable
+                            onPress={() => {
+                                navigation.navigate('Followers', {
+                                    isFollowers: true,
+                                    followers: followers,
+                                    following: following,
+                                    isOwnProfile: isOwnProfile,
+                                    profileUserId: userID,
+                                });
+                            }}
+                            style={styles.followingContainer}
+                        >
+                            <Text style={styles.followingText}>
+                                {followers?.length ?? '0'}
+                            </Text>
+                            <Text style={[styles.followingText, { color: colors.loginBlue }]}>
+                                Followers
+                            </Text>
+                        </Pressable>
+
+                        {/* Following */}
+                        <Pressable
+                            onPress={() => {
+                                navigation.navigate('Followers', {
+                                    isFollowers: false,
+                                    followers: followers,
+                                    following: following,
+                                    isOwnProfile: isOwnProfile,
+                                    profileUserId: userID,
+                                });
+                            }}
+                            style={styles.followingContainer}
+                        >
+                            <Text style={styles.followingText}>
+                                {following?.length || '0'}
+                            </Text>
+                            <Text style={[styles.followingText, { color: colors.loginBlue }]}>
                                 Following
                             </Text>
-                        </TouchableOpacity>) : (<TouchableOpacity style={[styles.followButton, styles.shadow]}
-                            onPress={() => handleMessage(userID)}
-                        >
-                            <EnvelopeSimple size={18} color={colors.accentGray} />
-                            <Text style={[styles.followText, { backgroundColor: 'white' }]}>
-                                Message
-                            </Text>
-                        </TouchableOpacity>)}
+                        </Pressable>
                     </View>
 
-                    <View style={styles.bioContainer}>
-                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
-                            <View >
-                                <Text style={styles.majorText}>
-                                    {userProfile.major}
+                    {/* MAJOR */}
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
+                        <View style={{ maxWidth: '80%', flex: 1 }}>
+                            <Text style={styles.majorText}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
+                                {userProfile.major}
+                            </Text>
+                            {userProfile?.concentration && (
+                                <Text style={{ fontFamily: 'inter', fontSize: 16, color: colors.accentGray, fontWeight: '500' }}
+                                    maxWidth={'95%'}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                >
+                                    {userProfile.concentration}
                                 </Text>
-                                {userProfile?.concentration && (
-                                    <Text style={{ fontFamily: 'inter', fontSize: 16, color: colors.accentGray, fontWeight: '500' }}>
-                                        {userProfile.concentration}
-                                    </Text>
-                                )}
-                            </View>
-                            <Text style={styles.majorText}>
-                                {userProfile.gradYear}
-                            </Text>
+                            )}
                         </View>
-
-                        {userProfile?.bio && (<View style={{ marginTop: 12, width: '100%', maxHeight: 128, marginBottom: 0 }}>
-                            <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
-                                {userProfile.bio}
-                            </Text>
-                        </View>)}
-
-                        <ProfileSocials userProfile={userProfile} />
-
-                        <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '600', alignSelf: 'flex-start', marginBottom: 0, marginTop: 20 }}>
-                            Listings
+                        <Text style={styles.majorText}>
+                            {userProfile.gradYear}
                         </Text>
-
                     </View>
+
+                    {/* BIO */}
+                    {userProfile?.bio && (<View style={{ width: '100%', maxHeight: 128, marginBottom: 0 }}>
+                        <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
+                            {userProfile.bio}
+                        </Text>
+                    </View>)}
+
+                    {/* SOCIALS */}
+                    <ProfileSocials userProfile={userProfile} />
                 </View>
 
-                {userPosts && userPosts.length > 0 ? (userPosts.length === 1 ? (<View style={{ width: '50%', alignSelf: 'flex-start' }}>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('ListingScreen', { listingID: userPosts[0].id })}
-                    >
-                        <ListingCard
-                            listing={userPosts[0]}
-                            disabled={!isOwnProfile && userPosts[0].sold}
-                        />
-                    </TouchableOpacity>
 
-                </View>) : (<View style={{
-                    width: '100%',
-                }}>
-                    <ListingsList
-                        listings={userPosts}
+                {/* saved posts */}
+                {isOwnProfile && (
+                    <ListingSection
                         navigation={navigation}
-                        scrollEnabled={false}
-                        isOwnProfile={isOwnProfile}
+                        title="Saved Listings"
+                        listings={savedPosts}
+                        onViewAll={() => navigation.navigate('SavedItems')}
                     />
-                </View>)) : (
-                    <View style={{ alignSelf: 'flex-start' }}>
-                        <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', marginLeft: 25 }}>
-                            {isOwnProfile ? 'You have ' : 'User has '}no listings
-                        </Text>
-                        {isOwnProfile && <Text style={{ fontFamily: 'inter', fontSize: 16, fontWeight: '400', marginLeft: 25 }}
-                        >
-                            Make a post to get started!
-                        </Text>}
-                    </View>
                 )}
+
+                {/* active listings */}
+                {activeListings.length > 0 && <ListingSection
+                    navigation={navigation}
+                    title="Active Listings"
+                    listings={activeListings.slice(0, 4)}
+                    onViewAll={() => navigation.navigate('FullListingsScreen', {
+                        listings: activeListings,
+                        mode: 'active',
+                        title: 'Active Listings'
+                    })}
+                />}
+
+                {/* sold listings */}
+                {soldListings.length > 0 && <ListingSection
+                    navigation={navigation}
+                    title="Past Listings"
+                    listings={soldListings.slice(0, 4)}
+                    onViewAll={() => navigation.navigate('FullListingsScreen', {
+                        listings: activeListings,
+                        mode: 'past',
+                        title: 'Past Listings'
+                    })}
+                />}
             </ScrollView >) : (
                 <TouchableOpacity
                     onPress={async () => {
@@ -271,19 +345,20 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         Unblock user
                     </Text>
                 </TouchableOpacity>
-            )}
+            )
+            }
 
-            {isOwnProfile && (
-                <TouchableOpacity style={{ backgroundColor: 'white', borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.35, shadowRadius: 5, position: 'absolute', bottom: 15, right: 15, shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 } }}
-                    onPress={() => {
-                        setShareModalVisible(true)
-                    }}
-                >
-                    <QrCode color={colors.darkblue} size={30} />
-                </TouchableOpacity>
-            )}
-
-            <ShareModal isVisible={shareModalVisible} setShareModalVisible={setShareModalVisible} profileLink={profileLink} />
+            {
+                isOwnProfile && (
+                    <TouchableOpacity style={{ backgroundColor: colors.lightgray, borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.35, shadowRadius: 5, position: 'absolute', bottom: 15, right: 15, shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 } }}
+                        onPress={() => {
+                            setShareModalVisible(true)
+                        }}
+                    >
+                        <QrCode color={colors.darkblue} size={30} />
+                    </TouchableOpacity>
+                )
+            }
         </View >
     )
 
@@ -292,6 +367,17 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 export default UserProfile;
 
 const styles = StyleSheet.create({
+    // FOLLOWING FOLLOWERS
+    followingContainer: {
+        alignItems: 'center',
+        height: 40,
+        justifyContent: 'space-between'
+    },
+    followingText: {
+        fontFamily: 'inter',
+        fontSize: 16,
+        fontWeight: '500'
+    },
     container: {
         flex: 1,
     },
@@ -301,7 +387,7 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'column',
         alignSelf: 'center',
-        paddingHorizontal: 1
+        paddingHorizontal: 1,
     },
     topContainer: {
         display: 'flex',
@@ -309,13 +395,12 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
         width: '100%',
-        paddingHorizontal: 25
+        paddingHorizontal: 20
     },
     headerTextContainer: {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        marginLeft: 12,
         marginBottom: 6,
         maxWidth: '70%',
         height: 60,
@@ -337,13 +422,6 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         width: '100%',
         marginTop: 4
-    },
-    socials: {
-        flexDirection: 'column',
-        marginTop: 16,
-        width: '100%',
-        justifyContent: 'space-between',
-        // height: 60
     },
     followText: {
         marginLeft: 4,
@@ -370,8 +448,7 @@ const styles = StyleSheet.create({
     majorText: {
         fontFamily: 'inter',
         fontSize: 18,
-        fontWeight: '600',
-        color: colors.uwPurple
+        fontWeight: '500',
     },
     socialContainer: {
         display: 'flex',

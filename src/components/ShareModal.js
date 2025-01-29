@@ -5,10 +5,11 @@ import { colors } from '../constants/colors'
 import { ChatCircleDots, Export, Link, X } from 'phosphor-react-native'
 import { View } from 'react-native'
 import { BlurView } from 'expo-blur'
-import { copyLink, sendProfile } from '../utils/socialUtils'
+import { copyLink, sendProfile, shareProfile } from '../utils/socialUtils'
 import { userContext } from '../context/UserContext'
 import { ToastContext } from '../context/ToastContext'
 import Toast from './toasts/CustomToast';
+import { Share } from 'expo-sharing';
 
 
 
@@ -16,9 +17,9 @@ export default function ShareModal({ isVisible, profileLink, setShareModalVisibl
     const { user, userData } = useContext(userContext)
     const { showToast } = useContext(ToastContext)
 
-
     const topCircleAnim = new Animated.ValueXY({ x: -10, y: -10 })
     const bottomCircleAnim = new Animated.ValueXY({ x: -10, y: -10 })
+
 
     const startAnimation = () => {
         // random amount within a small range
@@ -90,7 +91,7 @@ export default function ShareModal({ isVisible, profileLink, setShareModalVisibl
                     style={styles.closeButton}
                     onPress={() => setShareModalVisible(false)}
                 >
-                    <X size={32} color={colors.black} weight='bold' />
+                    <X size={24} color={colors.black} weight='bold' />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.container}
@@ -140,10 +141,6 @@ export default function ShareModal({ isVisible, profileLink, setShareModalVisibl
                             />
                         </View>
 
-
-
-
-
                         <Text style={[styles.qrText, { marginBottom: 14 }]}>
                             Add me on Ripple!
                         </Text>
@@ -167,9 +164,10 @@ export default function ShareModal({ isVisible, profileLink, setShareModalVisibl
                         <View style={[styles.socialButtonContainer, { marginRight: 29 }]}>
                             <TouchableOpacity style={styles.modalSocialButton}
                                 onPress={() => sendProfile(user?.uid)}
+                            // onPressIn={() => shareProfile(user?.uid)}
                             // style={[styles.modalSocialButton, styles.shadow]}
                             >
-                                <Export size={24} color={colors.loginBlue}
+                                <Export size={24} color={colors.loginBlue} weight='bold'
                                 // weight='bold'
                                 />
 
@@ -187,7 +185,7 @@ export default function ShareModal({ isVisible, profileLink, setShareModalVisibl
                                 }}
                                 style={[styles.modalSocialButton]}
                             >
-                                <Link size={24} color={colors.loginBlue}
+                                <Link size={24} color={colors.loginBlue} weight='bold'
                                 // weight='bold'
                                 />
 
@@ -237,28 +235,17 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
     },
-    // modalSocialButton: {
-    //     borderRadius: 50,
-    //     height: 55,
-    //     width: 55,
-    //     display: 'flex',
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     borderColor: colors.neonBlue,
-    //     borderWidth: 1,
-    //     backgroundColor: 'white'
-    // },
     closeButton: {
         position: 'absolute',
         top: 50,
-        left: 35,
+        left: 10,
         zIndex: 9999,
         padding: 10,
     },
     socialsContainer: {
         flexDirection: 'row',
         width: '100%',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
         position: 'absolute',
         bottom: 70
     },
@@ -285,7 +272,7 @@ const styles = StyleSheet.create({
     qrText: {
         fontSize: 20,
         fontFamily: 'inter',
-        fontWeight: '600',
+        fontWeight: '700',
         color: 'white'
     },
 

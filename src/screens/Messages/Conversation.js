@@ -134,7 +134,6 @@ const Conversation = ({ navigation, route }) => {
             clearInputs()
         }
 
-
         // send it away to our lovely database
         try {
             await sendMessage(
@@ -162,7 +161,6 @@ const Conversation = ({ navigation, route }) => {
         setImg(null)
         setInputListing(null)
     }
-
 
     // opens the image picker and updates the selectedImage state 
     const handleAddImage = async () => {
@@ -196,7 +194,6 @@ const Conversation = ({ navigation, route }) => {
             setOpeningImagePicker(false)
         }
     }
-
 
     return (
         <KeyboardAvoidingView // make sure that we can see input and keyboard
