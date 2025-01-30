@@ -8,10 +8,10 @@ import { db } from '../../firebaseConfig'
 import { formatDate } from '../utils/formatDate'
 
 const CACHE_KEY = 'uw_user_count'
-const CACHE_EXPIRY = 24 * 60 * 60;
+const CACHE_EXPIRY = 2 * 60 * 60 * 1000; // 2 hours
 
 export default function UWHeader() {
-    const [userCount, setUserCount] = useState(' -- ')
+    const [userCount, setUserCount] = useState('--')
 
     const formatNumber = (num) => {
         console.log('format', num)
@@ -42,23 +42,23 @@ export default function UWHeader() {
                         setUserCount(formatNumber(count))
                         return
                     }
-                } else {
-                    console.log('IN ELSE BRANC')
-                    // grab COUNT from DB
-                    // not grabbing all of the user docs
-                    const usersRef = collection(db, 'users')
-                    const uwQuery = query(usersRef)
-                    const snapshot = await getCountFromServer(uwQuery)
-                    const size = snapshot.data().count
-                    const cacheData = {
-                        count: size,
-                        timestamp: Date.now()
-                    }
-
-                    // set async with updated and set the user count accordingly
-                    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
-                    setUserCount(formatNumber(cacheData.count))
                 }
+
+                // grab COUNT from DB
+                // not grabbing all of the user docs
+                const usersRef = collection(db, 'users')
+                const uwQuery = query(usersRef)
+                const snapshot = await getCountFromServer(uwQuery)
+                const size = snapshot.data().count
+                const cacheData = {
+                    count: size,
+                    timestamp: Date.now()
+                }
+
+                // set async with updated and set the user count accordingly
+                await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
+                setUserCount(formatNumber(cacheData.count))
+
             } catch (e) {
                 console.error(e)
                 setUserCount('---')
@@ -91,8 +91,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         flexDirection: 'row',
-        paddingHorizontal: 10,
-        paddingBottom: 10
+        padding: 10,
     },
     iconPlaceholder: {
         width: 30,

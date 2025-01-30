@@ -69,7 +69,8 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignSelf: 'center',
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        paddingTop: 10
     },
     shadow: {
         shadowColor: colors.loginBlue,

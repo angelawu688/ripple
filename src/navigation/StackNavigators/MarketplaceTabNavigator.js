@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         paddingLeft: 20,
         paddingRight: 16,
         marginTop: 4,
-        marginBottom: 16,
+        // marginBottom: 16,
         justifyContent: 'space-between',
         borderBottomWidth: 1,
         borderColor: colors.loginGray

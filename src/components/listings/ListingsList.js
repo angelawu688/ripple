@@ -70,8 +70,6 @@ const ListingsList = ({ listings,
 
     return (
         <View style={{ flex: 1, width: '100%' }}>
-
-
             <FlashList
                 // non-negotiables
                 contentContainerStyle={{
@@ -114,17 +112,3 @@ const ListingsList = ({ listings,
 }
 
 export default ListingsList;
-
-const styles = StyleSheet.create({
-    container: {
-        paddingHorizontal: 1,
-        backgroundColor: 'green',
-    },
-    skeletonCard: {
-        width: '100%'
-    },
-    column: {
-        justifyContent: 'space-between',
-        marginTop: 0
-    }
-})
