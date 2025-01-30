@@ -82,7 +82,7 @@ const Profile = ({ navigation }) => {
                         {/* profile icon placeholder */}
                         <User size={24} color={'black'} style={styles.icon} />
                         {/* <Ionicons name={'person-outline'} size={24} color={'black'} style={styles.icon} /> */}
-                        <Text style={{ fontSize: 18, marginLeft: 6 }}>
+                        <Text style={{ fontSize: 18, }}>
                             Edit Profile
                         </Text>
                     </View>

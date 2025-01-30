@@ -31,12 +31,6 @@ const Conversation = ({ navigation, route }) => {
     const [loadingMessages, setLoadingMessages] = useState(true)
     const isFocused = useIsFocused();
 
-    useEffect(() => {
-        if (!otherUserDetails) {
-            console.error('no other user details')
-        }
-    }, [otherUserDetails])
-
     // auto-scroll to the bottom
     const scrollRef = useRef(null)
     useEffect(() => {
@@ -44,8 +38,6 @@ const Conversation = ({ navigation, route }) => {
             scrollRef.current.scrollToEnd({ animated: true });
         }
     }, [messages]);
-
-
 
     // update the top nav bar
     useEffect(() => {
@@ -108,15 +100,11 @@ const Conversation = ({ navigation, route }) => {
         if (!isFocused) {
             return
         }
-        const lastMessage = messages[0]
 
-        // mark in read if there is a last message and it wasnt sent by the user
-        if (lastMessage?.sentBy && lastMessage.sentBy !== user.uid) {
-            const conversationRef = doc(db, "conversations", conversationID);
-            updateDoc(conversationRef, {
-                lastMessageReadBy: user.uid
-            });
-        }
+        const conversationRef = doc(db, "conversations", conversationID);
+        updateDoc(conversationRef, {
+            lastMessageReadBy: user.uid
+        });
     }, [conversationID, user?.uid, messages, isFocused]);
 
 
