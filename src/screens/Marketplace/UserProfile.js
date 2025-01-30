@@ -112,7 +112,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 
     return (
         <View style={[styles.container]}>
-            {isOwnProfileInProfileStack && <View style={{ height: 80, width: '100%' }} />}
+            {isOwnProfileInProfileStack && <View style={{ height: 60, width: '100%' }} />}
             <View style={styles.topContainer}>
                 <View style={styles.headerTextContainer}>
                     <Text
@@ -181,26 +181,45 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 }}>
                     {/* pfp and following/followers */}
                     <View style={{ flex: 1, width: '100%', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
-                        {userProfile.pfp ? (
-                            <ZoomableImage
-                                uri={userProfile?.pfp}
-                                thumbnailStyle={{ width: 62, height: 62, borderRadius: 75, backgroundColor: 'gray' }}
-                            />
-                        ) :
-                            (<View style={{ backgroundColor: colors.loginGray, width: 60, height: 60, borderRadius: 75, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                                <User size={24} />
-                            </View>)
-                        }
-                        {isOwnProfile && (
-                            // QR CODE
-                            <View style={{ position: 'absolute', zIndex: 4 }}>
-                                <ShareModal
-                                    isVisible={shareModalVisible}
-                                    setShareModalVisible={setShareModalVisible}
-                                    profileLink={profileLink} />
-                            </View>
+                        <Pressable
+                            onPress={() => setShareModalVisible(true)}
+                            style={{ position: 'relative' }}
+                        >
+                            {userProfile.pfp ? (
+                                <ZoomableImage
+                                    disabled={true}
+                                    uri={userProfile?.pfp}
+                                    thumbnailStyle={{ width: 62, height: 62, borderRadius: 75, backgroundColor: 'gray' }}
+                                />
+                            ) :
+                                (<View style={{ backgroundColor: colors.loginGray, width: 60, height: 60, borderRadius: 75, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                                    <User size={24} />
+                                </View>)
+                            }
+                            {isOwnProfile && (
+                                <View style={{ position: 'absolute', bottom: -8, right: -8, zIndex: 4 }}>
+                                    <View
+                                        style={{
+                                            backgroundColor: colors.lightgray,
+                                            borderRadius: 20,
+                                            padding: 6,
+                                            shadowColor: colors.neonBlue,
+                                            shadowOpacity: 0.35,
+                                            shadowRadius: 3,
+                                            shadowOffset: { width: 0, height: 0 }
+                                        }}
+                                    >
+                                        <QrCode color={colors.darkblue} size={22} />
+                                    </View>
+                                    <ShareModal
+                                        isVisible={shareModalVisible}
+                                        setShareModalVisible={setShareModalVisible}
+                                        profileLink={profileLink}
+                                    />
+                                </View>
+                            )}
+                        </Pressable>
 
-                        )}
                         {/* Reviews */}
                         <Pressable
                             onPress={() => navigation.navigate('Reviews')}
@@ -282,6 +301,28 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         </Text>
                     </View>
 
+                    {!isOwnProfile && (
+                        // Following container
+                        <View style={styles.buttonContainer}>
+                            <Pressable
+                                style={styles.followButton}
+                                onPress={handleFollowToggle}
+                            >
+                                <Text style={[styles.followButtonText, followingUser && { color: colors.loginBlue }]}>
+                                    {followingUser ? 'Following' : 'Follow'}
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={handleMessage}
+                                style={styles.followButton}
+                            >
+                                <Text style={styles.followButtonText}>
+                                    Message
+                                </Text>
+                            </Pressable>
+                        </View>
+                    )}
+
                     {/* BIO */}
                     {userProfile?.bio && (<View style={{ width: '100%', maxHeight: 128, marginBottom: 0 }}>
                         <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
@@ -347,18 +388,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 </TouchableOpacity>
             )
             }
-
-            {
-                isOwnProfile && (
-                    <TouchableOpacity style={{ backgroundColor: colors.lightgray, borderColor: colors.darkblue, width: 60, height: 60, borderRadius: 50, display: 'flex', justifyContent: 'center', alignItems: 'center', shadowColor: colors.neonBlue, shadowOpacity: 0.35, shadowRadius: 5, position: 'absolute', bottom: 15, right: 15, shadowOffset: { top: 0, bottom: 0, left: 0, right: 0 } }}
-                        onPress={() => {
-                            setShareModalVisible(true)
-                        }}
-                    >
-                        <QrCode color={colors.darkblue} size={30} />
-                    </TouchableOpacity>
-                )
-            }
         </View >
     )
 
@@ -380,6 +409,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
+        // paddingBottom: 20
     },
     scrollContainer: {
         display: 'flex',
@@ -388,6 +418,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignSelf: 'center',
         paddingHorizontal: 1,
+        // marginBottom: 20
     },
     topContainer: {
         display: 'flex',
@@ -428,16 +459,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontFamily: 'inter',
         color: colors.accentGray
-    },
-    followButton: {
-        width: '45%',
-        height: 35,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-        borderRadius: 15,
-        backgroundColor: 'white',
     },
     shadow: {
         shadowColor: colors.accentGray,
@@ -492,5 +513,24 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: 'white',
         fontFamily: 'inter',
-    }
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    followButtonText: {
+        fontFamily: 'inter',
+        fontSize: 16,
+        fontWeight: '500'
+    },
+    followButton: {
+        width: '48%',
+        height: 35,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        borderRadius: 15,
+        backgroundColor: colors.lightgray,
+    },
 })

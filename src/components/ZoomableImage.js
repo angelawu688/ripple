@@ -9,6 +9,7 @@ const SCOLL_DOWN_THRESHOLD = 50
 export default function ZoomableImage({
     uri,
     thumbnailStyle,
+    disabled = false,
     modalBackgroundColor = 'black' // idk if this will need to change but allowing for future changes
 }) {
     const [isModalVisible, setIsModalVisible] = useState(false)
@@ -17,6 +18,7 @@ export default function ZoomableImage({
         <View style={styles.imageWrapper}>
             {/* THUMBNAIL */}
             <Pressable
+                disabled={disabled}
                 onPress={() => setIsModalVisible(true)}
             >
                 <Image

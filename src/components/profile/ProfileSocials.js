@@ -28,7 +28,10 @@ const ProfileSocials = ({ userProfile }) => {
                                 source={require('../../../assets/images/IG_logo.png')}
                                 style={styles.socialIcon}
                             />
-                            <Text style={styles.socialText}>
+                            <Text
+                                style={styles.socialText}
+                                numberOfLines={1}
+                            >
                                 {userProfile.instagram}
                             </Text>
                         </>
@@ -82,7 +85,6 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontFamily: 'inter',
         color: colors.loginBlue,
-        maxWidth: '80%',
     },
 });
 

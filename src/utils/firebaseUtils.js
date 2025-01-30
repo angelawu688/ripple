@@ -214,8 +214,6 @@ export const getConversation = async (senderID, receiverID) => {
         const convRef = doc(db, 'conversations', convID)
         const convSnap = await getDoc(convRef)
 
-
-
         if (convSnap.exists()) {
             // already exists, just return
             return convID

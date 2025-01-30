@@ -13,6 +13,7 @@ import { EmptyMessage, fetchRecentSearches, RecentSearchItem, RecentSearchSkelet
 import LoadingSpinner from "../../../components/LoadingSpinner.js";
 import UserSearch from "../../../components/Search/UserSearch.js";
 import ListingSearch from "../../../components/Search/ListingSearch.js";
+import { MagnifyingGlass, XCircle } from "phosphor-react-native";
 
 const Search = ({ navigation }) => {
     const [recentSearches, setRecentSearches] = useState([]);
@@ -48,7 +49,6 @@ const Search = ({ navigation }) => {
             if (user) {
                 setLoadingRecentSearches(true)
                 try {
-                    // TODO MAKE THIS ASYNC FUNCTION WORK
                     const recentSearches = await fetchRecentSearches(user.uid);
                     setRecentSearches(recentSearches || []);
 
@@ -304,21 +304,27 @@ const Search = ({ navigation }) => {
             style={styles.container}
         >
             {/* top input part */}
-            <TextInput
-                ref={inputRef}
-                value={query}
-                onChangeText={(text) => {
-                    setQuery(text);
-                    setDisplayResults(false); // will hide results
-                }}
-                style={[styles.input, styles.shadow]}
-                placeholder="Search"
-                placeholderTextColor={colors.accentGray}
-                onSubmitEditing={() => handleSearch(query)}
-                returnKeyType="search" // gives us the blue button on keyboard
-                autoComplete="off" // i feel like these are really annoying as a user
-                autoCapitalize="none"
-            />
+            <View style={{ position: 'relative' }}>
+                <TextInput
+                    ref={inputRef}
+                    value={query}
+                    onChangeText={(text) => {
+                        setQuery(text);
+                        setDisplayResults(false); // will hide results
+                    }}
+                    style={[styles.input, styles.shadow]}
+                    placeholder="Search"
+                    placeholderTextColor={'#767676'}
+                    onSubmitEditing={() => handleSearch(query)}
+                    returnKeyType="search" // gives us the blue button on keyboard
+                    autoComplete="off" // i feel like these are really annoying as a user
+                    autoCapitalize="none"
+                />
+                <View style={{ position: 'absolute', left: 22, top: 10 }}>
+                    <MagnifyingGlass size={20} color={'#767676'} weight="bold" />
+                </View>
+            </View>
+
 
             <View style={{ dispaly: 'flex', width: '100%', flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10 }}>
                 <TouchableOpacity onPress={() => setListingsSelected(!listingsSelected)}
@@ -344,10 +350,7 @@ const Search = ({ navigation }) => {
                 {query && (
                     <>
                         {(!displayResults && listingsSelected) || (!displayUserSearchResults && !listingsSelected) ? (
-                            <TouchableOpacity
-                                onPress={() => handleSearch(query)}>
-                                <Ionicons name="search" size={20} color={colors.loginBlue} />
-                            </TouchableOpacity>
+                            <></>
                         ) : (
                             <TouchableOpacity
                                 onPress={() => {
@@ -357,7 +360,9 @@ const Search = ({ navigation }) => {
                                     setDisplayResults(false)
                                     setDisplayUserSearchResults(false)
                                 }}>
-                                <Ionicons name='close-circle-outline' size={20} color={colors.accentGray} />
+                                <XCircle size={20} color={'#767676'} weight='fill' />
+
+
                             </TouchableOpacity>
                         )}
                     </>
@@ -397,15 +402,17 @@ const styles = StyleSheet.create({
     input: {
         height: 40,
         paddingHorizontal: 16,
-        backgroundColor: "#fff",
+        backgroundColor: colors.accentGray,
         borderRadius: 15,
         marginBottom: 16,
         width: '95%',
         alignSelf: 'center',
-        paddingRight: 40, // space for the icon
-        borderWidth: 1,
+        paddingHorizontal: 40, // space for the icon
         backgroundColor: colors.mediumGray,
-        borderColor: colors.accentGray
+        borderColor: colors.accentGray,
+        fontFamily: 'inter',
+        fontWeight: '600',
+        fontSize: 16
     },
     // shadow: {
     //     shadowColor: colors.loginBlue,
