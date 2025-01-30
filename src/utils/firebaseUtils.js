@@ -591,7 +591,6 @@ export const fetchUserCounts = async (userID) => {
                 following
             };
         } else {
-            console.log('User document does not exist.');
             return {
                 followers: [],
                 following: []

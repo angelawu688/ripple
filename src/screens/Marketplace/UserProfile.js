@@ -56,7 +56,6 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
             const link = Linking.createURL(`user/${userID}`);
             setProfileLink(link);
         }
-        console.log(savedPosts)
     }, [userID]);
 
     useEffect(() => {

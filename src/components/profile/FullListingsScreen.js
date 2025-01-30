@@ -12,7 +12,6 @@ export default function FullListingsScreen({
 
 
     useEffect(() => {
-        console.log(title)
         // Set navigation title
         navigation.setOptions({
             headerTitle: title

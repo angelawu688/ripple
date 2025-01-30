@@ -26,16 +26,6 @@ const Friends = ({ navigation }) => {
 
     const fetchListings = useCallback(async () => {
         try {
-            // TODO PAGINATION
-            // get following ids
-            // TODO:
-            // kinda expensive, use context to simplify this?
-            // const followingQuery = query(
-            //     collection(db, 'following'),
-            //     where('follower_id', '==', user.uid)
-            // );
-            // const followingData = await getDocs(followingQuery);
-            // const followingIds = followingData.docs.map(doc => doc.data().following_id);
 
             // not following anyone
             if (userFollowingIds.length === 0) {

@@ -18,7 +18,7 @@ const ListingsList = ({ listings,
     refreshing = false, // essentially loading state for refreshing
     onRefresh = () => { },
     onEndReached = () => { },
-    onEndReachedThreshold = 0.5,
+    onEndReachedThreshold = 0.2,
     isOwnProfile = false,
     ListFooterComponent = null,
     showCollegeHeader = false
@@ -27,6 +27,9 @@ const ListingsList = ({ listings,
     const [filteredListings, setFilteredListings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    // makes slower, but we wont see any blocked listing
+    // we arent actually using this atm
+    // were able to pass ASC without this lmao
     useEffect(() => {
         const filterBlockedListings = async () => {
             if (!user?.uid || !listings) return;
@@ -71,7 +74,6 @@ const ListingsList = ({ listings,
     return (
         <View style={{ flex: 1, width: '100%' }}>
             <FlashList
-                // non-negotiables
                 contentContainerStyle={{
                     padding: 2, // pad the whole list
                 }}
@@ -82,12 +84,12 @@ const ListingsList = ({ listings,
                 numColumns={2}
                 ListHeaderComponent={
                     showCollegeHeader && <UWHeader />
-                } // blank for now, this is where a header would go.
+                }
                 data={listings}
                 showsVerticalScrollIndicator={false}
                 scrollEnabled={scrollEnabled}
+                onEndReachedThreshold={onEndReachedThreshold}
                 onEndReached={onEndReached}
-                // onEndReachedThreshold={0.2}
                 ListFooterComponent={
                     <View style={{ width: 1, height: 50 }}>
                         {ListFooterComponent}

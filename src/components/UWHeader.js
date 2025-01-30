@@ -14,7 +14,6 @@ export default function UWHeader() {
     const [userCount, setUserCount] = useState('--')
 
     const formatNumber = (num) => {
-        console.log('format', num)
         if (num < 0) {
             throw new Error('number of users must be positive')
         }
@@ -38,7 +37,6 @@ export default function UWHeader() {
 
                     // check if the data time is still within the cache expiry
                     if (Date.now() - timestamp < CACHE_EXPIRY) {
-                        console.log('setting')
                         setUserCount(formatNumber(count))
                         return
                     }
