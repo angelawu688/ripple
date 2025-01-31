@@ -32,7 +32,7 @@ export default function RecommendationCard({ navigation, recommendedUser, onRemo
             </View>
 
             <TouchableOpacity onPress={() => onRemove(recommendedUserData.id)}>
-                <X size={30} color={colors.accentGray} />
+                <X size={20} />
             </TouchableOpacity>
         </TouchableOpacity>
     )

@@ -10,7 +10,6 @@ export default function FullListingsScreen({
     const { mode, listings, loading, title } = route.params
     const navigation = useNavigation();
 
-
     useEffect(() => {
         // Set navigation title
         navigation.setOptions({

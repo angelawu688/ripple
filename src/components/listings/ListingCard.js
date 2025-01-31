@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'flex-start',
         width: '100%',
-        marginBottom: 15
+        marginBottom: 15,
+        padding: 2,
     },
     imageContainer: {
         borderRadius: 12,

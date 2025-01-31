@@ -3,6 +3,7 @@ import { db } from '../../firebaseConfig';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MotiView } from 'moti';
+import { X } from 'phosphor-react-native';
 
 // taking the title and tags of a post, we generate the keywords
 // all keywords are lowercase, delimited (by nonletters), and deduped
@@ -106,7 +107,7 @@ export const RecentSearchItem = ({ item, onSelect, onRemove }) => (
             <Text style={styles.recentSearchText}>{item}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => onRemove(item)}>
-            <Ionicons name="close-outline" size={24} color="#000" />
+            <X size={20} />
         </TouchableOpacity>
     </View>
 );

@@ -71,7 +71,7 @@ export default function UWHeader() {
 
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ marginRight: 8, }}>
-                    <MapPin size={24} weight={'fill'} color={colors.uwPurple} />
+                    <MapPin size={20} weight={'fill'} color={colors.uwPurple} />
 
                 </View>
 
@@ -97,7 +97,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'black'
     },
     tabTextStyle: {
-        fontSize: 18,
+        fontSize: 16,
         fontFamily: 'inter',
+        fontWeight: '500'
     },
 })

@@ -196,7 +196,6 @@ export const useListing = (listingID) => {
         postSold,
         isOwnPost,
         sellerID,
-
         fetchListing,
         handleSavePost,
         handleMarkAsSold,

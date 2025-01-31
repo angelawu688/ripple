@@ -134,6 +134,7 @@ const ListingScreen = ({ navigation, route }) => {
                         navigation={navigation}
                     />
                     <OtherUserButtons
+                        isSold={listing?.sold}
                         isSaved={isSaved}
                         handleSendHi={handleNavToMessages}
                         handleSavePost={handleSavePost}
@@ -152,14 +153,14 @@ const ListingScreen = ({ navigation, route }) => {
 
             }
 
-            <View style={styles.sectionContainer}>
+            {listing?.description.length > 0 && (<View style={styles.sectionContainer}>
                 <Text style={{ fontSize: 18, fontFamily: 'inter', fontWeight: '500', marginBottom: 4, marginTop: 16 }}>
                     Description
                 </Text>
                 <Text style={{ fontSize: 16, fontFamily: 'inter' }}>
                     {listing.description}
                 </Text>
-            </View>
+            </View>)}
 
             <View style={{ width: 1, height: 20 }} />
 

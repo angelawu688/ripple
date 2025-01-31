@@ -169,6 +169,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 contentContainerStyle={{
                     alignItems: 'center',
                     justifyContent: 'flex-start',
+                    paddingBottom: 40
                 }}
                 style={styles.scrollContainer}
             >
@@ -408,7 +409,6 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        // paddingBottom: 20
     },
     scrollContainer: {
         display: 'flex',
@@ -417,7 +417,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignSelf: 'center',
         paddingHorizontal: 1,
-        // marginBottom: 20
     },
     topContainer: {
         display: 'flex',

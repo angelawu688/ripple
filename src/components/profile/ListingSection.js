@@ -46,7 +46,6 @@ export default function ListingSection({
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={item => item.id}
-
                 /> : (
                     <Text style={styles.emptyText}>
                         No {title}
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         paddingHorizontal: 12,
-        gap: 8,
+        gap: 4,
     },
     savedItemsText: {
         fontSize: 18,

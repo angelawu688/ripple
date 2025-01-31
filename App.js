@@ -11,12 +11,15 @@ import { AppProviders } from './src/providers/AppProviders';
 import { useFontLoader } from './src/hooks/useFontLoader';
 import { usePushNotifications } from './src/hooks/usePushNotifications';
 import { Image, View } from 'react-native'
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { userContext } from './src/context/UserContext';
 import { BlankLandingPage } from './src/screens/Auth/LandingPage';
+import { Alert } from 'react-native';
 
 export default function App() {
   const { appIsReady } = useFontLoader();
+  // const { } = useVersionNumber();
+
 
   // dont load the app until the fonts are loaded
   if (!appIsReady) {

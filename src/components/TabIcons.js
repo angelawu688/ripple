@@ -72,18 +72,17 @@ const styles = StyleSheet.create({
         marginTop: -5
     },
     profileImage: {
-        width: 25,
-        height: 25,
+        width: 28,
+        height: 28,
         justifyContent: 'center',
         alignItems: 'center',
         display: 'flex',
         borderRadius: 50,
-        marginTop: -5
     },
     badge: {
         position: 'absolute',
-        top: -2,
-        right: 2,
+        top: 0,
+        right: 0,
         backgroundColor: 'red',
         borderRadius: 4,
         minWidth: 17,
@@ -100,6 +99,9 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         width: 35,
-        height: 35
+        height: 35,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
 })

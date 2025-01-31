@@ -4,10 +4,9 @@ import MaskedView from "@react-native-masked-view/masked-view";
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../constants/colors';
 
-
 const Logo = ({ fontSize }) => {
 
-    const size = fontSize || 20
+    const size = fontSize || 18
 
     return (
         <View style={{ justifyContent: "center", alignItems: "center", }}>
@@ -26,15 +25,13 @@ const GradientText = (props) => {
         >
             <LinearGradient
                 colors={[colors.gradientTop, colors.gradientBottom]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={{}}
+                start={{ x: 0, y: -0.5 }}
+                end={{ x: 0, y: 0.75 }}
             >
                 <Text {...props} style={[props.style, { opacity: 0 }]} />
             </LinearGradient>
         </MaskedView>
     );
 };
-
 
 export default Logo;

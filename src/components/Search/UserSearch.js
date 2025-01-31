@@ -46,13 +46,7 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                     onPress={() => Keyboard.dismiss()
                     }
                 >
-                    {query ? (
-                        <>
-                        </>
-                        // <Text>
-                        //     Autocomplete for {query}
-                        // </Text>
-                    ) : (<Recommendations
+                    {!query && (<Recommendations
                         navigation={navigation}
                     />)}
                 </TouchableWithoutFeedback>

@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { getAuth } from 'firebase/auth';
 import { colors } from "../../../constants/colors";
 import { userContext } from "../../../context/UserContext";
-import { MinusCircle, PlusCircle, Scroll, UploadSimple } from "phosphor-react-native";
+import { ArrowBendRightUp, MinusCircle, PlusCircle, Scroll, UploadSimple } from "phosphor-react-native";
 import CurrencyInput from 'react-native-currency-input'
 import Asterisk from "../../../components/Asterisk";
 import { uploadListingImage } from "../../../utils/firebaseUtils";
@@ -253,6 +253,7 @@ const CreateListing = ({ navigation }) => {
                             }}
                             onFocus={() => scrollToInput('title')}
                             maxLength={60}
+                            enterKeyHint='Enter'
                         />
                     </View>
 
@@ -309,12 +310,19 @@ const CreateListing = ({ navigation }) => {
                                     onPressIn={() => {
                                         handleAddTag(tagInput)
                                     }}
-                                    // onPress={(e) => {
-                                    //     handleAddTag(tagInput)
-                                    // }}
-                                    style={{ marginLeft: 10 }}
+                                    style={{
+                                        marginLeft: 10,
+                                        // backgroundColor: tagInput.length > 0 ? colors.loginBlue : colors.loginGray
+                                    }}
                                 >
-                                    <PlusCircle color={tagInput.length > 0 && tagInput.length <= 15 ? colors.loginBlue : colors.accentGray} size={30} />
+                                    {/* <ArrowBendRightUp color={'white'} size={20} /> */}
+                                    {tagInput.length > 0 ? (
+                                        <PlusCircle color={colors.loginBlue} size={36} weight="fill" />
+                                        // <ArrowBendRightUp size={20} color={colors.loginBlue} />
+                                    ) : (
+                                        <PlusCircle color={colors.accentGray} size={36} />
+                                        // <ArrowBendRightUp size={20} color={colors.loginGray} />
+                                    )}
                                 </TouchableOpacity>
                             )}
                         </View>

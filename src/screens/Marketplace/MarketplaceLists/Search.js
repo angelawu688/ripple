@@ -312,7 +312,7 @@ const Search = ({ navigation }) => {
                         setQuery(text);
                         setDisplayResults(false); // will hide results
                     }}
-                    style={[styles.input, styles.shadow]}
+                    style={styles.input}
                     placeholder="Search"
                     placeholderTextColor={'#767676'}
                     onSubmitEditing={() => handleSearch(query)}
@@ -330,7 +330,7 @@ const Search = ({ navigation }) => {
                 <TouchableOpacity onPress={() => setListingsSelected(!listingsSelected)}
 
                     style={{ width: '50%', alignItems: 'center', display: 'flex' }}>
-                    <Text style={[{ marginBottom: 6, fontSize: 14 }, { fontWeight: listingsSelected ? '600' : '400' }]}>
+                    <Text style={[{ marginBottom: 6, fontSize: 16 }, { fontWeight: listingsSelected ? '600' : '400' }]}>
                         Listings
                     </Text>
                     <View style={{ width: '100%', height: 1, backgroundColor: !listingsSelected ? colors.loginGray : 'black' }} />
@@ -338,7 +338,7 @@ const Search = ({ navigation }) => {
                 <TouchableOpacity onPress={() => setListingsSelected(!listingsSelected)}
 
                     style={{ width: '50%', alignItems: 'center', display: 'flex' }}>
-                    <Text style={[{ marginBottom: 6, fontSize: 14 }, { fontWeight: !listingsSelected ? '600' : '400' }]}>
+                    <Text style={[{ marginBottom: 6, fontSize: 16 }, { fontWeight: !listingsSelected ? '600' : '400' }]}>
                         Users
                     </Text>
                     <View style={{ width: '100%', height: 1, backgroundColor: listingsSelected ? colors.loginGray : 'black' }} />
@@ -414,16 +414,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontSize: 16
     },
-    // shadow: {
-    //     shadowColor: colors.loginBlue,
-    //     shadowOffset: {
-    //         width: 0,
-    //         height: 0,
-    //     },
-    //     shadowOpacity: 0.3,
-    //     shadowRadius: 4,
-    //     elevation: 8,
-    // },
     sectionHeader: {
         fontSize: 18,
         fontWeight: "500",

@@ -190,13 +190,7 @@ const Conversation = ({ navigation, route }) => {
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
             onPress={() => Keyboard.dismiss()}
         >
-            <View style={{
-                // display: 'flex',
-                // justifyContent: 'flex-start',
-                // width: '100%',
-                // height: '100%',
-                flex: 1
-            }}>
+            <View style={{ flex: 1 }}>
                 {loadingMessages || !messages && <LoadingSpinner />}
                 {messages.length > 0 && !loadingMessages ? (<FlatList
                     onScrollBeginDrag={() => Keyboard.dismiss()}

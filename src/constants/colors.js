@@ -5,7 +5,7 @@ export const colors = {
     teal: '#6CD0D0',
     darkblue: '#19647E',
     gradientTop: '#9BE5E5',
-    gradientBottom: '#3CA2A2',
+    gradientBottom: '#006780',
     loginBlue: '#0C6E86',
     loginGray: '#D9D9D9',
     accentGray: '#7E7E7E',

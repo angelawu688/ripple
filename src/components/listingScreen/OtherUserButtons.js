@@ -4,10 +4,10 @@ import { Text, TouchableOpacity, View } from "react-native"
 import { StyleSheet } from "react-native"
 import { colors } from "../../constants/colors"
 
-export function OtherUserButtons({ isSaved, handleSendHi, handleSavePost, shareListing }) {
+export function OtherUserButtons({ isSold = false, isSaved, handleSendHi, handleSavePost, shareListing }) {
     return (
         <View style={styles.sectionContainer}>
-            <TouchableOpacity onPress={() => handleSendHi()}
+            {!isSold && (<TouchableOpacity onPress={() => handleSendHi()}
                 style={styles.touchableContainer}>
                 <View style={styles.messageContainer}>
                     <Storefront color='black' size={28} />
@@ -22,7 +22,7 @@ export function OtherUserButtons({ isSaved, handleSendHi, handleSavePost, shareL
                     <Text style={styles.sendText}>Send</Text>
                 </View>
 
-            </TouchableOpacity>
+            </TouchableOpacity>)}
 
             <View style={styles.bottomButtonContainer}>
 
