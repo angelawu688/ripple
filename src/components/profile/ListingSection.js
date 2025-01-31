@@ -11,8 +11,9 @@ export default function ListingSection({
     onViewAll,
     navigation
 }) {
-    const renderItem = ({ item }) => (
+    const renderItem = (item, index) => (
         <Pressable
+            key={index}
             onPress={() => navigation.navigate('ListingScreen', { listingID: item.id })}
             style={{ width: SCREEN_WIDTH / 2, padding: 1 }}
         >
@@ -41,10 +42,11 @@ export default function ListingSection({
                 {listings.length > 0 ? <FlatList
                     contentContainerStyle={styles.listContainer}
                     data={listings}
-                    renderItem={renderItem}
+                    renderItem={({ item, index }) => (renderItem(item, index))}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={item => item.id}
+
                 /> : (
                     <Text style={styles.emptyText}>
                         No {title}

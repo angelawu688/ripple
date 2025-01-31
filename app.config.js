@@ -3,7 +3,7 @@ export default () => ({
     name: "Ripple",
     slug: "uw-marketplace", // this cant really be changed
     owner: 'phunt22',
-    version: "1.0.2",
+    version: "1.0.3",
     orientation: "portrait",
     icon: "./assets/images/RippleIcon.png", // actual app Icon
     scheme: "myapp",

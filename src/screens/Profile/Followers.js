@@ -44,7 +44,6 @@ export default function Followers({ navigation, route }) {
     // for reporting
     const [reportModalVisible, setReportModalVisible] = useState(false)
 
-
     useEffect(() => {
         const data = isFollowers ? followers : following;
         setUsers(data || []);
@@ -115,17 +114,16 @@ export default function Followers({ navigation, route }) {
                     onPress={() => setIsFollowers(!isFollowers)}
 
                 >
-                    <Text style={{ fontSize: 16, fontFamily: 'inter', color: isFollowers ? 'black' : colors.accentGray }}>
+                    <Text style={{ fontSize: 16, fontFamily: 'inter', color: isFollowers ? 'black' : colors.accentGray, fontWeight: '600' }}>
                         Followers
                     </Text>
                     <View style={{ marginTop: 10, width: '100%', height: 1, backgroundColor: !isFollowers ? colors.loginGray : 'black' }} />
 
                 </TouchableOpacity>
 
-
                 <TouchableOpacity style={{ width: '50%', display: 'flex', alignItems: 'center' }}
                     onPress={() => setIsFollowers(!isFollowers)}>
-                    <Text style={{ fontSize: 16, fontFamily: 'inter', color: isFollowers ? colors.accentGray : 'black' }}>
+                    <Text style={{ fontSize: 16, fontFamily: 'inter', color: isFollowers ? colors.accentGray : 'black', fontWeight: '600' }}>
                         Following
                     </Text>
                     <View style={{ marginTop: 10, width: '100%', height: 1, backgroundColor: isFollowers ? colors.loginGray : 'black' }} />

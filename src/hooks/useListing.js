@@ -80,7 +80,8 @@ export const useListing = (listingID) => {
             photos: listing.photos
         };
         await setDoc(listingRef, newSaved);
-        setSavedPosts(prev => [...prev, newSaved]);
+        // setSavedPosts(prev => [...prev, newSaved]); // this was to put at the back 
+        setSavedPosts(prev => [newSaved, ...prev]); // this is the front (hopefully)
     };
 
     const handleUnsavePost = async (listingRef) => {
@@ -91,7 +92,6 @@ export const useListing = (listingID) => {
             )
         );
     };
-
 
     const handleMarkAsSold = async () => {
         if (postSold) {

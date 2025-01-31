@@ -26,7 +26,6 @@ import EditFieldModal from '../../components/personalInformation/EditFieldModal'
 // this defines the fields for us so that we can reuse our modal component
 // Took out prof photo for now
 const fields = [
-    { label: 'Email', key: 'email', keyboardType: 'email-address', required: false },
     { label: 'Name', key: 'name', keyboardType: 'default', required: true },
     { label: 'Bio', key: 'bio', keyboardType: 'default', multiline: true, description: 'What makes you unique?', required: false },
     { label: 'Major', key: 'major', keyboardType: 'default', required: true },

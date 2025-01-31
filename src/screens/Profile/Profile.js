@@ -254,9 +254,10 @@ const styles = StyleSheet.create({
         marginBottom: 40,
         marginTop: 40,
         borderWidth: 1,
+        borderColor: '#F2F0F0',
         borderRadius: 12,
         padding: 8,
-        borderColor: '#F2F0F0',
+
         height: 60
     },
     cardText: {
@@ -266,15 +267,16 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 45,
         borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#F2F0F0',
+        // borderWidth: 1,
+        // borderColor: '#F2F0F0',
         display: 'flex',
         flexDirection: 'row',
         marginBottom: 12,
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingRight: 5,
-        backgroundColor: colors.mediumGray
+        backgroundColor: colors.mediumGray,
+        padding: 1
     },
     icon: {
         marginLeft: 16,

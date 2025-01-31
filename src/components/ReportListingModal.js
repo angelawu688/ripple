@@ -26,6 +26,10 @@ const ReportListingModal = ({ visible, onClose, userId, listingID }) => {
 
     const handleSubmit = async () => {
         try {
+            if (!reportReason) {
+                showToast('Must input a reason!', 'error')
+                return;
+            }
             // add {userId} to firebase with the corresponding reason
             const listingReportsRef = collection(db, "reports", userId, "listingReports");
             // we have "userReports" in case we need to add more data later
@@ -45,7 +49,6 @@ const ReportListingModal = ({ visible, onClose, userId, listingID }) => {
             showToast('Error reporting listing')
         }
     }
-
 
     return (
         <Modal
@@ -91,14 +94,12 @@ const ReportListingModal = ({ visible, onClose, userId, listingID }) => {
 
                             <View style={styles.buttonRow}>
 
-                                <TouchableOpacity style={styles.button}
+                                <TouchableOpacity style={[styles.button, !reportReason && { backgroundColor: colors.loginGray }]}
                                     onPress={handleSubmit}
+                                    disabled={!reportReason}
                                 >
-                                    <Text style={styles.text}>Submit Report</Text>
+                                    <Text style={[styles.text, !reportReason && { color: colors.accentGray }]}>Submit Report</Text>
                                 </TouchableOpacity>
-
-
-
                             </View>
                             <TouchableOpacity style={styles.closeButton}
                                 onPress={onClose}

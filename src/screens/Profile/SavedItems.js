@@ -9,10 +9,6 @@ import { BookmarkSimple } from 'phosphor-react-native'
 
 
 const SavedItems = ({ navigation }) => {
-    // const testListings = [
-    //     { listingID: 1, img: undefined, title: 'Sony Camera', price: 10, sold: false },
-    //     { listingID: 10, img: undefined, title: 'Notebook', price: 2, sold: true },
-    // ]
     const { savedPosts } = useContext(userContext)
     const [savedListings, setSavedListings] = useState([])
     const [isLoading, setIsLoading] = useState(true)
@@ -20,7 +16,6 @@ const SavedItems = ({ navigation }) => {
     useEffect(() => {
         setIsLoading(true)
         try {
-            // grab the users saved listings on component mount
             setSavedListings(savedPosts)
         } catch (error) {
             console.error("Error fetching saved posts", error)
@@ -41,12 +36,6 @@ const SavedItems = ({ navigation }) => {
                     Your saved items will appear here.
                 </Text>
                 <BookmarkSimple size={24} weight='regular' />
-                {/* <Text style={[styles.text, { fontWeight: '600', fontSize: 20 }]}>
-                    No saved listings!
-                </Text>
-                <Text style={[styles.text, { fontWeight: '400', fontSize: 16 }]}>
-                    Saved listings will appear here
-                </Text> */}
             </View>
         )
     }
@@ -71,13 +60,7 @@ const SavedItems = ({ navigation }) => {
                         onPress={() => navigation.navigate('ListingScreen', { listingID: listingID })}
                         style={{ width: '49.75%' }}
                     >
-                        <ListingCard listing={listing} // pass in entire listing
-                        // price={listing.price || "0"}
-                        // title={listing.title || "na"}
-                        // img={listing.img || undefined}
-                        // sold={listing.sold !== undefined ? listing.sold : false}
-                        />
-
+                        <ListingCard listing={listing} />
                     </TouchableOpacity>
                 )
             }}

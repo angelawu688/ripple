@@ -5,8 +5,6 @@ import Friends from '../../screens/Marketplace/MarketplaceLists/Friends';
 import { View, TouchableOpacity, StyleSheet, Text, Dimensions } from 'react-native';
 import { MagnifyingGlass, Plus } from 'phosphor-react-native';
 import { colors } from '../../constants/colors';
-// import { useNavigation } from '@react-navigation/native';
-// import { useEffect, useLayoutEffect } from 'react';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -70,9 +68,9 @@ export function MarketplaceTabNavigator({ navigation }) {
                     options={{ tabBarLabel: 'For You' }}
                 />
                 <Tab.Screen
-                    name="Friends"
+                    name="Following"
                     component={Friends}
-                    options={{ tabBarLabel: 'Friends' }}
+                    options={{ tabBarLabel: 'Following' }}
                 />
                 <Tab.Screen
                     name="Sell"

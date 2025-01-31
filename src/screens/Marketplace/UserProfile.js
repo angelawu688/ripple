@@ -186,7 +186,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         >
                             {userProfile.pfp ? (
                                 <ZoomableImage
-                                    disabled={true}
+                                    disabled={isOwnProfile}
                                     uri={userProfile?.pfp}
                                     thumbnailStyle={{ width: 62, height: 62, borderRadius: 75, backgroundColor: 'gray' }}
                                 />
@@ -362,7 +362,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                     title="Past Listings"
                     listings={soldListings.slice(0, 4)}
                     onViewAll={() => navigation.navigate('FullListingsScreen', {
-                        listings: activeListings,
+                        listings: soldListings,
                         mode: 'past',
                         title: 'Past Listings'
                     })}

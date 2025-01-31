@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontFamily: 'inter',
         color: colors.loginBlue,
+        maxWidth: '90%'
     },
 });
 
