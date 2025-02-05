@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../constants/colors';
 import Asterisk from '../../components/Asterisk';
 
-
+// test add
 const EducationOnboarding = ({ navigation, route }) => {
     const { email, password } = route.params
     const [major, setMajor] = useState('')
