@@ -25,6 +25,7 @@ export function EditFieldModal({
     isLoading = false,
     errorMessage = '',
     multiline = false,
+    isRequired = true
 }) {
     const [input, setInput] = useState(initialValue);
     const [isModified, setIsModified] = useState(false);
@@ -35,14 +36,6 @@ export function EditFieldModal({
         setIsModified(false);
         setValidationError('');
     }, [initialValue, visible]);
-
-    // const handleInputChange = (newValue) => {
-    //     setInput(newValue);
-    //     setIsModified(true);
-    //     const error = validateInput(newValue, field.key);
-    //     setValidationError(error);
-    // };
-
 
     const validateInput = (field, value) => {
         if (!value) return ''; // Allow empty values initially
@@ -80,11 +73,19 @@ export function EditFieldModal({
         }
     }
 
-    const isSaveDisabled = !input ||
+    const isSaveDisabled = isRequired ? (
+        !input ||
         !isModified ||
         !!validationError ||
         isLoading ||
-        !!errorMessage;
+        !!errorMessage
+    ) : (
+        // no input if not required
+        !isModified ||
+        !!validationError ||
+        isLoading ||
+        !!errorMessage
+    )
 
     return (
         <Modal
@@ -138,7 +139,13 @@ export function EditFieldModal({
                                         styles.button,
                                         {
                                             backgroundColor:
-                                                !input || !isModified ? colors.loginGray : colors.neonBlue,
+                                                isRequired ? (
+                                                    !input || !isModified ? colors.loginGray : colors.neonBlue
+                                                ) : (
+                                                    !isModified ? colors.loginGray : colors.neonBlue
+                                                ),
+                                            width: 68
+
                                         },
                                     ]}
                                     disabled={isSaveDisabled}
@@ -150,7 +157,14 @@ export function EditFieldModal({
                                         <Text
                                             style={[
                                                 styles.buttonText,
-                                                { color: !input || !isModified ? 'black' : 'white' },
+                                                {
+                                                    color:
+                                                        isRequired ? (
+                                                            !input || !isModified ? 'black' : 'white'
+                                                        ) : (
+                                                            !isModified ? 'black' : 'white'
+                                                        )
+                                                }
                                             ]}
                                         >
                                             Save

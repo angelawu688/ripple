@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, query, collection, where, getDocs } from "firebase/firestore";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth, db } from '../../firebaseConfig';
 
 
 export const userContext = createContext();
@@ -16,8 +17,6 @@ export const UserProvider = ({ children }) => {
   const [userFollowers, setUserFollowers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState(null)
-
-
 
   // grabs the user data from firebase
   const fetchUserData = async (firebaseUser) => {
@@ -65,7 +64,8 @@ export const UserProvider = ({ children }) => {
         await AsyncStorage.setItem('userFollowing', JSON.stringify(userDoc.data().following));
         await AsyncStorage.setItem('userFollowers', JSON.stringify(userDoc.data().followers));
       } else {
-        // do nothing
+        // do nothing, there is no user data
+        return false
       }
     } catch (e) {
       setAuthError(e.message)
@@ -96,15 +96,35 @@ export const UserProvider = ({ children }) => {
         setAuthError('Log in with your @uw.edu email!')
         throw new Error('Log in with your @uw.edu email!')
       }
-      const auth = getAuth()
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      await fetchUserData(userCredential.user)
-      setUser(userCredential.user)
-      return userCredential.user
-    } catch (e) {
-      const message = e.message === 'Log in with your @uw.edu email!' ? 'Log in with your @uw.edu email!' : 'Incorrect email or password!'
-      setAuthError(message);
-      throw e;
+      const user = userCredential.user
+
+      // check if there is a userDoc/Data for this fbUser
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      if (!userDoc.exists()) {
+        await user.delete()
+        setAuthError('Please create an account')
+        throw new Error('Please create an account');
+      }
+
+      // at this point, we know they have given valid credentials and have user data
+      setUser(user)
+      return user
+
+    } catch (error) {
+      let errorMessage
+      if (error.message.indexOf('user-not-found') > 0) {
+        errorMessage = 'Please create an account'
+      } else if (error.message === 'Log in with your @uw.edu email!') {
+        errorMessage = 'Log in with your @uw.edu email!';
+      } else if (error.message === 'Please create an account') {
+        errorMessage = 'Please create an account';
+      } else {
+        console.log(error)
+        errorMessage = 'Incorrect email or password!';
+      }
+      setAuthError(errorMessage);
+      throw error;
     }
   }
 
@@ -189,6 +209,7 @@ export const UserProvider = ({ children }) => {
             setUserFollowers(userDoc.data().followers || []);
           } else {
             console.warn("No such document!");
+            setAuthError('Verify your email and complete onboarding!')
             setUserData(null);
           }
         } catch (error) {
@@ -197,8 +218,10 @@ export const UserProvider = ({ children }) => {
         }
       } else {
         // CLEAR ASYNC STORAGE
-        setUserData(null); // Clear user data if no user is logged in
+        // Clear user data if no user is logged in
+        setUserData(null);
         setSavedPosts(null);
+        setAuthError("Account doesn't exist, complete onboarding")
       }
       setIsLoading(false);
     });
@@ -214,6 +237,7 @@ export const UserProvider = ({ children }) => {
       userListings,
       isLoading,
       authError,
+      setAuthError,
       handleSignIn,
       handleSignOut,
       setUser,

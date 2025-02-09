@@ -43,11 +43,8 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
     const [reportModalVisible, setReportModalVisible] = useState(false) // report modal
     const [modalVisible, setModalVisible] = useState(false) // 3 dots modal
     const [profileLink, setProfileLink] = useState('');
-
     const [followers, setFollowers] = useState([])
-
     const [following, setFollowing] = useState([])
-
     const [activeListings, setActiveListings] = useState([])
     const [soldListings, setSoldListings] = useState([])
 
@@ -196,6 +193,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                                     <User size={24} />
                                 </View>)
                             }
+
                             {isOwnProfile && (
                                 <View style={{ position: 'absolute', bottom: -8, right: -8, zIndex: 4 }}>
                                     <View
@@ -279,7 +277,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
 
                     {/* MAJOR */}
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%', }}>
-                        <View style={{ maxWidth: '80%', flex: 1 }}>
+                        <View style={{ maxWidth: '80%', flex: 1, }}>
                             <Text style={styles.majorText}
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
@@ -334,9 +332,8 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                     <ProfileSocials userProfile={userProfile} />
                 </View>
 
-
                 {/* saved posts */}
-                {isOwnProfile && (
+                {isOwnProfile && savedPosts?.length > 0 && (
                     <ListingSection
                         navigation={navigation}
                         title="Saved Listings"
@@ -346,7 +343,7 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                 )}
 
                 {/* active listings */}
-                {activeListings.length > 0 && <ListingSection
+                {activeListings?.length > 0 && <ListingSection
                     navigation={navigation}
                     title="Active Listings"
                     listings={activeListings.slice(0, 4)}
@@ -355,10 +352,11 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         mode: 'active',
                         title: 'Active Listings'
                     })}
-                />}
+                />
+                }
 
                 {/* sold listings */}
-                {soldListings.length > 0 && <ListingSection
+                {soldListings?.length > 0 && <ListingSection
                     navigation={navigation}
                     title="Past Listings"
                     listings={soldListings.slice(0, 4)}
@@ -367,7 +365,8 @@ const UserProfile = ({ navigation, route, isOwnProfileInProfileStack = false }) 
                         mode: 'past',
                         title: 'Past Listings'
                     })}
-                />}
+                />
+                }
             </ScrollView >) : (
                 <TouchableOpacity
                     onPress={async () => {

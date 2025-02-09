@@ -1,17 +1,14 @@
 import React, { useContext } from 'react';
-import { Image, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ProfileStackNavigator from './StackNavigators/ProfileStackNavigator';
 import MarketplaceStackNavigator from './StackNavigators/MarketplaceStackNavigator';
 import MessagesStackNavigator from './StackNavigators/MessagesStackNavigator';
 import { colors } from '../constants/colors'
 import { userContext } from '../context/UserContext';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { UnreadContext } from '../context/UnreadContext';
 import { useTabBarVisibility } from '../hooks/useTabBarVisibility';
 import { MarketplaceTabIcon, MessageTabIcon, ProfileTabIcon } from '../components/TabIcons';
-
-
+import { BlurView } from 'expo-blur';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,18 +16,26 @@ const Tab = createBottomTabNavigator();
 // dont show headers on the stackNavigators, do that at a screen level
 const defaultScreenOptions = {
     headerShown: false,
-    contentStyle: { backgroundColor: 'white' },
+    contentStyle: { backgroundColor: 'transparent' },
     headerShadowVisible: false,
     tabBarActiveTintColor: colors.black,
     tabBarInactiveTintColor: colors.black,
     tabBarShowLabel: false,
     tabBarStyle: {
-        backgroundColor: colors.white,
+        // backgroundColor: colors.white,
         paddingTop: 12,
-        borderTopWidth: 0.5,
+        // borderTopWidth: 0.5,
+        // opacity: 0.1,
+        // backgroundColor: 'transparent',
+        opacity: 0.7,
+        // borderTopWidth: 0,
+        // position: 'absolute',
+        // left: 50,
+        // right: 50,
+        // bottom: 20,
+        // height: 100
     },
 }
-
 
 const TabNavigator = () => {
     const { userData } = useContext(userContext)

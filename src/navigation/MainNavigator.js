@@ -32,7 +32,7 @@ const NavContent = () => {
 
   return (
     <RootStack.Navigator screenOptions={{
-      contentStyle: { backgroundColor: 'white' }, // Set background for all screens
+      contentStyle: { backgroundColor: 'white' }, // set background for all screens
       headerShown: false,
     }}>
       {isAuthenticated ? (

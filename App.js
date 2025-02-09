@@ -18,8 +18,6 @@ import { Alert } from 'react-native';
 
 export default function App() {
   const { appIsReady } = useFontLoader();
-  // const { } = useVersionNumber();
-
 
   // dont load the app until the fonts are loaded
   if (!appIsReady) {

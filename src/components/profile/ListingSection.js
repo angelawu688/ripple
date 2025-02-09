@@ -22,37 +22,39 @@ export default function ListingSection({
     );
 
     return (
-        <View style={[styles.container, { height: listings.length > 0 ? 260 : 60 }]}>
-            {/* TOP BAR */}
-            <View style={[styles.barTextContainer, { marginBottom: listings.length > 0 ? 10 : 0 }]}>
-                <Text style={styles.savedItemsText}>
-                    {title}
-                </Text>
-                {listings.length !== 0 && <TouchableOpacity
-                    onPress={onViewAll}
-                    style={styles.viewAllButton}
-                >
-                    <Text style={styles.viewAllText}>
-                        View all
+        listings?.length > 0 && (
+            <View style={[styles.container, { height: listings.length > 0 ? 260 : 60 }]}>
+                {/* TOP BAR */}
+                <View style={[styles.barTextContainer, { marginBottom: listings.length > 0 ? 10 : 0 }]}>
+                    <Text style={styles.savedItemsText}>
+                        {title}
                     </Text>
-                </TouchableOpacity>}
-            </View>
+                    {listings.length !== 0 && <TouchableOpacity
+                        onPress={onViewAll}
+                        style={styles.viewAllButton}
+                    >
+                        <Text style={styles.viewAllText}>
+                            View all
+                        </Text>
+                    </TouchableOpacity>}
+                </View>
 
-            <View style={{ justifyContent: 'center', height: '100%', marginLeft: -10 }}>
-                {listings.length > 0 ? <FlatList
-                    contentContainerStyle={styles.listContainer}
-                    data={listings}
-                    renderItem={({ item, index }) => (renderItem(item, index))}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => item.id}
-                /> : (
-                    <Text style={styles.emptyText}>
-                        No {title}
-                    </Text>
-                )}
+                <View style={{ justifyContent: 'center', height: '100%', marginLeft: -10 }}>
+                    {listings.length > 0 ? <FlatList
+                        contentContainerStyle={styles.listContainer}
+                        data={listings}
+                        renderItem={({ item, index }) => (renderItem(item, index))}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={item => item.id}
+                    /> : (
+                        <Text style={styles.emptyText}>
+                            No {title}
+                        </Text>
+                    )}
+                </View>
             </View>
-        </View>
+        )
     )
 }
 

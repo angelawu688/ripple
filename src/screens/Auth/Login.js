@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Touchable, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { userContext } from '../../context/UserContext';
@@ -8,19 +8,50 @@ import { colors } from '../../constants/colors';
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const { setUser, handleSignIn, authError } = useContext(userContext);
+  const [localError, setLocalError] = useState('');
+  const { setUser, handleSignIn, authError, setAuthError } = useContext(userContext);
   const [secureTextEntry, setSecureTextEntry] = useState(true)
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  // combine our local error with the authError
+  const errorMessage = localError || authError
+
+  // clear errors on mount
+  // otherwise we get an initial error
+  useEffect(() => {
+    setLocalError('');
+    setAuthError(null);
+
+    // clear errors when component unmounts
+    return () => {
+      setAuthError(null);
+    };
+  }, []);  // Empty dependency array means this runs once on mount
+
+  // clear the local error when the authError changes
+  useEffect(() => {
+    if (authError) {
+      setLocalError('')
+    }
+  }, [authError])
+
+  const validateEmail = (email) => (email.toLowerCase().endsWith('@uw.edu'))
 
   const handleLogin = async () => {
     try {
       setIsLoading(true)
       setForgotPasswordSent(false)
+      setLocalError('')
+      if (!validateEmail(email)) {
+        setLocalError('Log in with your @uw.edu email!')
+        return
+      }
+
       await handleSignIn(email, password)
     } catch (error) {
-      setErrorMessage(authError)
+      console.log('login', error)
+      setLocalError(authError)
     } finally {
       setIsLoading(false)
     }
@@ -49,23 +80,26 @@ const Login = ({ navigation }) => {
   const handleForgotPassword = async () => {
     try {
       setIsLoading(true)
-      if (email.indexOf('@uw.edu') < 0) {
-        throw new Error('Use your @uw.edu email!')
+      setLocalError('')
+
+      if (!email) {
+        setLocalError('Enter your email!')
+        return
       }
-      const auth = getAuth();
-      await sendPasswordResetEmail(auth, email);
+
+      if (!validateEmail(email)) {
+        setLocalError('Use your @uw.edu email!')
+        return
+      }
+
+      await sendPasswordResetEmail(auth, email)
       setForgotPasswordSent(true)
     } catch (error) {
-      if (error.message.indexOf('missing-email') > 0) {
-        setErrorMessage('Enter your email!')
-      } else if (email.indexOf('@uw.edu') < 0) {
-        setErrorMessage('Use your @uw.edu email!')
-      } else if (error.message.indexOf('invalid-email') > 0) {
-        setErrorMessage('Invalid email!')
+      if (error.code === 'auth/invalid-email') {
+        setLocalError('Invalid email!');
       } else {
-        setErrorMessage('Oops! Unexpected error, please try again later')
+        setLocalError('Oops! Unexpected error, please try again later');
       }
-      // setErrorMessage(error.message);
     } finally {
       setIsLoading(false)
     }
@@ -95,7 +129,10 @@ const Login = ({ navigation }) => {
             placeholder='Email'
             placeholderTextColor={colors.placeholder}
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => {
+              setEmail(text)
+              setLocalError('')
+            }}
             style={styles.input}
             keyboardType='email-address'
             autoCapitalize='none'
@@ -112,7 +149,10 @@ const Login = ({ navigation }) => {
             placeholder="Password"
             placeholderTextColor={colors.placeholder}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text)
+              setLocalError('')
+            }}
             secureTextEntry={secureTextEntry}
           />
           <TouchableOpacity onPress={toggle}

@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ActivityIndicator, AppState } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification, signInWithEmailAndPassword } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../constants/colors';
 import Asterisk from '../../components/Asterisk';
 import EmailVerificationModal from '../../components/auth/EmailVerificationModal';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../../firebaseConfig';
 
 const EmailOnboarding = ({ navigation }) => {
     const [email, setEmail] = useState('')
@@ -92,20 +94,53 @@ const EmailOnboarding = ({ navigation }) => {
     const handleNext = async () => {
         setIsLoading(true)
         try {
-            //  create and account and send an email to the user
+            // create and account and send an email to the user
             // this will throw error if email in use
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user
 
-
+            // if we successfully create an account
             await sendEmailVerification(user);
             setEmailSent(true)
             setIsModalVisible(true)
         } catch (e) {
             console.error(e)
+
             // if the email is already in use tell them to just log in!
             if (e.message.indexOf('already-in-use') > 0) {
-                setErrorMessage('Email in use! Log in to your account')
+                try {
+                    // sign them in (DO NOT SET USER) to see if they have an account
+                    const existingCred = await signInWithEmailAndPassword(auth, email, password)
+                    const existingUser = existingCred.user
+
+                    // check if they have a userDoc
+                    const userDoc = await getDoc(doc(db, 'users', existingUser.uid))
+                    if (!userDoc.exists()) {
+                        // this means that they are incomplete
+                        // they have auth profile but not data, so we delete them
+                        await existingUser.delete()
+
+                        // create a fresh user profile for them, follow previous steps
+                        const newUserCred = await createUserWithEmailAndPassword(auth, email, password)
+                        const newUser = newUserCred.user
+
+                        // send them verification and update state
+                        await sendEmailVerification(newUser)
+                        setEmailSent(true)
+                        setIsModalVisible(true)
+                    } else {
+                        // they actually have user data, just tell them to log in
+                        setErrorMessage('Email in use! Log in to your account')
+                    }
+                } catch (signErr) {
+                    console.error(signErr)
+                    // this is unhandled, and they will be stuck, and delete failed, so just manual delete
+                    setErrorMessage('Email in use! Contact support')
+                }
+            } else {
+                // SOME OTHER ERROR
+                // give default error message
+                setErrorMessage(e.message || 'Error creating account, please try again later')
             }
         } finally {
             setIsLoading(false);

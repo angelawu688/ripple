@@ -153,6 +153,7 @@ const PersonalInformation = () => {
                     onClose={() => setModalVisible(false)}
                     onSave={handleSaveField}
                     multiline={currentField.label === 'Bio'}
+                    isRequired={currentField.required}
                 />
             )}
         </ScrollView >

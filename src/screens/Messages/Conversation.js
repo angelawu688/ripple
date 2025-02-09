@@ -83,10 +83,11 @@ const Conversation = ({ navigation, route }) => {
             }));
             // most recent first, since we are using inverted flatlist
             setMessages(fetchedMessages.sort((a, b) => b.timestamp - a.timestamp));
+            setLoadingMessages(false)
         });
 
         // unsub on unmount
-        setLoadingMessages(false)
+
         return () => unsubscribe();
     }, [conversationID]);
 
@@ -192,57 +193,65 @@ const Conversation = ({ navigation, route }) => {
         >
             <View style={{ flex: 1 }}>
                 {loadingMessages || !messages && <LoadingSpinner />}
-                {messages.length > 0 && !loadingMessages ? (<FlatList
-                    onScrollBeginDrag={() => Keyboard.dismiss()}
-                    data={messages}
-                    renderItem={({ item, index }) => {
-                        const previousMessage = messages[index + 1]; // seems backwards, most recent is last
-                        let showDate = false;
+                {messages.length > 0 && !loadingMessages ? (
+                    <FlatList
+                        onScrollBeginDrag={() => Keyboard.dismiss()}
+                        data={messages}
+                        renderItem={({ item, index }) => {
+                            const previousMessage = messages[index + 1]; // seems backwards, most recent is last
+                            let showDate = false;
 
-                        if (!previousMessage) {
-                            //    oldest message, so show the timestamp
-                            showDate = true;
-                        } else {
-                            // compare to the previous message. If more than 30 min, then show timestamp
-                            const currentTime = item.timestamp;
-                            const prevTime = previousMessage.timestamp;
-                            const diffInMinutes = Math.abs((prevTime - currentTime) / 60000);
-                            if (diffInMinutes > 30) {
+                            if (!previousMessage) {
+                                //    oldest message, so show the timestamp
                                 showDate = true;
+                            } else {
+                                // compare to the previous message. If more than 30 min, then show timestamp
+                                const currentTime = item.timestamp;
+                                const prevTime = previousMessage.timestamp;
+                                const diffInMinutes = Math.abs((prevTime - currentTime) / 60000);
+                                if (diffInMinutes > 30) {
+                                    showDate = true;
+                                }
                             }
+
+                            // todo some sort of formatting. We only get a formatted date if we show the date
+                            const formattedDate = showDate ? formatDateForMessages(item.timestamp / 1000) : null;
+
+                            return (
+                                <MessageBubble
+                                    navigation={navigation}
+                                    message={item}
+                                    activeUserID={user.uid}
+                                    formattedDate={formattedDate}
+                                />
+                            )
                         }
+                        }
+                        keyExtractor={(item) => item.id}
+                        keyboardShouldPersistTaps='handled'
+                        inverted={true}// This inverts the list
+                        contentContainerStyle={{
+                            paddingHorizontal: 10,
+                            paddingTop: 10,
+                            flexGrow: 1,
+                            justifyContent: 'flex-end', // this is key for inverted lists to put nonfull at top
+                            padding: 10,
+                        }}
+                        ListEmptyComponent={() => (
+                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
+                                    Start a conversation!
+                                </Text>
+                            </View>
+                        )}
+                    />) : inputListing || img ? (
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
+                                Start a conversation!
+                            </Text>
+                        </View>
 
-                        // todo some sort of formatting. We only get a formatted date if we show the date
-                        const formattedDate = showDate ? formatDateForMessages(item.timestamp / 1000) : null;
-
-                        return (
-                            <MessageBubble
-                                navigation={navigation}
-                                message={item}
-                                activeUserID={user.uid}
-                                formattedDate={formattedDate}
-                            />
-                        )
-                    }
-                    }
-                    keyExtractor={(item) => item.id}
-                    keyboardShouldPersistTaps='handled'
-                    inverted={true}// This inverts the list
-                    contentContainerStyle={{
-                        paddingHorizontal: 10,
-                        paddingTop: 10,
-                        flexGrow: 1,
-                        justifyContent: 'flex-end', // this is key for inverted lists to put nonfull at top
-                        padding: 10,
-                    }}
-                />) : inputListing || img ? (
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
-                            Start a conversation!
-                        </Text>
-                    </View>
-
-                ) : (
+                    ) : (
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontWeight: '500', fontFamily: 'inter', fontSize: 18 }}>
                             Start a conversation!

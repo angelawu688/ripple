@@ -9,18 +9,26 @@ import { db } from "../../../firebaseConfig"
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { colors } from "../../constants/colors"
 import { checkIfBlocked } from "../../utils/blockUser"
+import ConversationsSkeletonLoader from "../../components/messages/ConversationsSkeletonLoader"
 
 
 const MessagesOverview = ({ navigation }) => {
     const { user, userData } = useContext(userContext)
+    const [conversations, setConversations] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
+    // grab messages on component mount or as prop
+    // for now they are implemented as test message props below
+    // note: structure will likely have to change
 
-    // on component focus, grab all of the conversations for that user
     useEffect(() => {
-        // make sure we have uid
         if (!user?.uid) return;
 
-        // function
-        setIsLoading(true);
+        // ONLY SET LOADING ON INIT FETCH
+        // onSnapshot handles the other stuff, but this prevents the loading flash
+        if (conversations.length === 0) {
+            setIsLoading(true);
+        }
+
         const q = query(
             collection(db, "conversations"),
             where("users", "array-contains", user.uid)
@@ -32,7 +40,6 @@ const MessagesOverview = ({ navigation }) => {
                 ...doc.data(),
             }));
 
-            // this returns an array of promises from the conversations
             const filterPromises = fetchedConversations.map(async (conv) => {
                 const otherUserID = conv.users.find(id => id !== user.uid)
                 const hasBlocked = await checkIfBlocked(user.uid, otherUserID)
@@ -43,43 +50,24 @@ const MessagesOverview = ({ navigation }) => {
                 }
             })
 
-            // filter out conversations that we arent allowed to view or ones that are empty
             const filterResults = await Promise.all(filterPromises);
             const filteredConversations = filterResults
                 .filter((result) => result.isAllowed && result.conv.lastMessage && result.conv.lastMessage !== "")
                 .map(result => result.conv)
+                .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-            // sort the conversations in last read order
-            setConversations(
-                filteredConversations.sort((a, b) => {
-                    // if timestamps are undefined this way we dont break them
-                    const bT = b.timestamp || 0;
-                    const aT = a.timestamp || 0;
-                    return bT - aT;
-                })
-            );
-            setIsLoading(false);
-
-        }, (error) => {
-            console.error("Error fetching conversations:", error);
+            setConversations(filteredConversations);
             setIsLoading(false);
         });
 
-        // cleanup
         return () => unsubscribe();
-    }, [user?.uid])
+    }, [user?.uid]);
 
-
-    // grab messages on component mount or as prop
-    // for now they are implemented as test message props below
-    // note: structure will likely have to change
-    const [conversations, setConversations] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
 
     if (isLoading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <LoadingSpinner />
+                <ConversationsSkeletonLoader />
             </View>
         )
     }

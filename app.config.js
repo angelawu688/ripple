@@ -51,7 +51,7 @@ export default () => ({
         origin: false
       },
       eas: {
-        projectId: "a6b6a98c-bdbb-4cbc-ba6a-9d850d1ecdf1"
+        projectId: "a6b6a98c-bdbb-4cbc-ba6a-9d850d1ecdf1" // DO NOT CHANGE
       },
       APIKEY: process.env.REACT_APP_APIKEY,
       AUTHDOMAIN: process.env.REACT_APP_AUTHDOMAIN,

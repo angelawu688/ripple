@@ -30,7 +30,8 @@ export async function registerForPushNotificationsAsync(userID) {
             await updateDoc(userRef, { expoPushToken: token })
         } else {
             // this should only happen if they decline the request
-            Alert.alert('failed to get push token for notification')
+            // TODO FIGURE OUT WHY THIS IS
+            // Alert.alert('failed to get push token for notification')
         }
     } else {
         Alert.alert('Dont do this on a simulator')

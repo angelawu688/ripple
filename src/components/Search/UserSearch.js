@@ -9,7 +9,12 @@ import { TouchableWithoutFeedback } from 'react-native'
 import { Keyboard } from 'react-native'
 
 
-export default function UserSearch({ navigation, query, loadingUserSearch, userSearchResults, displayUserSearchResults }) {
+export default function UserSearch({ navigation,
+    query,
+    loadingUserSearch,
+    userSearchResults,
+    displayUserSearchResults = []
+}) {
     if (loadingUserSearch) {
         return <RecentSearchSkeletonLoader />
     }
@@ -27,6 +32,7 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                         <FlatList
                             keyboardDismissMode="on-drag"
                             data={userSearchResults}
+
                             renderItem={({ item, index }) => {
                                 return (
                                     <UserResultCard
@@ -46,9 +52,11 @@ export default function UserSearch({ navigation, query, loadingUserSearch, userS
                     onPress={() => Keyboard.dismiss()
                     }
                 >
-                    {!query && (<Recommendations
-                        navigation={navigation}
-                    />)}
+                    <View style={{ flex: 1 }}>
+                        {!query && (<Recommendations
+                            navigation={navigation}
+                        />)}
+                    </View>
                 </TouchableWithoutFeedback>
             )}
         </View>
